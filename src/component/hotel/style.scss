@@ -1,0 +1,14 @@
+.box {
+    position: absolute;
+    animation: GFG 7s infinite linear;
+}
+
+@keyframes GFG {
+    0% {
+        right: 10px
+    }
+
+    100% {
+        right: 200px
+    }
+}
