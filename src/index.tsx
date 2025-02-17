@@ -18,7 +18,7 @@ ReactDOM.render(
                     components: {
                         Table: {
                             cellPaddingInline: 0,
-                            cellPaddingBlock: 5
+                            cellPaddingBlock: 0
                         }
                     }
                 }}

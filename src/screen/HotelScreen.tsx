@@ -1,11 +1,25 @@
 import React, {useEffect, useState} from 'react';
-import {Button, DatePicker, Divider, Empty, Flex, message, Slider, SliderSingleProps, Spin, Switch} from 'antd';
+import {
+    Button,
+    DatePicker,
+    Divider,
+    Dropdown,
+    Empty,
+    Flex,
+    MenuProps,
+    message,
+    Slider,
+    SliderSingleProps,
+    Spin,
+    Switch,
+    Table
+} from 'antd';
 import {useNavigate, useParams} from "react-router-dom";
 import {flatAPI} from "../service/FlatService";
 import {FlatModel} from "../model/FlatModel";
 import {FlatCard} from "../component/hotel/FlatCard";
 import {FlatModal} from "../component/hotel/FlatModal";
-import {AppstoreOutlined, BorderlessTableOutlined, LeftOutlined, UserAddOutlined, UsergroupAddOutlined} from "@ant-design/icons";
+import {LeftOutlined, UserAddOutlined, UsergroupAddOutlined} from "@ant-design/icons";
 import Search from 'antd/lib/input/Search';
 import {RoomModel} from "../model/RoomModel";
 import {GuestModel} from "../model/GuestModel";
@@ -16,6 +30,7 @@ import {NotCheckoutedModal} from "../component/hotel/NotCheckoutedModal";
 import {ThirdFloorPlanModal} from "../component/hotel/ThirdFloorPlanModal";
 import {GuestModal} from "../component/dict/GuestModal";
 import {ManyGuestModal} from "../component/hotel/ManyGuestModal";
+import {TableView} from "../component/hotel/TableView";
 
 const HotelScreen: React.FC = () => {
 
@@ -40,6 +55,7 @@ const HotelScreen: React.FC = () => {
     const [chessDateRange, setChessDateRange] = useState<Dayjs[]>([dayjs(), dayjs().add(14, 'days')]);
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleManyGuestModal, setVisibleManyGuestModal] = useState(false);
+    const [selectedView, setSelectedView] = useState<string>("1");
     // -----
 
     // Useful utils
@@ -49,6 +65,20 @@ const HotelScreen: React.FC = () => {
     const showSuccessMsg = (msg: string) => {
         messageApi.success(msg);
     };
+    const viewItemsButton = [
+        {
+            key: 0,
+            label: 'Таблица',
+        },
+        {
+            key: 1,
+            label: 'Карточки',
+        },
+        {
+            key: 2,
+            label: 'Шахматка',
+        },
+    ];
     // -----
 
     // Web requests
@@ -130,6 +160,9 @@ const HotelScreen: React.FC = () => {
     // -----
 
     // Handlers
+    const onViewButtonClick: MenuProps['onClick'] = (e) => {
+        setSelectedView(e.key);
+    };
     const searchGuestHandler = () => {
         if (flatsData) {
             if (searchText.length === 0) {
@@ -139,8 +172,7 @@ const HotelScreen: React.FC = () => {
             let res = flatsData.filter((flat: FlatModel) => {
                 let flats = flat.rooms.filter((room: RoomModel) => {
                     let res: GuestModel | undefined = room.guests.find((guest: GuestModel) => guest.lastname?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1 || guest.firstname?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1 || guest.secondName?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1);
-                    if (res) return true;
-                    else return false;
+                    return !!res;
                 });
                 if (flats.length > 0) return true;
                 else return false;
@@ -212,10 +244,14 @@ const HotelScreen: React.FC = () => {
                         <Button style={{marginRight: 10, height: dividerHeight}} icon={<LeftOutlined/>} type={'primary'} onClick={() => navigate(-1)}></Button>
                         <Flex vertical style={{width: 260}}>
                             <Button style={{marginBottom: 5}} onClick={() => setNotCheckoutedModalVisible(true)}>Список не выселенных</Button>
-                            {chessMode ?
-                                <Button icon={<AppstoreOutlined/>} onClick={() => setChessMode(false)}>Карточки</Button> :
-                                <Button icon={<BorderlessTableOutlined/>} onClick={() => setChessMode(true)}>Шахматка</Button>
-                            }
+                            <Dropdown.Button menu={{ items: viewItemsButton, onClick: onViewButtonClick }}>
+                                <div style={{width: 197}}>
+                                    Выбран режим:
+                                    {selectedView === "0" && " Таблица"}
+                                    {selectedView === "1" && " Карточки"}
+                                    {selectedView === "2" && " Шахматка"}
+                                </div>
+                            </Dropdown.Button>
                             {!chessMode &&
                                 <Flex style={{marginTop: 5}}>
                                     <DatePicker
@@ -258,7 +294,7 @@ const HotelScreen: React.FC = () => {
                         </Button>
                     </Flex>
                     <Divider style={{height: dividerHeight}} type={'vertical'}/>
-                    {!chessMode && <>
+                    {selectedView !== "2" && <>
                         <Flex align={'center'} vertical={true}>
                             <Search style={{marginBottom: 10, width: 300}} size={'middle'} value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder={'Поиск комнаты жильца'}
                                     onSearch={searchGuestHandler}/>
@@ -271,13 +307,13 @@ const HotelScreen: React.FC = () => {
                     </>
                     }
                 </Flex>
-                {!chessMode &&
+                {selectedView === "1" &&
                     <Flex justify={'center'} align={'center'} style={{width: window.innerWidth}}>
                         <Slider onChange={onSliderChange} defaultValue={49} step={7} style={{width: '93%'}} marks={dateMarks} min={0} max={98}/>
                     </Flex>
                 }
                 <Divider style={{marginTop: 0, marginBottom: 5}}/>
-                {!chessMode ?
+                {(selectedView == "1") &&
                     <>{[1, 2, 3, 4, 5, 6].map((floorNumber: number) => {
                         let flatCount = flats?.filter((f: FlatModel) => f.floor === floorNumber)?.length;
                         if (flatCount)
@@ -337,11 +373,19 @@ const HotelScreen: React.FC = () => {
                                         }}>Сбросить поиск</Button>
                                     </Flex>)}/>
                             </Flex>
-                        }</>
-                    : <>
-                        {id && <CellsView chessDateRange={chessDateRange} setChessDateRange={setChessDateRange} selectedDate={selectedDate} hotelId={id}/>}
+                        }
                     </>
-
+                }
+                {(id && selectedView==='2') && <CellsView chessDateRange={chessDateRange} setChessDateRange={setChessDateRange} selectedDate={selectedDate} hotelId={id}/>}
+                {(selectedView === '0') &&
+                <Flex>
+                    <TableView
+                        flatsData={flats}
+                        selectedDate={selectedDate}
+                        setVisibleGuestModal={setVisibleGuestModal}
+                        visibleGuestModal={visibleGuestModal}
+                    />
+                </Flex>
                 }
             </Flex>
         );

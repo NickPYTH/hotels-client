@@ -183,6 +183,8 @@ export const CellsView = (props: ModalPros) => {
                                 let dateTime: string[] = val.split('#')[0]?.split('&')[1].split(' :: ');
                                 return (<Flex vertical={false}>
                                     <div style={{
+                                        marginTop: 3,
+                                        marginBottom: 3,
                                         cursor: 'pointer',
                                         background: '#1677ff',
                                         width: Math.abs(percent) + 43 == 143 ? '100%' : Math.abs(percent) + 43*(percent/100),
@@ -195,7 +197,7 @@ export const CellsView = (props: ModalPros) => {
                                         borderTopLeftRadius: percent > 0 && percent < 100 ? 8 : 0,
                                         position: percent > 0 && percent < 100 ? 'absolute' : 'inherit',
                                         right: 0,
-                                        top: 5
+                                        top: 0
                                     }}>
                                         <Flex justify="center" align="center">
                                             <Popconfirm onConfirm={() => {
@@ -222,6 +224,8 @@ export const CellsView = (props: ModalPros) => {
                                 return (<Flex vertical={false}>
                                     <>
                                         <div style={{
+                                            marginTop: 3,
+                                            marginBottom: 3,
                                             cursor: 'pointer',
                                             background: '#1677ff',
                                             height: 25,
@@ -239,7 +243,6 @@ export const CellsView = (props: ModalPros) => {
                                                             title={`${personLeft.split('#')[0]} ${record.post !== undefined ? `- ${record.post}` : ""}`}
                                                             description={`Даты проживания ${personLeft.split('#')[0].split('&')[1]}`}>
                                                     <div style={{paddingTop: 4, width: Math.abs(personLeftPercent) + 43*(personLeftPercent/100), height: 25}}>
-                                                        {/*{`${personLeft.split('#')[0]}`}*/}
                                                     </div>
                                                 </Popconfirm>
                                             </Flex>
@@ -250,7 +253,7 @@ export const CellsView = (props: ModalPros) => {
                                             borderBottomLeftRadius: 8,
                                             borderTopLeftRadius: 8,
                                             width: Math.abs(personRightPercent) + 43*(personRightPercent/100),
-                                            position: 'absolute', right: 0,
+                                            position: 'absolute', right: 0
                                         }}>
                                             <Flex justify="center" align="center">
                                                 <Popconfirm onConfirm={() => {

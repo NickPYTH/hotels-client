@@ -11,7 +11,6 @@ import Male from "../../assets/male.png";
 import Female from "../../assets/female.png";
 import dayjs, {Dayjs} from "dayjs";
 import {GuestModal} from "../dict/GuestModal";
-import {flatAPI} from "../../service/FlatService";
 
 type CardProps = {
     flat: FlatModel,
@@ -133,9 +132,6 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                         <div>
                             Этаж {flat.floor}
                         </div>
-                        {/*<div>*/}
-                        {/*    Статус <Tag color={flat.statusId === 1 ? "blue" : "red"}>{flat.status}</Tag>*/}
-                        {/*</div>*/}
                         <Button type={'primary'} style={{marginTop: 10, width: 118}} onClick={() => {
                             setVisible(true);
                             setSelectedFlatId(flat.id);
