@@ -1,12 +1,17 @@
 import '../../index.scss';
-import {Button, DatePicker, Flex, Popconfirm, Skeleton, Table} from 'antd';
+import {Button, DatePicker, Flex, Popconfirm, Popover, Skeleton, Table} from 'antd';
 import dayjs, {Dayjs} from 'dayjs';
 import React, {useEffect, useRef, useState} from 'react';
 import {flatAPI} from "../../service/FlatService";
 import {FlatModal} from "./FlatModal";
-import {FlatModel} from "../../model/FlatModel";
 import Search from "antd/lib/input/Search";
 import {GuestModal} from "../dict/GuestModal";
+import {CellsViewSettingsModal} from "./CellsViewSettingsModal";
+import {SettingOutlined} from "@ant-design/icons";
+//@ts-ignore
+import Male from "../../assets/maleSVG.svg";
+//@ts-ignore
+import Female from "../../assets/femaleSVG.svg";
 
 const {RangePicker} = DatePicker;
 
@@ -55,6 +60,15 @@ export const CellsView = (props: ModalPros) => {
     const [columns, setColumns] = useState<any[] | null>(null);
     const [isFilialUEZS, setIsFilialUEZS] = useState(() => props.hotelId === '182' || props.hotelId === '183' || props.hotelId === '184' || props.hotelId === '327');
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
+    const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(false);
+    const [cellsColor, setCellsColor] = useState(() => {
+        if (localStorage.getItem("cellsColor")) return localStorage.getItem('cellsColor');
+        return "#75a5f2";
+    });
+    const [fontColor, setFontColor] = useState(() => {
+        if (localStorage.getItem("fontColor")) return localStorage.getItem('fontColor');
+        return "#fff";
+    });
     // -----
 
     // Web requests
@@ -66,8 +80,7 @@ export const CellsView = (props: ModalPros) => {
 
     // Effects
     useEffect(() => {
-        if (props.hotelId)
-            getAllFlats({hotelId: props.hotelId, dateStart: props.chessDateRange[0].format("DD-MM-YYYY"), dateFinish: props.chessDateRange[1].format("DD-MM-YYYY")});
+        if (props.hotelId) getAllFlats({hotelId: props.hotelId, dateStart: props.chessDateRange[0].format("DD-MM-YYYY"), dateFinish: props.chessDateRange[1].format("DD-MM-YYYY")});
     }, []);
     useEffect(() => {
         if (flatsData)
@@ -88,7 +101,7 @@ export const CellsView = (props: ModalPros) => {
                     width: 80,
                     render: (val: any) => {
                         if (val) {
-                            return (<div style={{cursor: 'pointer', background: '#337ab7', width: 80, height: 25, padding: 5}}>
+                            return (<div style={{cursor: 'pointer', background: cellsColor, width: 80, height: 25, padding: 5}}>
                                 {el}
                             </div>);
                         } else return <></>;
@@ -178,18 +191,22 @@ export const CellsView = (props: ModalPros) => {
                     width: 143,
                     render: (val: any, record: any) => {
                         if (val) {
-                            if (val.split('||').length === 1) {
-                                let percent = val.split('#')[1]; // ТЕЛКОВ В. В. -. -.&02-02-2025 17:00-09-02-2025 09:00#29
-                                let dateTime: string[] = val.split('#')[0]?.split('&')[1].split(' :: ');
+                            if (val.split('||').length === 1) { // Если ячейка с одним жильцом
+                                let percent = val.split('#')[1]; // ТЕЛКОВ В. В.&02-02-2025 17:00-09-02-2025 09:00#29   <-- Формат строки
+                                let fio = val.split('#')[0].split('&')[0];
+                                let dateTime: string[] = val.split('#')[0].split('&')[1].split(' :: ');
+                                let male = val.split('#')[0].split('&')[2];
+                                let note = val.split('#')[0].split('&')[3] == 'null' ? "" : val.split('#')[0].split('&')[3];
+                                let post = record.post !== undefined ? `${record.post}` : "";
                                 return (<Flex vertical={false}>
                                     <div style={{
                                         marginTop: 3,
                                         marginBottom: 3,
                                         cursor: 'pointer',
-                                        background: '#1677ff',
-                                        width: Math.abs(percent) + 43 == 143 ? '100%' : Math.abs(percent) + 43*(percent/100),
+                                        background: cellsColor,
+                                        width: Math.abs(percent) + 43 == 143 ? '100%' : Math.abs(percent) + 43*(Math.abs(percent)/100),
                                         height: 25,
-                                        color: 'white',
+                                        color: fontColor,
                                         fontSize: 10,
                                         borderBottomRightRadius: percent < 0 ? 8 : 0,
                                         borderTopRightRadius: percent < 0 ? 8 : 0,
@@ -207,16 +224,36 @@ export const CellsView = (props: ModalPros) => {
                                                 else
                                                     setSelectedDate(dayjs((percent > 0 && percent < 100) ? dateTime[0] : dateTime[1], "DD-MM-YYYY HH:mm"));
                                             }} cancelText={"Отмена"} okText={"Открыть"}
-                                                        title={`${val.split('#')[0].split('&')[0]} ${record.post !== undefined ? `- ${record.post}` : ""}`}
+                                                        title={`${fio} ${post}`}
                                                         description={`Даты проживания ${val.split('#')[0].split('&')[1]}`}>
-                                                <div style={{paddingTop: 4, width: '100%', height: 25}}>
-                                                    {Math.abs(percent) === 100 ? val.split('#')[0].split('&')[0] : ""}
-                                                </div>
+                                                <Popover placement={'left'} title={`${fio}`} content={() => (<Flex vertical={true}>
+                                                    <div>{post}</div>
+                                                    <div>{val.split('#')[0].split('&')[1]}</div>
+                                                    <div>{note}</div>
+                                                    </Flex>)}>
+                                                    {Math.abs(percent) === 100 ?
+                                                    <div style={{paddingTop: 4, width: '100%', height: 25}}>
+
+                                                    </div> :
+                                                    <div style={{position: 'absolute', width: 100, top: 7, left: Math.abs(percent) > 60 ? 0 : -(fio.length+16)*1.5 }}>
+                                                        {percent < 0 && Math.abs(percent) !== 100 &&
+                                                            <Flex vertical={false} align={'start'} justify={'center'}>
+                                                                {male == 'true' ?
+                                                                    <img style={{marginRight: 3}} width={15} height={15} src={Male}/>
+                                                                    :
+                                                                    <img style={{marginRight: 3}} width={15} height={15} src={Female}/>
+                                                                }
+                                                                {val.split('#')[0].split('&')[0]}
+                                                            </Flex>
+                                                        }
+                                                    </div>
+                                                }
+                                                </Popover>
                                             </Popconfirm>
                                         </Flex>
                                     </div>
                                 </Flex>)
-                            } else {
+                            } else {  // Если ячейка с двумя жильцами
                                 let personLeft = val.split('||')[0];
                                 let personRight = val.split('||')[1];
                                 let personLeftPercent = Math.abs(personLeft.split('#')[1]);
@@ -227,13 +264,13 @@ export const CellsView = (props: ModalPros) => {
                                             marginTop: 3,
                                             marginBottom: 3,
                                             cursor: 'pointer',
-                                            background: '#1677ff',
+                                            background: cellsColor,
                                             height: 25,
-                                            color: 'white',
+                                            color: fontColor,
                                             fontSize: 10,
                                             borderBottomRightRadius: 8,
                                             borderTopRightRadius: 8,
-                                            width: Math.abs(personLeftPercent) + 43*(personLeftPercent/100),
+                                            width: Math.abs(personLeftPercent) + 43*(Math.abs(personLeftPercent)/100),
                                         }}>
                                             <Flex justify="center" align="center">
                                                 <Popconfirm onConfirm={() => {
@@ -242,17 +279,17 @@ export const CellsView = (props: ModalPros) => {
                                                 }} cancelText={"Отмена"} okText={"Открыть"}
                                                             title={`${personLeft.split('#')[0]} ${record.post !== undefined ? `- ${record.post}` : ""}`}
                                                             description={`Даты проживания ${personLeft.split('#')[0].split('&')[1]}`}>
-                                                    <div style={{paddingTop: 4, width: Math.abs(personLeftPercent) + 43*(personLeftPercent/100), height: 25}}>
+                                                    <div style={{paddingTop: 4, width: Math.abs(personLeftPercent) + 43*(Math.abs(personLeftPercent)/100), height: 25}}>
                                                     </div>
                                                 </Popconfirm>
                                             </Flex>
                                         </div>
                                         <div style={{width: 3}}></div>
                                         <div style={{
-                                            cursor: 'pointer', background: '#1677ff', height: 25, color: 'white', fontSize: 10,
+                                            cursor: 'pointer', background: cellsColor, height: 25, color: fontColor, fontSize: 10,
                                             borderBottomLeftRadius: 8,
                                             borderTopLeftRadius: 8,
-                                            width: Math.abs(personRightPercent) + 43*(personRightPercent/100),
+                                            width: Math.abs(personRightPercent) + 43*(Math.abs(personRightPercent)/100),
                                             position: 'absolute', right: 0
                                         }}>
                                             <Flex justify="center" align="center">
@@ -262,7 +299,7 @@ export const CellsView = (props: ModalPros) => {
                                                 }} cancelText={"Отмена"} okText={"Открыть"}
                                                             title={`${personRight.split('#')[0].split('&')[0]} ${record.post2 !== undefined ? `- ${record.post2}` : ""}`}
                                                             description={`Даты проживания ${personRight.split('#')[0].split('&')[1]}`}>
-                                                    <div style={{paddingTop: 4, width: Math.abs(personRightPercent) + 43*(personRightPercent/100), height: 25}}></div>
+                                                    <div style={{paddingTop: 4, width: Math.abs(personRightPercent) + 43*(Math.abs(personRightPercent)/100), height: 25}}></div>
                                                 </Popconfirm>
                                             </Flex>
                                         </div>
@@ -301,6 +338,7 @@ export const CellsView = (props: ModalPros) => {
 
     return (
         <>
+            <CellsViewSettingsModal visible={visibleCellsViewSettings} setVisible={setVisibleCellsViewSettings}/>
             {visibleGuestModal &&
                 <GuestModal
                     filialId={filialId}
@@ -320,20 +358,23 @@ export const CellsView = (props: ModalPros) => {
                     setSelectedDate(null);
                 }}/>
             }
-            <Flex vertical={false}>
-                {/*//@ts-ignore*/}
-                <RangePicker style={{margin: 15}} format={"DD-MM-YYYY"} value={props.chessDateRange} onChange={(e) => {
-                    props.setChessDateRange(e as any)
-                }}/>
-                <Flex align={'center'} vertical={false}>
-                    <Search ref={searchInputRef} style={{width: 300}} size={'middle'}
-                            placeholder={'Поиск комнаты жильца'}
-                            onSearch={searchGuestHandler}/>
-                    <Button style={{marginLeft: 5, width: 170}} size={'middle'} type={'primary'} onClick={() => {
-                        setData(flatsData ?? []);
-                        if (searchInputRef) searchInputRef.current.input.value = "";
-                    }}>Сбросить поиск</Button>
+            <Flex vertical={false} justify={'space-between'} style={{width: window.innerWidth-10}}>
+                <Flex vertical={false}>
+                    {/*//@ts-ignore*/}
+                    <RangePicker style={{margin: 15}} format={"DD-MM-YYYY"} value={props.chessDateRange} onChange={(e) => {
+                        props.setChessDateRange(e as any)
+                    }}/>
+                    <Flex align={'center'} vertical={false}>
+                        <Search ref={searchInputRef} style={{width: 300}} size={'middle'}
+                                placeholder={'Поиск комнаты жильца'}
+                                onSearch={searchGuestHandler}/>
+                        <Button style={{marginLeft: 5, width: 170}} size={'middle'} type={'primary'} onClick={() => {
+                            setData(flatsData ?? []);
+                            if (searchInputRef) searchInputRef.current.input.value = "";
+                        }}>Сбросить поиск</Button>
+                    </Flex>
                 </Flex>
+                <Button icon={<SettingOutlined />} onClick={() => setVisibleCellsViewSettings(true)}/>
             </Flex>
             {(data && columns && !isFlatsLoading) ?
                 <MemoizedChess data={data} columns={columns} isFilialUEZS={isFilialUEZS}/> :

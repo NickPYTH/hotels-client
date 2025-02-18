@@ -28,7 +28,7 @@ export function buildLoaders({isDev, paths}: BuildOptions): webpack.RuleSetRule[
     }
 
     const fileLoader = {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpe?g|gif|svg)$/i,
         use: [
             {
                 loader: 'file-loader',

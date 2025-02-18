@@ -1,6 +1,6 @@
 import {Badge, Button, Flex, Popconfirm, Table, TableProps, Tooltip} from "antd";
 import {FlatModel} from "../../model/FlatModel";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {RoomModel} from "../../model/RoomModel";
 import {GuestModal} from "../dict/GuestModal";
 import {ClockCircleOutlined, HomeOutlined, LockOutlined} from "@ant-design/icons";
@@ -10,6 +10,7 @@ import dayjs, {Dayjs} from "dayjs";
 import Male from "../../assets/male.png";
 //@ts-ignore
 import Female from "../../assets/female.png";
+import {FlatModal} from "./FlatModal";
 
 type ModalProps = {
     flatsData: FlatModel[],
@@ -22,6 +23,14 @@ export const TableView = (props:ModalProps) => {
 
     // States
     const [selectedGuest, setSelectedGuest] = useState<GuestModel | null>(null);
+    const [selectedFlatId, setSelectedFlatId] = useState<number | null> (null);
+    const [flatModalVisible,setFlatModalVisible] = useState(false);
+    // -----
+
+    // Effects
+    useEffect(() => {
+        if (!flatModalVisible) setSelectedFlatId(null);
+    }, [flatModalVisible]);
     // -----
 
     // Useful utils
@@ -203,7 +212,10 @@ export const TableView = (props:ModalProps) => {
             render: (_, flat) => {
                 return(
                     <Flex vertical={true}>
-                        <Button style={{margin: 5, width: 200}}>Открыть</Button>
+                        <Button onClick={() => {
+                            setSelectedFlatId(flat.id);
+                            setFlatModalVisible(true);
+                        }} style={{margin: 5, width: 200}}>Открыть</Button>
                     </Flex>
                 )
             }
@@ -213,6 +225,9 @@ export const TableView = (props:ModalProps) => {
 
     return(
         <Flex>
+            {selectedFlatId &&
+                <FlatModal date={props.selectedDate} flatId={selectedFlatId} visible={flatModalVisible} setVisible={setFlatModalVisible} />
+            }
             <Table
                 bordered={true}
                 style={{width: '100vw'}}

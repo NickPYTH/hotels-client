@@ -81,8 +81,8 @@ export const GuestModal = (props: ModalProps) => {
     const [rooms, setRooms] = useState<RoomModel[]>([]); // Перечень доступных для выбора комнат
     const [selectedBedId, setSelectedBedId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.bedId : null); // ИД выбранного места (койко-места)
     const [beds, setBeds] = useState<BedModel[]>([]); // Перечень доступных для выбора мест
+    const [note, setNote] = useState("");
     const [visibleSelectGuestModal, setVisibleSelectGuestModal] = useState(false);  // Окно выбора проживающего из ранее заселенных жильцов для авто аполнения данных
-
     const [visibleHistoryModal, setVisibleHistoryModal] = useState(false); // Видимость модального окна и историей изменений карточки
     const [visibleExtrasModal, setVisibleExtrasModal] = useState(false); // Видимость модального окна с доп. услугами (только для Ермака)
     // -----
@@ -236,6 +236,7 @@ export const GuestModal = (props: ModalProps) => {
             setMale(props.selectedGuest.male);
             if (props.selectedGuest.contractId)
                 setSelectedContractId(props.selectedGuest.contractId);
+            setNote(props.selectedGuest.note);
             getAllExtras(props.selectedGuest.id);
         }
     }, [props.selectedGuest]);
@@ -313,6 +314,7 @@ export const GuestModal = (props: ModalProps) => {
                             dateStart: updatedGuest.dateStart,
                             dateFinish: updatedGuest.dateFinish,
                             bedName: updatedGuest.bedName,
+                            note: updatedGuest.note,
                         }
                         : p));
                 }
@@ -345,6 +347,7 @@ export const GuestModal = (props: ModalProps) => {
                             regPoMestu: createdGuest.regPoMestu,
                             dateStart: createdGuest.dateStart,
                             dateFinish: createdGuest.dateFinish,
+                            note: createdGuest.note,
                         }
                         : p));
                 }
@@ -411,7 +414,7 @@ export const GuestModal = (props: ModalProps) => {
                 bedId: selectedBedId, // По этому полю происходит заселение по цепочке тянутся остальные
                 id: null,
                 lastname: lastname ? lastname.trim(): null,
-                note: "",
+                note,
                 secondName: secondName ? secondName.trim(): null,
                 roomId: selectedRoomId,
                 roomName: "",
@@ -721,6 +724,10 @@ export const GuestModal = (props: ModalProps) => {
                         onClear={() => selectBedHandler()}
                         options={beds.map((bed: BedModel) => ({value: bed.id, label: bed.name}))}
                     />
+                </Flex>
+                <Flex align={"center"}>
+                    <div style={{width: 220}}>Примечание</div>
+                    <Input value={note} onChange={(e) => setNote(e.target.value)}/>
                 </Flex>
             </Flex>
         </Modal>
