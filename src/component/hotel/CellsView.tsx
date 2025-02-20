@@ -67,7 +67,7 @@ export const CellsView = (props: ModalPros) => {
     });
     const [fontColor] = useState(() => {
         if (localStorage.getItem("fontColor")) return localStorage.getItem('fontColor');
-        return "#fff";
+        return "#000";
     });
     const [columnWidth] = useState(() => {
         if (localStorage.getItem("columnWidth")) return parseInt(localStorage.getItem('columnWidth'));
@@ -203,6 +203,7 @@ export const CellsView = (props: ModalPros) => {
                             if (val.split('||').length === 1) { // Если ячейка с одним жильцом
                                 let percent = val.split('#')[1]; // ТЕЛКОВ В. В.&02-02-2025 17:00-09-02-2025 09:00#29   <-- Формат строки
                                 let fio = val.split('#')[0].split('&')[0];
+                                let datesRange = val.split('#')[0].split('&')[1];
                                 let dateTime: string[] = val.split('#')[0].split('&')[1].split(' :: ');
                                 let male = val.split('#')[0].split('&')[2];
                                 let note = val.split('#')[0].split('&')[3] == 'null' ? "" : val.split('#')[0].split('&')[3];
@@ -236,40 +237,58 @@ export const CellsView = (props: ModalPros) => {
                                             }} cancelText={"Отмена"} okText={"Открыть"}
                                                         title={`${fio} ${post}`}
                                                         description={`Даты проживания ${val.split('#')[0].split('&')[1]}`}>
-                                                <Popover placement={'left'} title={`${fio}`} content={() => (<Flex vertical={true}>
+                                                <Popover placement={'bottom'} title={`${fio}`} content={() => (<Flex vertical={true}>
                                                     <div>{post}</div>
-                                                    <div>{val.split('#')[0].split('&')[1]}</div>
+                                                    <div>{datesRange}</div>
                                                     <div>{note}</div>
                                                     </Flex>)}>
                                                     {Math.abs(percent) === 100 ?
-                                                    <div style={{paddingTop: 4, width: '100%', height: 25}}>
-
-                                                    </div> :
-                                                    <div style={{position: 'absolute', width: columnWidth, top: 7, left: -(columnWidth-Math.abs(percent))}}>
-                                                        {percent < 0 && Math.abs(percent) !== 100 &&
-                                                            <Flex vertical={false} align={'start'} justify={'center'}>
-                                                                {male == 'true' ?
-                                                                    <img style={{marginRight: 3}} width={15} height={15} src={Male}/>
-                                                                    :
-                                                                    <img style={{marginRight: 3}} width={15} height={15} src={Female}/>
-                                                                }
-                                                                {val.split('#')[0].split('&')[0]}
-                                                            </Flex>
-                                                        }
-                                                    </div>
+                                                        <div style={{paddingTop: 4, width: '100%', height: 25}}></div>
+                                                        :
+                                                        <div style={{position: 'absolute', width: columnWidth, top: 7, left: -((columnWidth - (coloredWidth as unknown as number)))}}>
+                                                            {percent < 0 ?
+                                                                <Flex vertical={false} align={'start'} justify={'center'}>
+                                                                    {male == 'true' ?
+                                                                        <img style={{marginRight: 3}} width={15} height={15} src={Male} alt={'man'}/>
+                                                                        :
+                                                                        <img style={{marginRight: 3}} width={15} height={15} src={Female} alt={'woman'}/>
+                                                                    }
+                                                                    {fio}
+                                                                </Flex>
+                                                                :
+                                                                <div style={{position: 'absolute', right:0, width: coloredWidth, height: 25}}/>
+                                                            }
+                                                        </div>
                                                 }
                                                 </Popover>
                                             </Popconfirm>
                                         </Flex>
                                     </div>
                                 </Flex>)
-                            } else {  // Если ячейка с двумя жильцами
+                            }
+                            else {  // Если ячейка с двумя жильцами
+
+                                // Разбор данных по жильцу в левой ячейке
                                 let personLeft = val.split('||')[0];
-                                let fioPersonLeft = val.split('||')[0].split('#')[0].split('&')[0];
+                                let fioPersonLeft = personLeft.split('#')[0].split('&')[0];
+                                let personLeftDates = personLeft.split('#')[0].split('&')[1];
+                                let personLeftMale = personLeft.split('#')[0].split('&')[2];
+                                let personLeftNote = personLeft.split('#')[0].split('&')[3] == 'null' ? "" : personLeft.split('#')[0].split('&')[3];
+                                let personLeftPost = personLeft.split('#')[0].split('&')[4];
+                                let personLeftPercent = Math.abs(personLeft.split('#')[1]);
+                                let coloredLeftWidth = Math.abs(personLeftPercent) + addedPixel*(Math.abs(personLeftPercent)/100);
+                                // -----
+
+                                // Разбор данных по жильцу в левой ячейке
                                 let personRight = val.split('||')[1];
                                 let fioPersonRight = val.split('||')[1].split('#')[0].split('&')[0];
-                                let personLeftPercent = Math.abs(personLeft.split('#')[1]);
+                                let personRightDates = personRight.split('#')[0].split('&')[1]
+                                let personRightNote = personRight.split('#')[0].split('&')[3] == 'null' ? "" : personRight.split('#')[0].split('&')[3];
+                                let personRightPost = personRight.split('#')[0].split('&')[4];
                                 let personRightPercent = Math.abs(personRight.split('#')[1]);
+                                let coloredRightWidth = Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100);
+                                // -----
+
                                 return (<Flex vertical={false}>
                                     <>
                                         <div style={{
@@ -282,17 +301,32 @@ export const CellsView = (props: ModalPros) => {
                                             fontSize,
                                             borderBottomRightRadius: 8,
                                             borderTopRightRadius: 8,
-                                            width: Math.abs(personLeftPercent) + 43*(Math.abs(personLeftPercent)/100),
+                                            width: coloredLeftWidth,
                                         }}>
                                             <Flex justify="center" align="center">
                                                 <Popconfirm onConfirm={() => {
                                                     setSelectedFlatId(record.sectionId);
-                                                    setSelectedDate(dayjs(record.dates2.split(" - ")[0], "DD-MM-YYYY HH:mm"));
+                                                    setSelectedDate(dayjs(personLeftDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
                                                 }} cancelText={"Отмена"} okText={"Открыть"}
-                                                            title={`${fioPersonLeft} ${record.post !== undefined ? `- ${record.post}` : ""}`}
-                                                            description={`Даты проживания ${personLeft.split('#')[0].split('&')[1]}`}>
-                                                    <div style={{paddingTop: 4, width: Math.abs(personLeftPercent) + 43*(Math.abs(personLeftPercent)/100), height: 25}}>
-                                                    </div>
+                                                            title={`${fioPersonLeft} ${personLeftPost}`}
+                                                            description={`Даты проживания ${personLeftDates}`}>
+                                                    <Popover placement={'bottom'} title={`${fioPersonLeft}`} content={() => (<Flex vertical={true}>
+                                                        <div>{personLeftPost}</div>
+                                                        <div>{personLeftDates}</div>
+                                                        <div>{personLeftNote}</div>
+                                                    </Flex>)}>
+                                                        <div style={{paddingTop: 4, width: Math.abs(personLeftPercent) + 43*(Math.abs(personLeftPercent)/100), height: 25}}>
+                                                            <Flex style={{position: "absolute", top: 6, left: -(coloredLeftWidth + fioPersonLeft.length*1.5), height: 25}}
+                                                                vertical={false} align={'start'} justify={'center'}>
+                                                                {personLeftMale == 'true' ?
+                                                                    <img style={{marginRight: 3}} width={15} height={15} src={Male} alt={'man'}/>
+                                                                    :
+                                                                    <img style={{marginRight: 3}} width={15} height={15} src={Female} alt={'woman'}/>
+                                                                }
+                                                                {fioPersonLeft}
+                                                            </Flex>
+                                                        </div>
+                                                    </Popover>
                                                 </Popconfirm>
                                             </Flex>
                                         </div>
@@ -303,25 +337,32 @@ export const CellsView = (props: ModalPros) => {
                                             cursor: 'pointer', background: cellsColor, height: 25, color: fontColor, fontSize,
                                             borderBottomLeftRadius: 8,
                                             borderTopLeftRadius: 8,
-                                            width: Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100),
+                                            width: coloredRightWidth,
                                             position: 'absolute', right: 0
                                         }}>
                                             <Flex justify="center" align="center">
                                                 <Popconfirm onConfirm={() => {
                                                     setSelectedFlatId(record.sectionId);
-                                                    setSelectedDate(dayjs(el, "DD-MM-YYYY"));
+                                                    setSelectedDate(dayjs(personRightDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
                                                 }} cancelText={"Отмена"} okText={"Открыть"}
-                                                            title={`${fioPersonRight} ${record.post2 !== undefined ? `- ${record.post2}` : ""}`}
-                                                            description={`Даты проживания ${personRight.split('#')[0].split('&')[1]}`}>
-                                                    <div style={{paddingTop: 6, width: Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100), height: 25}}></div>
-                                                </Popconfirm>
+                                                            title={`${fioPersonRight} ${personRightPost}`}
+                                                            description={`Даты проживания ${personRightDates}`}>
+                                                    <Popover placement={'bottom'} title={`${fioPersonRight}`} content={() => (<Flex vertical={true}>
+                                                        <div>{personRightPost}</div>
+                                                        <div>{personRightDates}</div>
+                                                        <div>{personRightNote}</div>
+                                                    </Flex>)}>
+                                                        <div style={{paddingTop: 6, width: Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100), height: 25}}></div>
+                                                    </Popover>
+                                                    </Popconfirm>
                                             </Flex>
                                         </div>
                                     </>
 
                                 </Flex>)
                             }
-                        } else return <Popconfirm title={'Добавить запись о проживании?'} okText={"Да"} cancelText={"Отмена"} onConfirm={() => {
+                        }
+                        else return <Popconfirm title={'Добавить запись о проживании?'} okText={"Да"} cancelText={"Отмена"} onConfirm={() => {
                             setFilialId(record.filialId);
                             setHotelId(record.hotelId);
                             setFlatId(record.sectionId);

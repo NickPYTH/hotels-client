@@ -67,7 +67,7 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
                 </Flex>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
                     <div style={{width: 200, marginRight: 15}}>Ширина столбцов</div>
-                    <InputNumber min={90} max={200} value={columnWidth} onChange={(value) => setColumnWidth(value)}/>
+                    <InputNumber min={101} max={200} value={columnWidth} onChange={(value) => setColumnWidth(value)}/>
                 </Flex>
             </Flex>
         </Modal>
