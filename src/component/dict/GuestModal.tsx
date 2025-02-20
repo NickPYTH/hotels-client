@@ -194,6 +194,7 @@ export const GuestModal = (props: ModalProps) => {
     }, [contractsFromRequest, selectedHotelId, isEmployee]);
     useEffect(() => {
         setContractsStep2(contracts);
+        if (contracts.length === 1) setSelectedContractId(contracts[0].id);
     }, [contracts])
     useEffect(() => {
         if (fioByTabnum) {

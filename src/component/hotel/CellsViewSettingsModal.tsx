@@ -26,13 +26,18 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
         if (localStorage.getItem("fontSize")) return parseInt(localStorage.getItem('fontSize'));
         return 10;
     });
+    const [cellBackgroundColor, setCellBackgroundColor] = useState(() => {
+        if (localStorage.getItem("cellBackgroundColor")) return localStorage.getItem('cellBackgroundColor');
+        return '#e1e1e1';
+    });
     // -----
 
     // Handlers
     const saveHandler = () => {
-        if (cellsColor != null && fontColor != null && columnWidth != null && fontSize != null) {
+        if (cellsColor != null && fontColor != null && columnWidth != null && fontSize != null && cellBackgroundColor != null) {
             localStorage.setItem("cellsColor", cellsColor);
             localStorage.setItem("fontColor", fontColor);
+            localStorage.setItem("cellBackgroundColor", cellBackgroundColor);
             localStorage.setItem("columnWidth", columnWidth.toString());
             localStorage.setItem("fontSize", fontSize.toString());
             window.location.reload();
@@ -40,6 +45,9 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
     }
     const updateCellsColor = (_, css:string) => {
         setCellsColor(css);
+    }
+    const updateCellBackgroundColor = (_, css:string) => {
+        setCellBackgroundColor(css);
     }
     const updateFontColor = (_, css:string) => {
         setFontColor(css);
@@ -56,6 +64,10 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
                     <div style={{width: 200, marginRight: 15}}>Цвет ячеек шахматки</div>
                     <ColorPicker value={cellsColor} onChange={updateCellsColor} defaultValue={cellsColor}/>
+                </Flex>
+                <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
+                    <div style={{width: 200, marginRight: 15}}>Цвет выходных дней</div>
+                    <ColorPicker value={cellBackgroundColor} onChange={updateCellBackgroundColor} defaultValue={cellBackgroundColor}/>
                 </Flex>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
                     <div style={{width: 200, marginRight: 15}}>Цвет текста в шахматке</div>

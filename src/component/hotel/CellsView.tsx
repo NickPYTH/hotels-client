@@ -1,5 +1,5 @@
 import '../../index.scss';
-import {Button, DatePicker, Flex, Popconfirm, Popover, Skeleton, Table} from 'antd';
+import {Button, DatePicker, Flex, Popconfirm, Popover, Segmented, Skeleton, Table} from 'antd';
 import dayjs, {Dayjs} from 'dayjs';
 import React, {useEffect, useRef, useState} from 'react';
 import {flatAPI} from "../../service/FlatService";
@@ -61,6 +61,34 @@ export const CellsView = (props: ModalPros) => {
     const [isFilialUEZS] = useState(() => props.hotelId === '182' || props.hotelId === '183' || props.hotelId === '184' || props.hotelId === '327');
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(false);
+    const [currentMonth, setCurrentMonth] = useState<string>(() => {
+        switch (props.selectedDate.month()) {
+            case 0:
+                return "Январь";
+            case 1:
+                return "Февраль";
+            case 2:
+                return "Март";
+            case 3:
+                return "Апрель";
+            case 4:
+                return "Май";
+            case 5:
+                return "Июнь";
+            case 6:
+                return "Июль";
+            case 7:
+                return "Август";
+            case 8:
+                return "Сентябрь";
+            case 9:
+                return "Октябрь";
+            case 10:
+                return "Ноябрь";
+            case 11:
+                return "Декабрь";
+        }
+    });
     const [cellsColor] = useState(() => {
         if (localStorage.getItem("cellsColor")) return localStorage.getItem('cellsColor');
         return "#75a5f2";
@@ -76,6 +104,10 @@ export const CellsView = (props: ModalPros) => {
     const [fontSize] = useState(() => {
         if (localStorage.getItem("fontSize")) return parseInt(localStorage.getItem('fontSize'));
         return 10;
+    });
+    const [cellBackgroundColor] = useState(() => {
+        if (localStorage.getItem("cellBackgroundColor")) return localStorage.getItem('cellBackgroundColor');
+        return '#e1e1e1';
     });
     // -----
 
@@ -127,7 +159,7 @@ export const CellsView = (props: ModalPros) => {
                         fixed: 'left',
                         title: 'Секция',
                         dataIndex: 'section',
-                        width: 50,
+                        width: 60,
                         onCell: (_: any, index: any) => {
                             let uniqSectionNames = data.reduce((acc, section: DataType) => {
                                 if (!acc.includes(section.section))
@@ -198,6 +230,9 @@ export const CellsView = (props: ModalPros) => {
                     dataIndex: `${el}`,
                     width: columnWidth,
                     render: (val: any, record: any) => {
+                        let dayOfWeek = dayjs(el, "DD-MM-YYYY").day();
+                        let isWeekend = false;
+                        if (dayOfWeek == 6 || dayOfWeek == 0) isWeekend = true;
                         if (val) {
                             let addedPixel = Math.abs(columnWidth-100);
                             if (val.split('||').length === 1) { // Если ячейка с одним жильцом
@@ -208,8 +243,9 @@ export const CellsView = (props: ModalPros) => {
                                 let male = val.split('#')[0].split('&')[2];
                                 let note = val.split('#')[0].split('&')[3] == 'null' ? "" : val.split('#')[0].split('&')[3];
                                 let post = val.split('#')[0].split('&')[4];
+                                let filial = val.split('#')[0].split('&')[5] == 'emptyF' ? "" : val.split('#')[0].split('&')[5];
                                 let coloredWidth = Math.abs(percent) + addedPixel == columnWidth ? '100%' : Math.abs(percent) + addedPixel*(Math.abs(percent)/100);
-                                return (<Flex vertical={false}>
+                                return (<Flex vertical={false} style={{background: isWeekend ? cellBackgroundColor : 'inherit', height: 31}}>
                                     <div style={{
                                         marginTop: 3,
                                         marginBottom: 3,
@@ -235,10 +271,10 @@ export const CellsView = (props: ModalPros) => {
                                                 else
                                                     setSelectedDate(dayjs((percent > 0 && percent < 100) ? dateTime[0] : dateTime[1], "DD-MM-YYYY HH:mm"));
                                             }} cancelText={"Отмена"} okText={"Открыть"}
-                                                        title={`${fio} ${post}`}
+                                                        title={`${fio} ${post} ${filial}`}
                                                         description={`Даты проживания ${val.split('#')[0].split('&')[1]}`}>
                                                 <Popover placement={'bottom'} title={`${fio}`} content={() => (<Flex vertical={true}>
-                                                    <div>{post}</div>
+                                                    <div>{post} {filial}</div>
                                                     <div>{datesRange}</div>
                                                     <div>{note}</div>
                                                     </Flex>)}>
@@ -275,6 +311,7 @@ export const CellsView = (props: ModalPros) => {
                                 let personLeftMale = personLeft.split('#')[0].split('&')[2];
                                 let personLeftNote = personLeft.split('#')[0].split('&')[3] == 'null' ? "" : personLeft.split('#')[0].split('&')[3];
                                 let personLeftPost = personLeft.split('#')[0].split('&')[4];
+                                let personLeftFilial = personLeft.split('#')[0].split('&')[5] == 'emptyF' ? "" : personLeft.split('#')[0].split('&')[5];
                                 let personLeftPercent = Math.abs(personLeft.split('#')[1]);
                                 let coloredLeftWidth = Math.abs(personLeftPercent) + addedPixel*(Math.abs(personLeftPercent)/100);
                                 // -----
@@ -285,11 +322,12 @@ export const CellsView = (props: ModalPros) => {
                                 let personRightDates = personRight.split('#')[0].split('&')[1]
                                 let personRightNote = personRight.split('#')[0].split('&')[3] == 'null' ? "" : personRight.split('#')[0].split('&')[3];
                                 let personRightPost = personRight.split('#')[0].split('&')[4];
+                                let personRightFilial = personRight.split('#')[0].split('&')[5] == 'emptyF' ? "" : personRight.split('#')[0].split('&')[5];
                                 let personRightPercent = Math.abs(personRight.split('#')[1]);
                                 let coloredRightWidth = Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100);
                                 // -----
 
-                                return (<Flex vertical={false}>
+                                return (<Flex vertical={false} style={{height: 31, background: isWeekend ? cellBackgroundColor : 'inherit'}}>
                                     <>
                                         <div style={{
                                             marginTop: 3,
@@ -308,10 +346,10 @@ export const CellsView = (props: ModalPros) => {
                                                     setSelectedFlatId(record.sectionId);
                                                     setSelectedDate(dayjs(personLeftDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
                                                 }} cancelText={"Отмена"} okText={"Открыть"}
-                                                            title={`${fioPersonLeft} ${personLeftPost}`}
+                                                            title={`${fioPersonLeft} ${personLeftPost} ${personLeftFilial}`}
                                                             description={`Даты проживания ${personLeftDates}`}>
                                                     <Popover placement={'bottom'} title={`${fioPersonLeft}`} content={() => (<Flex vertical={true}>
-                                                        <div>{personLeftPost}</div>
+                                                        <div>{personLeftPost} {personLeftFilial}</div>
                                                         <div>{personLeftDates}</div>
                                                         <div>{personLeftNote}</div>
                                                     </Flex>)}>
@@ -345,10 +383,10 @@ export const CellsView = (props: ModalPros) => {
                                                     setSelectedFlatId(record.sectionId);
                                                     setSelectedDate(dayjs(personRightDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
                                                 }} cancelText={"Отмена"} okText={"Открыть"}
-                                                            title={`${fioPersonRight} ${personRightPost}`}
+                                                            title={`${fioPersonRight} ${personRightPost} ${personRightFilial}`}
                                                             description={`Даты проживания ${personRightDates}`}>
                                                     <Popover placement={'bottom'} title={`${fioPersonRight}`} content={() => (<Flex vertical={true}>
-                                                        <div>{personRightPost}</div>
+                                                        <div>{personRightPost} {personRightFilial}</div>
                                                         <div>{personRightDates}</div>
                                                         <div>{personRightNote}</div>
                                                     </Flex>)}>
@@ -370,7 +408,7 @@ export const CellsView = (props: ModalPros) => {
                             setBedId(record.bedId);
                             setVisibleGuestModal(true);
                         }}>
-                            <div style={{cursor: 'pointer', width: "100%", height: 25}}></div>
+                            <div style={{cursor: 'pointer', width: "100%", height: 31, background: isWeekend ? cellBackgroundColor : 'inherit'}}></div>
                         </Popconfirm>
                     }
                 })));
@@ -387,6 +425,47 @@ export const CellsView = (props: ModalPros) => {
                     if (JSON.stringify(record).toLowerCase().indexOf(searchInputRef.current.input.value.toLowerCase()) > 0) return true;
                 });
             });
+        }
+    }
+    const updateCurrentMonthHandler = (value: string) => {
+        setCurrentMonth(value);
+        switch (value) {
+            case "Январь":
+                props.setChessDateRange([dayjs('01-01-2025', 'DD-MM-YYYY'), dayjs('31-01-2025', 'DD-MM-YYYY')])
+                break;
+            case "Февраль":
+                props.setChessDateRange([dayjs('01-02-2025', 'DD-MM-YYYY'), dayjs('28-02-2025', 'DD-MM-YYYY')])
+                break;
+            case "Март":
+                props.setChessDateRange([dayjs('01-03-2025', 'DD-MM-YYYY'), dayjs('31-03-2025', 'DD-MM-YYYY')])
+                break;
+            case "Апрель":
+                props.setChessDateRange([dayjs('01-04-2025', 'DD-MM-YYYY'), dayjs('30-01-2025', 'DD-MM-YYYY')])
+                break;
+            case "Май":
+                props.setChessDateRange([dayjs('01-05-2025', 'DD-MM-YYYY'), dayjs('31-01-2025', 'DD-MM-YYYY')])
+                break;
+            case "Июнь":
+                props.setChessDateRange([dayjs('01-06-2025', 'DD-MM-YYYY'), dayjs('30-06-2025', 'DD-MM-YYYY')])
+                break;
+            case "Июль":
+                props.setChessDateRange([dayjs('01-07-2025', 'DD-MM-YYYY'), dayjs('31-07-2025', 'DD-MM-YYYY')])
+                break;
+            case "Август":
+                props.setChessDateRange([dayjs('01-08-2025', 'DD-MM-YYYY'), dayjs('31-08-2025', 'DD-MM-YYYY')])
+                break;
+            case "Сентябрь":
+                props.setChessDateRange([dayjs('01-09-2025', 'DD-MM-YYYY'), dayjs('30-09-2025', 'DD-MM-YYYY')])
+                break;
+            case "Октябрь":
+                props.setChessDateRange([dayjs('01-10-2025', 'DD-MM-YYYY'), dayjs('30-10-2025', 'DD-MM-YYYY')])
+                break;
+            case "Ноябрь":
+                props.setChessDateRange([dayjs('01-11-2025', 'DD-MM-YYYY'), dayjs('30-11-2025', 'DD-MM-YYYY')])
+                break;
+            case "Декабрь":
+                props.setChessDateRange([dayjs('01-12-2025', 'DD-MM-YYYY'), dayjs('31-11-2025', 'DD-MM-YYYY')])
+                break;
         }
     }
     // -----
@@ -416,12 +495,12 @@ export const CellsView = (props: ModalPros) => {
             <Flex vertical={false} justify={'space-between'} style={{width: window.innerWidth-10}}>
                 <Flex vertical={false}>
                     {/*//@ts-ignore*/}
-                    <RangePicker style={{margin: 15}} format={"DD-MM-YYYY"} value={props.chessDateRange} onChange={(e) => {
+                    <RangePicker style={{marginLeft: 15, marginRight: 15}} format={"DD-MM-YYYY"} value={props.chessDateRange} onChange={(e) => {
                         props.setChessDateRange(e as any)
                     }}/>
                     <Flex align={'center'} vertical={false}>
                         <Search ref={searchInputRef} style={{width: 300}} size={'middle'}
-                                placeholder={'Поиск комнаты жильца'}
+                                placeholder={'Общий поиск комнаты жильца'}
                                 onSearch={searchGuestHandler}/>
                         <Button style={{marginLeft: 5, width: 170}} size={'middle'} type={'primary'} onClick={() => {
                             setData(flatsData ?? []);
@@ -431,6 +510,13 @@ export const CellsView = (props: ModalPros) => {
                 </Flex>
                 <Button icon={<SettingOutlined />} onClick={() => setVisibleCellsViewSettings(true)}/>
             </Flex>
+            <Segmented<string>
+                value={currentMonth}
+                block={true}
+                style={{width: window.innerWidth, margin: 0}}
+                options={['Январь', 'Февраль', 'Март', 'Аперль', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']}
+                onChange={updateCurrentMonthHandler}
+            />
             {(data && columns && !isFlatsLoading) ?
                 <MemoizedChess data={data} columns={columns} isFilialUEZS={isFilialUEZS}/> :
                 <Skeleton active={true} style={{width: window.innerWidth}}/>

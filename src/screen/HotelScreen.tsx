@@ -55,7 +55,10 @@ const HotelScreen: React.FC = () => {
     const [chessDateRange, setChessDateRange] = useState<Dayjs[]>([dayjs(), dayjs().add(14, 'days')]);
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleManyGuestModal, setVisibleManyGuestModal] = useState(false);
-    const [selectedView, setSelectedView] = useState<string>("2"); // default 1
+    const [selectedView, setSelectedView] = useState<string>(() => {
+        if (localStorage.getItem("viewMode")) return localStorage.getItem('viewMode');
+        return "1";
+    });
     // -----
 
     // Useful utils
@@ -161,6 +164,7 @@ const HotelScreen: React.FC = () => {
 
     // Handlers
     const onViewButtonClick: MenuProps['onClick'] = (e) => {
+        localStorage.setItem('viewMode', e.key);
         setSelectedView(e.key);
     };
     const searchGuestHandler = () => {
