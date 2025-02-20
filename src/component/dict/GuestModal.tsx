@@ -420,6 +420,7 @@ export const GuestModal = (props: ModalProps) => {
             return;
         }
         if (firstname && lastname && secondName && dateStart && dateFinish && selectedFlatId && selectedRoomId && memo && male !== null) {
+            if (dateStart.isAfter(dateFinish)) return;
             let ds = `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`;
             let df = `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`;
             if (ds.includes("00:00")) ds = ds.replace("00:00", "12:00");
