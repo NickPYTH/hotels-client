@@ -1,5 +1,18 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Alert, Badge, Button, Checkbox, DatePicker, DatePickerProps, Flex, Input, InputNumber, message, Modal, Select} from 'antd';
+import React, {useEffect, useState} from 'react';
+import {
+    Alert,
+    Badge,
+    Button,
+    Checkbox,
+    DatePicker,
+    Flex,
+    Input,
+    InputNumber,
+    message,
+    Modal,
+    Select,
+    TimePicker
+} from 'antd';
 import dayjs, {Dayjs} from "dayjs";
 import {filialAPI} from "../../service/FilialService";
 import {FilialModel} from "../../model/FilialModel";
@@ -70,7 +83,10 @@ export const GuestModal = (props: ModalProps) => {
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
     const [contractsStep2, setContractsStep2] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) а тут по причине и оплате
     const [regPoMestu, setRegPoMestu] = useState(false); // Регистрация по месту пребывания
-    const [dateRange, setDateRange] = useState<Dayjs[] | null>(null); // Период проживания
+    const [dateStart, setDateStart] = useState<Dayjs | null>(null); // Дата заселения
+    const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время заселения
+    const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
+    const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время выселения
     const [selectedFilialId, setSelectedFilialId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.filialId : null); // ИД выбранного филиала
     const [filials, setFilials] = useState<FilialModel[]>([]); // Перечень доступных для выбора филиалов
     const [selectedHotelId, setSelectedHotelId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.hotelId : null); // ИД выбранного общежития
@@ -166,7 +182,10 @@ export const GuestModal = (props: ModalProps) => {
             setReason(props.semiAutoParams.reason);
             setBilling(props.semiAutoParams.billing);
             setSelectedContractId(props.semiAutoParams.contractId);
-            setDateRange(props.semiAutoParams.dateRange);
+            setDateStart(props.semiAutoParams.dateRange[0]);
+            setTimeStart(props.semiAutoParams.dateRange[0]);
+            setDateFinish(props.semiAutoParams.dateRange[1]);
+            setTimeFinish(props.semiAutoParams.dateRange[1]);
             setCustomOrgName("ООО \"Газпром трансгаз Сургут\"");
             getFioByTabnum(props.semiAutoParams.tabnum);
             setMemo("-");
@@ -223,8 +242,11 @@ export const GuestModal = (props: ModalProps) => {
             setLastname(props.selectedGuest.lastname);
             setSecondName(props.selectedGuest.secondName);
             let dateStart: Dayjs = dayjs(props.selectedGuest.dateStart, "DD-MM-YYYY HH:mm");
-            let dateFinish: Dayjs = dayjs(props.selectedGuest.dateFinish, "DD-MM-YYYY H:mm");
-            setDateRange([dateStart, dateFinish]);
+            let dateFinish: Dayjs = dayjs(props.selectedGuest.dateFinish, "DD-MM-YYYY HH:mm");
+            setDateStart(dateStart);
+            setTimeStart(dateStart);
+            setDateFinish(dateFinish);
+            setTimeFinish(dateFinish);
             getAllHotels({filialId: props.selectedGuest.filialId.toString()});
             getAllFlats({hotelId: props.selectedGuest.flatId.toString(), date: dayjs().format("DD-MM-YYYY HH:mm")});
             getAllRooms(props.selectedGuest.flatId.toString());
@@ -397,14 +419,14 @@ export const GuestModal = (props: ModalProps) => {
             showWarningMsg("Вы находитесь в режиме просмотра");
             return;
         }
-        if (firstname && lastname && secondName && dateRange && selectedFlatId && selectedRoomId && memo && male !== null) {
-            let dateStart = dateRange[0].format("DD-MM-YYYY HH:mm");
-            let dateFinish = dateRange[1].format("DD-MM-YYYY HH:mm");
-            if (dateStart.includes("00:00")) dateStart = dateStart.replace("00:00", "12:00");
-            if (dateFinish.includes("00:00")) dateFinish = dateFinish.replace("00:00", "12:00");
+        if (firstname && lastname && secondName && dateStart && dateFinish && selectedFlatId && selectedRoomId && memo && male !== null) {
+            let ds = `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`;
+            let df = `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`;
+            if (ds.includes("00:00")) ds = ds.replace("00:00", "12:00");
+            if (df.includes("00:00")) df = df.replace("00:00", "12:00");
             let guest: GuestModel = {
-                dateFinish,
-                dateStart,
+                dateFinish: df,
+                dateStart: ds,
                 filialName: "",
                 filialId: 0,
                 firstname: firstname ? firstname.trim(): null,
@@ -440,12 +462,17 @@ export const GuestModal = (props: ModalProps) => {
         props.setVisible(false);
         if (props.setSelectedGuest) props.setSelectedGuest(null);
     };
-    const selectDateRangeHandler = (dates:Dayjs[]) => {
-        let dateStart = dates[0] as Dayjs;
-        let dateFinish = dates[1] as Dayjs;
-        dateStart.format('DD-MM-YYYY HH:mm');
-        dateFinish.format('DD-MM-YYYY HH:mm');
-        setDateRange([dateStart, dateFinish])
+    const selectStartDateHandler = (date: Dayjs) => {
+        setDateStart(date);
+    }
+    const selectStartTimeHandler = (time: Dayjs) => {
+        setTimeStart(time);
+    }
+    const selectFinishDateHandler = (date: Dayjs) => {
+        setDateFinish(date);
+    }
+    const selectFinishTimeHandler = (time: Dayjs) => {
+        setTimeFinish(time);
     }
     const switchIsEmployerHandler = (e) => {
         setIsEmployee(e.target.checked);
@@ -646,9 +673,17 @@ export const GuestModal = (props: ModalProps) => {
                     <div style={{width: 250}}>Регистрация по месту пребывания</div>
                     <Checkbox onChange={(e) => setRegPoMestu(e.target.checked)} checked={regPoMestu}/>
                 </Flex>
+                <Flex align={"center"}>
+                    <div style={{width: 220}}>Дата и время заселения</div>
+                    <DatePicker format={'DD.MM.YYYY'} value={dateStart} onChange={selectStartDateHandler} style={{width: 170, marginRight: 5}} allowClear={false}/>
+                    <TimePicker needConfirm={false} value={timeStart} style={{width: 170}} onChange={selectStartTimeHandler} minuteStep={15} showSecond={false} hourStep={1} allowClear={false} />
+                </Flex>
+                <Flex align={"center"}>
+                    <div style={{width: 220}}>Дата и время выселения</div>
+                    <DatePicker format={'DD.MM.YYYY'} value={dateFinish} onChange={selectFinishDateHandler} style={{width: 170, marginRight: 5}} allowClear={false}/>
+                    <TimePicker needConfirm={false} value={timeFinish} style={{width: 170}} onChange={selectFinishTimeHandler} minuteStep={15} showSecond={false} hourStep={1} allowClear={false} />
+                </Flex>
                 <Flex vertical={true} align={"center"}>
-                    {/*//@ts-ignore*/}
-                    <RangePicker showTime showSecond={false} format={dateRange == null ? "DDMMYYYY HHmm" : "DD-MM-YYYY HH:mm"} value={dateRange} onChange={selectDateRangeHandler} style={{width: 550}}/>
                     {updatedGuest?.error &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`Указанные даты пересекают существующий период проживания работника ${updatedGuest.lastname} ${updatedGuest.firstname} ${updatedGuest.secondName} (с ${updatedGuest.dateStart} по ${updatedGuest.dateFinish}) 

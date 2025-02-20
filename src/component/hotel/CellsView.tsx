@@ -353,8 +353,8 @@ export const CellsView = (props: ModalPros) => {
                                                         <div>{personLeftDates}</div>
                                                         <div>{personLeftNote}</div>
                                                     </Flex>)}>
-                                                        <div style={{paddingTop: 4, width: Math.abs(personLeftPercent) + 43*(Math.abs(personLeftPercent)/100), height: 25}}>
-                                                            <Flex style={{position: "absolute", top: 6, left: -(coloredLeftWidth + fioPersonLeft.length*1.5), height: 25}}
+                                                        <div style={{paddingTop: 4, width: fioPersonLeft.length*1.5 + 15, height: 25}}>
+                                                            <Flex style={{position: "absolute", top: 6, left: -((columnWidth - (coloredLeftWidth as unknown as number))), height: 25}}
                                                                 vertical={false} align={'start'} justify={'center'}>
                                                                 {personLeftMale == 'true' ?
                                                                     <img style={{marginRight: 3}} width={15} height={15} src={Male} alt={'man'}/>
@@ -396,7 +396,6 @@ export const CellsView = (props: ModalPros) => {
                                             </Flex>
                                         </div>
                                     </>
-
                                 </Flex>)
                             }
                         }
