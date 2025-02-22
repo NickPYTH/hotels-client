@@ -43,7 +43,7 @@ export const TableView = (props:ModalProps) => {
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'ascend',
             render: (_, flat) => (<div style={{marginLeft: 15}}>{flat.floor}</div>),
-            filters: props.flatsData.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
+            filters: props.flatsData?.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
                     if (acc.find((g: { text: string, value: string }) => g.text === flat.floor?.toString()) === undefined)
                         return acc.concat({text: flat.floor.toString(), value: flat.floor.toString()});
                 return acc;
@@ -57,7 +57,7 @@ export const TableView = (props:ModalProps) => {
             title: 'Секция',
             dataIndex: 'name',
             key: 'name',
-            filters: props.flatsData.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
+            filters: props.flatsData?.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
                 if (acc.find((g: { text: string, value: string }) => g.text === flat.name) === undefined)
                     return acc.concat({text: flat.name, value: flat.name});
                 return acc;
@@ -163,7 +163,7 @@ export const TableView = (props:ModalProps) => {
             key: 'roomsCount',
             sorter: (a, b) => a.roomsCount - b.roomsCount,
             sortDirections: ['descend', 'ascend'],
-            filters: props.flatsData.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
+            filters: props.flatsData?.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
                 if (acc.find((g: { text: string, value: string }) => g.text === flat.roomsCount.toString()) === undefined)
                     return acc.concat({text: flat.roomsCount.toString(), value: flat.roomsCount.toString()});
                 return acc;
@@ -179,7 +179,7 @@ export const TableView = (props:ModalProps) => {
             key: 'emptyBedsCount',
             sorter: (a, b) => a.emptyBedsCount - b.emptyBedsCount,
             sortDirections: ['descend', 'ascend'],
-            filters: props.flatsData.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
+            filters: props.flatsData?.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
                 if (acc.find((g: { text: string, value: string }) => g.text === flat.emptyBedsCount.toString()) === undefined)
                     return acc.concat({text: flat.emptyBedsCount.toString(), value: flat.emptyBedsCount.toString()});
                 return acc;
@@ -196,7 +196,7 @@ export const TableView = (props:ModalProps) => {
             render: (_, flat) => (<div>{flat.bedsCount - flat.emptyBedsCount}</div>),
             sorter: (a, b) => (a.bedsCount - a.emptyBedsCount) - (b.bedsCount - b.emptyBedsCount),
             sortDirections: ['descend', 'ascend'],
-            filters: props.flatsData.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
+            filters: props.flatsData?.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
                 let tmp = flat.bedsCount - flat.emptyBedsCount;
                 if (acc.find((g: { text: string, value: string }) => g.text === tmp.toString()) === undefined)
                     return acc.concat({text: tmp.toString(), value: tmp.toString()});

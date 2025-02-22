@@ -49,6 +49,8 @@ type ModalProps = {
     roomId?: number,
     bedId?: number;
     room?: RoomModel;
+    dateStart?: Dayjs,
+    dateFinish?: Dayjs,
     selectedGuest: GuestModel | null,
     setSelectedGuest?: Function,
     visible: boolean,
@@ -175,6 +177,8 @@ export const GuestModal = (props: ModalProps) => {
             setSelectedFlatId(parseInt(props.flatId.toString()));
             setSelectedRoomId(parseInt(props.roomId.toString()));
             setSelectedBedId(parseInt(props.bedId.toString()));
+            setDateStart(props?.dateStart);
+            setDateFinish(props?.dateFinish);
         }
 
         if (props.semiAutoParams){

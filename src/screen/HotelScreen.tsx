@@ -47,7 +47,6 @@ const HotelScreen: React.FC = () => {
     const [searchText, setSearchText] = useState('');
     const [selectedFlatId, setSelectedFlatId] = useState<number | null>(null);
     const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
-    const [chessMode, setChessMode] = useState(false);
     const [notCheckoutedModalVisible, setNotCheckoutedModalVisible] = useState(false);
     const [dateMarks, setDateMarks] = useState<SliderSingleProps['marks']>({});
     let {id} = useParams();
@@ -56,7 +55,7 @@ const HotelScreen: React.FC = () => {
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleManyGuestModal, setVisibleManyGuestModal] = useState(false);
     const [selectedView, setSelectedView] = useState<string>(() => {
-        if (localStorage.getItem("viewMode")) return localStorage.getItem('viewMode');
+        if (localStorage.getItem("viewMode")) return localStorage.getItem('viewMode'); // 1 - Карточки, 2 - Шахматка, 3 - Таблица
         return "1";
     });
     // -----
@@ -98,9 +97,9 @@ const HotelScreen: React.FC = () => {
 
     // Effects
     useEffect(() => {
-        if (chessMode) setDividerHeight(69);
+        if (selectedView == "2") setDividerHeight(69);
         else setDividerHeight(110);
-    }, [chessMode]);
+    }, [selectedView]);
     useEffect(() => {
         if (hideBusy) setFlats(prev => prev ? prev.filter((f: FlatModel) => {
             let all = f.bedsCount;
@@ -256,7 +255,7 @@ const HotelScreen: React.FC = () => {
                                     {selectedView === "2" && " Шахматка"}
                                 </div>
                             </Dropdown.Button>
-                            {!chessMode &&
+                            {selectedView != "2" &&
                                 <Flex style={{marginTop: 5}}>
                                     <DatePicker
                                         value={selectedDate}
@@ -293,9 +292,11 @@ const HotelScreen: React.FC = () => {
                         <Button style={{width: '100%', marginBottom: 10}} icon={<UsergroupAddOutlined/>} type="primary" onClick={() => setVisibleManyGuestModal(true)}>
                             Массовая загрузка жильцов
                         </Button>
-                        <Button style={{width: '100%'}} icon={<UserAddOutlined/>} type="primary" onClick={() => setVisibleGuestModal(true)}>
-                            Добавить жильца
-                        </Button>
+                        {selectedView != "2" &&
+                            <Button style={{width: '100%'}} icon={<UserAddOutlined/>} type="primary" onClick={() => setVisibleGuestModal(true)}>
+                                Добавить жильца
+                            </Button>
+                        }
                     </Flex>
                     <Divider style={{height: dividerHeight}} type={'vertical'}/>
                     {selectedView !== "2" && <>
@@ -317,7 +318,7 @@ const HotelScreen: React.FC = () => {
                     </Flex>
                 }
                 <Divider style={{marginTop: 0, marginBottom: 5}}/>
-                {(selectedView == "1") &&
+                {(selectedView == "1" && flats) &&
                     <>{[1, 2, 3, 4, 5, 6].map((floorNumber: number) => {
                         let flatCount = flats?.filter((f: FlatModel) => f.floor === floorNumber)?.length;
                         if (flatCount)
@@ -380,7 +381,7 @@ const HotelScreen: React.FC = () => {
                         }
                     </>
                 }
-                {(id && selectedView==='2') && <CellsView chessDateRange={chessDateRange} setChessDateRange={setChessDateRange} selectedDate={selectedDate} hotelId={id}/>}
+                {(id && selectedView==='2') && <CellsView showWarningMsg={showWarningMsg} chessDateRange={chessDateRange} setChessDateRange={setChessDateRange} selectedDate={selectedDate} hotelId={id}/>}
                 {(selectedView === '0') &&
                 <Flex>
                     <TableView
