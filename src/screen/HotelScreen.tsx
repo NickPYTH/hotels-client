@@ -381,7 +381,14 @@ const HotelScreen: React.FC = () => {
                         }
                     </>
                 }
-                {(id && selectedView==='2') && <CellsView showWarningMsg={showWarningMsg} chessDateRange={chessDateRange} setChessDateRange={setChessDateRange} selectedDate={selectedDate} hotelId={id}/>}
+                {(id && selectedView==='2') && <CellsView
+                    showWarningMsg={showWarningMsg}
+                    chessDateRange={chessDateRange}
+                    setChessDateRange={setChessDateRange}
+                    selectedDate={selectedDate}
+                    hotelId={id}
+                />
+                }
                 {(selectedView === '0') &&
                 <Flex>
                     <TableView

@@ -1,5 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Checkbox, DatePicker, Flex, Input, Modal, Select, Table, TableProps, Upload, UploadProps} from 'antd';
+import {
+    Button,
+    Checkbox,
+    DatePicker,
+    Flex,
+    Input,
+    Modal,
+    Select,
+    Table,
+    TableProps,
+    TimePicker,
+    Upload,
+    UploadProps
+} from 'antd';
 import {InboxOutlined} from "@ant-design/icons";
 import {host} from "../../config/constants";
 import {GuestModel} from "../../model/GuestModel";
@@ -9,9 +22,13 @@ import {ContractModel} from "../../model/ContractModel";
 import {contractAPI} from "../../service/ContractService";
 import dayjs, {Dayjs} from "dayjs";
 import {GuestModal} from "../dict/GuestModal";
+import {ContractCellRender} from './ContractCellRender';
+import {DatesCellRender} from "./DatesCellRender";
+import {FlatRoomCellRenderer} from "./FlatRoomCellRender";
+import {flatAPI} from "../../service/FlatService";
+import {roomAPI} from "../../service/RoomService";
 
 const {Dragger} = Upload;
-const {RangePicker} = DatePicker;
 
 type ModalProps = {
     filialId: number,
@@ -22,18 +39,23 @@ type ModalProps = {
     refresh: Function,
     showWarningMsg: Function,
 }
+
 export const ManyGuestModal = (props: ModalProps) => {
 
     // States
     const [mode, setMode] = useState<boolean>(false); // 0 - by tab, 1 - by fio
     const [data, setData] = useState<GuestModel[] | null>(null); // Данные в таблице
-    const [reason, setReason] = useState(""); // Основание
-    const [billing, setBilling] = useState(""); // Вид оплаты
+    const [reason, setReason] = useState(null); // Основание
+    const [billing, setBilling] = useState(null); // Вид оплаты
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
     const [selectedContractId, setSelectedContractId] = useState<number | null>(null); // ИД выбранного договора
     const [dateRange, setDateRange] = useState<Dayjs[] | null>(null); // Период проживания
     const [selectedTabnum, setSelectedTabnum] = useState<number | null>(null);
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
+    const [dateStart, setDateStart] = useState<Dayjs | null>(null); // Дата заселения
+    const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время заселения
+    const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
+    const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время выселения
     // -----
 
     // Useful utils
@@ -62,19 +84,22 @@ export const ManyGuestModal = (props: ModalProps) => {
             key: 'secondName',
         },
         {
-            title: 'Секция',
+            title: 'Договор',
+            dataIndex: 'contract',
+            key: 'contract',
+            render: (val, record:GuestModel) => (<ContractCellRender selectedContractId={record.contractId} reasons={reasons} contracts={contracts} setGridData={setData} hotelId={props.hotelId} />)
+        },
+        {
+            title: 'Даты проживания',
+            dataIndex: 'dates',
+            key: 'dates',
+            render: (val, record:GuestModel) => (<DatesCellRender dateTimeStart={record.dateStart} dateTimeFinish={record.dateFinish} setGridData={setData} />)
+        },
+        {
+            title: 'Секция и комната',
             dataIndex: 'flatName',
             key: 'flatName',
-        },
-        {
-            title: 'Комната',
-            dataIndex: 'roomName',
-            key: 'roomName',
-        },
-        {
-            title: 'Место',
-            dataIndex: 'bedName',
-            key: 'bedName',
+            render: (val, record: GuestModel) => (<FlatRoomCellRenderer flats={flatsFromRequest} flatId={record.flatId} roomId={record.roomId} setGridData={setData} filialId={props.filialId} hotelId={props.hotelId} />)
         },
         {
             title: 'Статус',
@@ -85,7 +110,8 @@ export const ManyGuestModal = (props: ModalProps) => {
             title: '',
             dataIndex: 'action',
             key: 'action',
-            render: (val, record:any) => (<Button disabled={record.status === "Заселен" && reason == null || selectedContractId == null || billing == null || dateRange == null} onClick={() => {
+            render: (val, record:any) => (<Button disabled={record.status === "Заселен" && reason == null || selectedContractId == null || billing == null || dateRange == null}
+                                                  onClick={() => {
                 setSelectedTabnum(record.tabnum);
                 setVisibleGuestModal(true);
             }}>Заселить</Button>)
@@ -122,12 +148,16 @@ export const ManyGuestModal = (props: ModalProps) => {
         data: reasons,
         isLoading: isReasonsLoading
     }] = reasonAPI.useGetAllMutation(); // Получение всех оснований
+    const [getAllFlats, {
+        data: flatsFromRequest,
+    }] = flatAPI.useGetAllMutation(); // Получение секций по ИД отеля
     // -----
 
     // Effects
     useEffect(() => {
         getContracts();
         getAllReasons();
+        getAllFlats({hotelId: props.hotelId.toString(), date: dayjs().format("DD-MM-YYYY HH:mm")});
     }, [])
     useEffect(() => {
         if (contractsFromRequest) {
@@ -137,9 +167,6 @@ export const ManyGuestModal = (props: ModalProps) => {
     // -----
 
     // Handlers
-    const loadGuestHandler = () => {
-
-    }
     const selectReasonHandler = (reason: string) => {
         setReason(reason);
         setSelectedContractId(null);
@@ -152,26 +179,52 @@ export const ManyGuestModal = (props: ModalProps) => {
 
     }
     const selectContractHandler = (id: number) => {
+        let contract = contracts.find((c:ContractModel) => c.id == id);
+        setBilling(contract.billing);
+        setReason(contract.reason);
         setSelectedContractId(id);
     }
-    const selectDateRangeHandler = (dates: Dayjs[]) => {
-        let dateStart = dates[0] as Dayjs;
-        let dateFinish = dates[1] as Dayjs;
-        dateStart.format('DD-MM-YYYY HH:mm');
-        dateFinish.format('DD-MM-YYYY HH:mm');
-        setDateRange([dateStart, dateFinish])
+    const selectStartDateHandler = (date: Dayjs) => {
+        setDateStart(date);
+    }
+    const selectStartTimeHandler = (time: Dayjs) => {
+        setTimeStart(time);
+    }
+    const selectFinishDateHandler = (date: Dayjs) => {
+        setDateFinish(date);
+    }
+    const selectFinishTimeHandler = (time: Dayjs) => {
+        setTimeFinish(time);
+    }
+    const fillTableHandler = () => {
+        if (selectedContractId && reason && billing && dateStart && dateFinish) {
+            if (dateStart.isAfter(dateFinish)){
+                props.showWarningMsg("Дата заселения указана после даты выселения");
+                return;
+            }
+            setData((guests:GuestModel[]) => {
+                let tmp: GuestModel[] = JSON.parse(JSON.stringify(guests));
+                return tmp.map((guest:GuestModel) => ({...guest,
+                    reason,
+                    billing,
+                    contractId: selectedContractId,
+                    dateStart: `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`,
+                    dateFinish: `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`
+
+                }))
+            });
+        } else props.showWarningMsg("Некторые поля остались пустыми");
     }
     // -----
 
     return (
         <Modal title={`Массовая загрузка жильцов`}
                open={props.visible}
-               onOk={loadGuestHandler}
                onCancel={() => {
                    if (window.confirm("Вы уверены что хотите закрыть окно расселения?")) props.setVisible(false);
                }}
                footer={() => (<></>)}
-               width={window.innerWidth - 100}
+               width={window.innerWidth - 10}
                maskClosable={false}
         >
             {visibleGuestModal &&
@@ -228,52 +281,64 @@ export const ManyGuestModal = (props: ModalProps) => {
             }
             {data != null &&
                 <Flex vertical={true}>
-                    <Flex align={"center"} style={{marginBottom: 5}}>
-                        <div style={{width: 120}}>Общежитие</div>
-                        <Input disabled={true}
-                               style={{width: 500}}
-                               value={props.hotelName}
-                        />
-                    </Flex>
-                    <Flex align={"center"} style={{marginBottom: 5}}>
-                        <div style={{width: 120}}>Основание</div>
-                        <Select
-                            loading={isReasonsLoading}
-                            value={reason}
-                            placeholder={"Выберите основание"}
-                            style={{width: 500}}
-                            onChange={selectReasonHandler}
-                            options={reasons?.filter((r: ReasonModel) => r.isDefault).map((r: ReasonModel) => ({value: r.name, label: r.name}))}
-                        />
-                    </Flex>
-                    <Flex align={"center"} style={{marginBottom: 5}}>
-                        <div style={{width: 120}}>Вид оплаты</div>
-                        <Select
-                            value={billing}
-                            placeholder={"Выберите способо оплаты"}
-                            style={{width: 500}}
-                            onChange={selectBillingHandler}
-                            options={[{value: "наличный расчет", label: "наличный расчет"}, {value: "безналичный расчет", label: "безналичный расчет"}]}
-                        />
-                    </Flex>
-                    <Flex align={"center"} style={{marginBottom: 5}}>
-                        <div style={{width: 120}}>Договор</div>
-                        <Select
-                            loading={isContractsLoading}
-                            value={selectedContractId}
-                            placeholder={"Перед выбором договора заполните предыдущие поля"}
-                            style={{width: 500}}
-                            onChange={selectContractHandler}
-                            options={contracts?.map((contractModel: ContractModel) => ({value: contractModel.id, label: `Год: ${contractModel.year} №: ${contractModel.docnum}`}))}
-                        />
-                    </Flex>
-                    <Flex align={"center"} style={{marginBottom: 5}}>
-                        <div style={{width: 120}}>Период</div>
-                        {/*//@ts-ignore*/}
-                        <RangePicker showTime showSecond={false} format={dateRange == null ? "DDMMYYYY HHmm" : "DD-MM-YYYY HH:mm"} value={dateRange} onChange={selectDateRangeHandler}
-                                     style={{width: 500}}/>
+                    <Flex>
+                        <Flex vertical={true}>
+                            <Flex align={"center"} style={{marginBottom: 5}}>
+                                <div style={{width: 120}}>Общежитие</div>
+                                <Input disabled={true}
+                                       style={{width: 300}}
+                                       value={props.hotelName}
+                                />
+                            </Flex>
+                            <Flex align={"center"} style={{marginBottom: 5}}>
+                                <div style={{width: 120}}>Основание</div>
+                                <Select
+                                    loading={isReasonsLoading}
+                                    value={reason}
+                                    placeholder={"Выберите основание"}
+                                    style={{width: 300}}
+                                    onChange={selectReasonHandler}
+                                    options={reasons?.filter((r: ReasonModel) => r.isDefault).map((r: ReasonModel) => ({value: r.name, label: r.name}))}
+                                />
+                            </Flex>
+                            <Flex align={"center"} style={{marginBottom: 5}}>
+                                <div style={{width: 120}}>Вид оплаты</div>
+                                <Select
+                                    value={billing}
+                                    placeholder={"Выберите способо оплаты"}
+                                    style={{width: 300}}
+                                    onChange={selectBillingHandler}
+                                    options={[{value: "наличный расчет", label: "наличный расчет"}, {value: "безналичный расчет", label: "безналичный расчет"}]}
+                                />
+                            </Flex>
+                            <Flex align={"center"} style={{marginBottom: 5}}>
+                                <div style={{width: 120}}>Договор</div>
+                                <Select
+                                    loading={isContractsLoading}
+                                    value={selectedContractId}
+                                    placeholder={"Перед выбором договора заполните предыдущие поля"}
+                                    style={{width: 300}}
+                                    onChange={selectContractHandler}
+                                    options={contracts?.map((contractModel: ContractModel) => ({value: contractModel.id, label: `Год: ${contractModel.year} №: ${contractModel.docnum}`}))}
+                                />
+                            </Flex>
+                        </Flex>
+                        <Flex vertical={true} style={{marginLeft: 15}}>
+                            <Flex align={"center"} style={{marginBottom: 5}}>
+                                <div style={{width: 150}}>Дата и время заезда</div>
+                                <DatePicker placeholder={'Заезд'} format={'DD.MM.YYYY'} value={dateStart} onChange={selectStartDateHandler} style={{width: 140, marginRight: 5}} allowClear={false}/>
+                                <TimePicker needConfirm={false} value={timeStart} style={{width: 140}} onChange={selectStartTimeHandler} minuteStep={15} showSecond={false} hourStep={1} allowClear={false} />
+                            </Flex>
+                            <Flex align={"center"} style={{marginBottom: 5}}>
+                                <div style={{width: 150}}>Дата и время выезда</div>
+                                <DatePicker placeholder={'Выезд'} format={'DD.MM.YYYY'} value={dateFinish} onChange={selectFinishDateHandler} style={{width: 140, marginRight: 5}} allowClear={false}/>
+                                <TimePicker needConfirm={false} value={timeFinish} style={{width: 140}} onChange={selectFinishTimeHandler} minuteStep={15} showSecond={false} hourStep={1} allowClear={false} />
+                            </Flex>
+                            <Button onClick={fillTableHandler}>Применить заполненные параметры</Button>
+                        </Flex>
                     </Flex>
                     <Table
+                        bordered={true}
                         style={{width: '100vw'}}
                         columns={columns}
                         dataSource={data}
