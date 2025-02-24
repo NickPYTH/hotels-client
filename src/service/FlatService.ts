@@ -17,6 +17,13 @@ export const flatAPI = createApi({
             }),
             invalidatesTags: ['flat']
         }),
+        getAllSimple: build.mutation<FlatModel[], { hotelId: string, dateStart: string, dateFinish: string }>({
+            query: ({hotelId, dateStart, dateFinish}) => ({
+                url: `/getAll?hotelId=${hotelId}&dateStart=${dateStart}&dateStart=${dateFinish}`,
+                method: 'GET',
+            }),
+            invalidatesTags: ['flat']
+        }),
         getAllNotCheckotedBeforeTodayByHotelId: build.mutation<GuestModel[], { hotelId: string, date: string }>({
             query: ({hotelId, date}) => ({
                 url: `/getAllNotCheckotedBeforeTodayByHotelId?id=${hotelId}&date=${date}`,

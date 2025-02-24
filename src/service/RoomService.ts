@@ -10,9 +10,9 @@ export const roomAPI = createApi({
     }),
     tagTypes: ['room'],
     endpoints: (build) => ({
-        getAll: build.mutation<RoomModel[], string>({
-            query: (id) => ({
-                url: `/getAllByFlatId?id=${id}`,
+        getAll: build.mutation<RoomModel[], { flatId:number, dateStart:string, dateFinish:string }>({
+            query: ({flatId, dateStart, dateFinish}) => ({
+                url: `/getAllByFlatId?flatId=${flatId}&dateStart=${dateStart}&dateFinish=${dateFinish}`,
                 method: 'GET',
             }),
             invalidatesTags: ['room']
@@ -24,9 +24,16 @@ export const roomAPI = createApi({
             }),
             invalidatesTags: ['room']
         }),
-        getAllBeds: build.mutation<BedModel[], number>({
-            query: (roomId) => ({
-                url: `/getAllBeds?roomId=${roomId}`,
+        getAllBeds: build.mutation<BedModel[], { roomId:number, dateStart:string, dateFinish:string }>({
+            query: ({roomId, dateStart, dateFinish}) => ({
+                url: `/getAllBeds?roomId=${roomId}&dateStart=${dateStart}&dateFinish=${dateFinish}`,
+                method: 'GET',
+            }),
+            invalidatesTags: ['room']
+        }),
+        getAvailableBedWithRoomByFlatId: build.mutation<BedModel, { flatId: number, dateStart: string, dateFinish: string }>({
+            query: ({flatId, dateStart, dateFinish}) => ({
+                url: `/getAvailableBedWithRoomByFlatId?flatId=${flatId}&dateStart=${dateStart}&dateFinish=${dateFinish}`,
                 method: 'GET',
             }),
             invalidatesTags: ['room']

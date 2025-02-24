@@ -425,10 +425,10 @@ export const CellsView = (props: ModalPros) => {
                 props.setChessDateRange([dayjs('01-03-2025', 'DD-MM-YYYY'), dayjs('31-03-2025', 'DD-MM-YYYY')])
                 break;
             case "Апрель":
-                props.setChessDateRange([dayjs('01-04-2025', 'DD-MM-YYYY'), dayjs('30-01-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-04-2025', 'DD-MM-YYYY'), dayjs('30-04-2025', 'DD-MM-YYYY')])
                 break;
             case "Май":
-                props.setChessDateRange([dayjs('01-05-2025', 'DD-MM-YYYY'), dayjs('31-01-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-05-2025', 'DD-MM-YYYY'), dayjs('31-05-2025', 'DD-MM-YYYY')])
                 break;
             case "Июнь":
                 props.setChessDateRange([dayjs('01-06-2025', 'DD-MM-YYYY'), dayjs('30-06-2025', 'DD-MM-YYYY')])

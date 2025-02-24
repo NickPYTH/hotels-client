@@ -3,26 +3,27 @@ import {ContractModel} from "../../model/ContractModel";
 import dayjs, {Dayjs} from "dayjs";
 import {DatePicker, Flex, Select, TimePicker} from "antd";
 import {ReasonModel} from "../../model/ReasonModel";
+import {GuestModel} from "../../model/GuestModel";
 
 type DatesCellRenderProps = {
     setGridData: Function,
     dateTimeStart: string,
-    dateTimeFinish: string
+    dateTimeFinish: string,
+    tabnum: number,
 }
 
 export const DatesCellRender = (props:DatesCellRenderProps) => {
 
     // States
     const [dateStart, setDateStart] = useState<Dayjs | null>(); // Дата заселения
-    const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время заселения
+    const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время заселения
     const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
-    const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время выселения
+    const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время выселения
     // -----
 
     // Effects
     useEffect(() => {
         if (props.dateTimeStart){
-            console.log(props)
             setDateStart(dayjs(props.dateTimeStart, "DD-MM-YYYY"));
             setTimeStart(dayjs(props.dateTimeStart.split(' ')[1], "HH:mm"));
         }
@@ -38,15 +39,47 @@ export const DatesCellRender = (props:DatesCellRenderProps) => {
     // Handlers
     const selectStartDateHandler = (date: Dayjs) => {
         setDateStart(date);
+        props.setGridData((prev:GuestModel[]) => {
+            let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
+            return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ?
+                {...guest,
+                    dateStart: `${date.format('DD-MM-YYYY')} ${timeStart.format("HH:mm")}`
+                }
+                :guest);
+        });
     }
     const selectStartTimeHandler = (time: Dayjs) => {
         setTimeStart(time);
+        props.setGridData((prev:GuestModel[]) => {
+            let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
+            return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ?
+                {...guest,
+                    dateStart: `${dateStart.format('DD-MM-YYYY')} ${time.format("HH:mm")}`
+                }
+                :guest);
+        });
     }
     const selectFinishDateHandler = (date: Dayjs) => {
         setDateFinish(date);
+        props.setGridData((prev:GuestModel[]) => {
+            let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
+            return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ?
+                {...guest,
+                    dateFinish: `${date.format('DD-MM-YYYY')} ${timeFinish.format("HH:mm")}`
+                }
+                :guest);
+        });
     }
     const selectFinishTimeHandler = (time: Dayjs) => {
         setTimeFinish(time);
+        props.setGridData((prev:GuestModel[]) => {
+            let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
+            return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ?
+                {...guest,
+                    dateFinish: `${dateFinish.format('DD-MM-YYYY')} ${time.format("HH:mm")}`
+                }
+                :guest);
+        });
     }
     // -----
 

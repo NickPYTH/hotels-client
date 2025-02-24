@@ -26,7 +26,6 @@ import {ContractCellRender} from './ContractCellRender';
 import {DatesCellRender} from "./DatesCellRender";
 import {FlatRoomCellRenderer} from "./FlatRoomCellRender";
 import {flatAPI} from "../../service/FlatService";
-import {roomAPI} from "../../service/RoomService";
 
 const {Dragger} = Upload;
 
@@ -49,13 +48,12 @@ export const ManyGuestModal = (props: ModalProps) => {
     const [billing, setBilling] = useState(null); // Вид оплаты
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
     const [selectedContractId, setSelectedContractId] = useState<number | null>(null); // ИД выбранного договора
-    const [dateRange, setDateRange] = useState<Dayjs[] | null>(null); // Период проживания
-    const [selectedTabnum, setSelectedTabnum] = useState<number | null>(null);
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [dateStart, setDateStart] = useState<Dayjs | null>(null); // Дата заселения
-    const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время заселения
+    const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время заселения
     const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
-    const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время выселения
+    const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время выселения
+    const [selectedRecord, setSelectedRecord] = useState<GuestModel | null>(null);
     // -----
 
     // Useful utils
@@ -87,19 +85,19 @@ export const ManyGuestModal = (props: ModalProps) => {
             title: 'Договор',
             dataIndex: 'contract',
             key: 'contract',
-            render: (val, record:GuestModel) => (<ContractCellRender selectedContractId={record.contractId} reasons={reasons} contracts={contracts} setGridData={setData} hotelId={props.hotelId} />)
+            render: (val, record:GuestModel) => (<ContractCellRender tabnum={record.tabnum} selectedContractId={record.contractId} reasons={reasons} contracts={contracts} setGridData={setData} hotelId={props.hotelId} />)
         },
         {
             title: 'Даты проживания',
             dataIndex: 'dates',
             key: 'dates',
-            render: (val, record:GuestModel) => (<DatesCellRender dateTimeStart={record.dateStart} dateTimeFinish={record.dateFinish} setGridData={setData} />)
+            render: (val, record:GuestModel) => (<DatesCellRender tabnum={record.tabnum} dateTimeStart={record.dateStart} dateTimeFinish={record.dateFinish} setGridData={setData} />)
         },
         {
             title: 'Секция и комната',
             dataIndex: 'flatName',
             key: 'flatName',
-            render: (val, record: GuestModel) => (<FlatRoomCellRenderer flats={flatsFromRequest} flatId={record.flatId} roomId={record.roomId} setGridData={setData} filialId={props.filialId} hotelId={props.hotelId} />)
+            render: (val, record: GuestModel) => (<FlatRoomCellRenderer tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.flatId} roomId={record.roomId} setGridData={setData} filialId={props.filialId} hotelId={props.hotelId} bedId={record.bedId} />)
         },
         {
             title: 'Статус',
@@ -110,9 +108,9 @@ export const ManyGuestModal = (props: ModalProps) => {
             title: '',
             dataIndex: 'action',
             key: 'action',
-            render: (val, record:any) => (<Button disabled={record.status === "Заселен" && reason == null || selectedContractId == null || billing == null || dateRange == null}
+            render: (val, record:any) => (<Button disabled={record.status === "Заселен"}
                                                   onClick={() => {
-                setSelectedTabnum(record.tabnum);
+                setSelectedRecord(record);
                 setVisibleGuestModal(true);
             }}>Заселить</Button>)
         },
@@ -148,16 +146,12 @@ export const ManyGuestModal = (props: ModalProps) => {
         data: reasons,
         isLoading: isReasonsLoading
     }] = reasonAPI.useGetAllMutation(); // Получение всех оснований
-    const [getAllFlats, {
-        data: flatsFromRequest,
-    }] = flatAPI.useGetAllMutation(); // Получение секций по ИД отеля
     // -----
 
     // Effects
     useEffect(() => {
         getContracts();
         getAllReasons();
-        getAllFlats({hotelId: props.hotelId.toString(), date: dayjs().format("DD-MM-YYYY HH:mm")});
     }, [])
     useEffect(() => {
         if (contractsFromRequest) {
@@ -229,15 +223,7 @@ export const ManyGuestModal = (props: ModalProps) => {
         >
             {visibleGuestModal &&
                 <GuestModal
-                    semiAutoParams={{
-                        filialId: props.filialId,
-                        hotelId: props.hotelId,
-                        tabnum: selectedTabnum,
-                        reason,
-                        billing,
-                        contractId: selectedContractId,
-                        dateRange,
-                    }}
+                    semiAutoParams={selectedRecord}
                     room={null}
                     bedId={null}
                     setGuests={() => {

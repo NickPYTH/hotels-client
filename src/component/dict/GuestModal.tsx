@@ -38,11 +38,13 @@ import {extraAPI} from "../../service/ExtraService";
 import {GuestExtrasModal} from "./GuestExtrasModal";
 import {BedModel} from "../../model/BedModel";
 import {SelectGuestFromOrgModal} from "../hotel/SelectGuestFromOrgModal";
+import {LabelOptionRender} from "../LabelOptionRender";
+import {SelectOptionRender} from "../SelectOptionRender";
 
 const {RangePicker} = DatePicker;
 
 type ModalProps = {
-    semiAutoParams?: any, // Перечень параметров для полу автоматичского заполнения
+    semiAutoParams?: GuestModel, // Перечень параметров для полу автоматичского заполнения
     filialId?: number,
     hotelId?: number,
     flatId?: number,
@@ -85,10 +87,22 @@ export const GuestModal = (props: ModalProps) => {
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
     const [contractsStep2, setContractsStep2] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) а тут по причине и оплате
     const [regPoMestu, setRegPoMestu] = useState(false); // Регистрация по месту пребывания
-    const [dateStart, setDateStart] = useState<Dayjs | null>(null); // Дата заселения
-    const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время заселения
-    const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
-    const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('00:00', 'HH:mm')); // Время выселения
+    const [dateStart, setDateStart] = useState<Dayjs | null>(() => {
+        if (props.selectedGuest?.dateStart) return dayjs(props.selectedGuest.dateStart, 'DD-MM-YYYY');
+        else return null;
+    }); // Дата заселения
+    const [timeStart, setTimeStart] = useState<Dayjs>(() => {
+        if (props.selectedGuest?.dateStart) return dayjs(props.selectedGuest.dateStart.split(" ")[1], 'HH:mm');
+        else return dayjs('12:00', 'HH:mm');
+    }); // Время заселения
+    const [dateFinish, setDateFinish] = useState<Dayjs | null>(() => {
+        if (props.selectedGuest?.dateFinish) return dayjs(props.selectedGuest.dateFinish, 'DD-MM-YYYY');
+        else return null;
+    }); // Дата выселения
+    const [timeFinish, setTimeFinish] = useState<Dayjs>(() => {
+        if (props.selectedGuest?.dateFinish) return dayjs(props.selectedGuest.dateFinish.split(" ")[1], 'HH:mm');
+        else return dayjs('12:00', 'HH:mm');
+    }); // Время выселения
     const [selectedFilialId, setSelectedFilialId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.filialId : null); // ИД выбранного филиала
     const [filials, setFilials] = useState<FilialModel[]>([]); // Перечень доступных для выбора филиалов
     const [selectedHotelId, setSelectedHotelId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.hotelId : null); // ИД выбранного общежития
@@ -123,7 +137,7 @@ export const GuestModal = (props: ModalProps) => {
     const [getAllFlats, {
         data: flatsFromRequest,
         isLoading: isFlatsLoading
-    }] = flatAPI.useGetAllMutation(); // Получение секций по ИД отеля
+    }] = flatAPI.useGetAllSimpleMutation(); // Получение секций по ИД отеля
     const [getAllRooms, {
         data: roomsFromRequest,
         isLoading: isRoomsLoading
@@ -186,15 +200,22 @@ export const GuestModal = (props: ModalProps) => {
             setReason(props.semiAutoParams.reason);
             setBilling(props.semiAutoParams.billing);
             setSelectedContractId(props.semiAutoParams.contractId);
-            setDateStart(props.semiAutoParams.dateRange[0]);
-            setTimeStart(props.semiAutoParams.dateRange[0]);
-            setDateFinish(props.semiAutoParams.dateRange[1]);
-            setTimeFinish(props.semiAutoParams.dateRange[1]);
+            if (props.semiAutoParams.dateStart) {
+                setDateStart(dayjs(props.semiAutoParams.dateStart, 'DD-MM-YYYY'));
+                setTimeStart(dayjs(props.semiAutoParams.dateStart.split(" ")[1], 'HH:mm'));
+            }
+            if (props.semiAutoParams.dateFinish) {
+                setDateFinish(dayjs(props.semiAutoParams.dateFinish, 'DD-MM-YYYY'));
+                setTimeFinish(dayjs(props.semiAutoParams.dateFinish.split(" ")[1], 'HH:mm'));
+            }
             setCustomOrgName("ООО \"Газпром трансгаз Сургут\"");
             getFioByTabnum(props.semiAutoParams.tabnum);
             setMemo("-");
             setSelectedFilialId(props.semiAutoParams.filialId);
             setSelectedHotelId(props.semiAutoParams.hotelId);
+            setSelectedFlatId(props.semiAutoParams.flatId);
+            setSelectedRoomId(props.semiAutoParams.roomId);
+            setSelectedBedId(props.semiAutoParams.bedId);
         }
     }, []);
     useEffect(() => {
@@ -245,20 +266,13 @@ export const GuestModal = (props: ModalProps) => {
             setFirstname(props.selectedGuest.firstname);
             setLastname(props.selectedGuest.lastname);
             setSecondName(props.selectedGuest.secondName);
-            let dateStart: Dayjs = dayjs(props.selectedGuest.dateStart, "DD-MM-YYYY HH:mm");
-            let dateFinish: Dayjs = dayjs(props.selectedGuest.dateFinish, "DD-MM-YYYY HH:mm");
-            setDateStart(dateStart);
-            setTimeStart(dateStart);
-            setDateFinish(dateFinish);
-            setTimeFinish(dateFinish);
             getAllHotels({filialId: props.selectedGuest.filialId.toString()});
-            getAllFlats({hotelId: props.selectedGuest.flatId.toString(), date: dayjs().format("DD-MM-YYYY HH:mm")});
-            getAllRooms(props.selectedGuest.flatId.toString());
-            getAllBeds(props.selectedGuest.bedId);
+            getAllFlats({hotelId: props.selectedGuest.flatId.toString(), dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
+            getAllRooms({flatId: props.selectedGuest.flatId, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
+            getAllBeds({roomId: props.selectedGuest.roomId, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
             setIsEmployee(!!props.selectedGuest.tabnum);
             setTabnum(props.selectedGuest.tabnum);
             setCustomOrgName(!!props.selectedGuest.tabnum ? "ООО \"Газпром трансгаз Сургут\"" : props.selectedGuest.organization);
-            console.log(props.selectedGuest)
             setRegPoMestu(props.selectedGuest.regPoMestu);
             setMale(props.selectedGuest.male);
             if (props.selectedGuest.contractId)
@@ -282,15 +296,24 @@ export const GuestModal = (props: ModalProps) => {
     }, [selectedFilialId]);
     useEffect(() => {
         if (selectedHotelId)
-            getAllFlats({hotelId: selectedHotelId.toString(), date: dayjs().format("DD-MM-YYYY HH:mm")});
+                getAllFlats({hotelId: selectedHotelId.toString(),
+                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+            });
     }, [selectedHotelId]);
     useEffect(() => {
         if (selectedFlatId)
-            getAllRooms(selectedFlatId.toString());
+            getAllRooms({flatId: selectedFlatId,
+                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+            });
     }, [selectedFlatId]);
     useEffect(() => {
         if (selectedRoomId)
-            getAllBeds(selectedRoomId);
+            getAllBeds({roomId: selectedRoomId,
+                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+            });
     }, [selectedRoomId]);
     useEffect(() => {
         if (selectedContractId) {
@@ -751,6 +774,8 @@ export const GuestModal = (props: ModalProps) => {
                         onChange={(e) => selectRoomHandler(e)}
                         onClear={() => selectRoomHandler()}
                         options={rooms.map((room: RoomModel) => ({value: room.id, label: room.name}))}
+                        labelRender={(params) => (<LabelOptionRender params={params}/>)}
+                        optionRender={(params) => (<SelectOptionRender params={params}/>)}
                     />
                 </Flex>
                 <Flex align={"center"}>
@@ -764,6 +789,8 @@ export const GuestModal = (props: ModalProps) => {
                         onChange={(e) => selectBedHandler(e)}
                         onClear={() => selectBedHandler()}
                         options={beds.map((bed: BedModel) => ({value: bed.id, label: bed.name}))}
+                        labelRender={(params) => (<LabelOptionRender params={params}/>)}
+                        optionRender={(params) => (<SelectOptionRender params={params}/>)}
                     />
                 </Flex>
                 <Flex align={"center"}>

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {Button, Card, Flex, message, Modal, Popconfirm, Switch, Tabs, Tag} from 'antd';
 import {flatAPI} from "../../service/FlatService";
 import {GuestModel} from "../../model/GuestModel";
-import {AddGuestModal} from "./AddGuestModal";
 import {guestAPI} from "../../service/GuestService";
 import {RoomModel} from "../../model/RoomModel";
 import TextArea from "antd/es/input/TextArea";

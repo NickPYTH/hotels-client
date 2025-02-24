@@ -3,6 +3,7 @@ import {ContractModel} from "../../model/ContractModel";
 import dayjs from "dayjs";
 import {Flex, Select} from "antd";
 import {ReasonModel} from "../../model/ReasonModel";
+import {GuestModel} from "../../model/GuestModel";
 
 type ContractCellRenderProps = {
     reasons: ReasonModel[],
@@ -10,6 +11,7 @@ type ContractCellRenderProps = {
     setGridData: Function,
     hotelId: number,
     selectedContractId: number | null,
+    tabnum: number,
 }
 
 export const ContractCellRender = (props:ContractCellRenderProps) => {
@@ -44,6 +46,10 @@ export const ContractCellRender = (props:ContractCellRenderProps) => {
         setBilling(contract.billing);
         setReason(contract.reason);
         setSelectedContractId(id);
+        props.setGridData((prev:GuestModel[]) => {
+            let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
+            return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ? {...guest, contractId: id}:guest);
+        });
     }
     // -----
 
