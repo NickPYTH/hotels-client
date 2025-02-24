@@ -19,7 +19,7 @@ export const flatAPI = createApi({
         }),
         getAllSimple: build.mutation<FlatModel[], { hotelId: string, dateStart: string, dateFinish: string }>({
             query: ({hotelId, dateStart, dateFinish}) => ({
-                url: `/getAll?hotelId=${hotelId}&dateStart=${dateStart}&dateStart=${dateFinish}`,
+                url: `/getAll?hotelId=${hotelId}&dateStart=${dateStart}&dateFinish=${dateFinish}`,
                 method: 'GET',
             }),
             invalidatesTags: ['flat']

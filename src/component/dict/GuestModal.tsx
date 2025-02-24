@@ -316,6 +316,22 @@ export const GuestModal = (props: ModalProps) => {
             });
     }, [selectedRoomId]);
     useEffect(() => {
+        if (dateStart && dateFinish){
+            getAllFlats({hotelId: selectedHotelId.toString(),
+                dateStart: `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+            });
+            getAllRooms({flatId: selectedFlatId,
+                dateStart: `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+            });
+            getAllBeds({roomId: selectedRoomId,
+                dateStart: `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+            });
+        }
+    }, [dateStart, dateFinish])
+    useEffect(() => {
         if (selectedContractId) {
             let contract: ContractModel | undefined = contracts.find((c: ContractModel) => c.id === selectedContractId);
             if (contract) {
@@ -761,6 +777,8 @@ export const GuestModal = (props: ModalProps) => {
                         onChange={(e) => selectFlatHandler(e)}
                         onClear={() => selectFlatHandler()}
                         options={flats.map((flat: FlatModel) => ({value: flat.id, label: flat.name}))}
+                        labelRender={(params) => (<LabelOptionRender params={params}/>)}
+                        optionRender={(params) => (<SelectOptionRender params={params}/>)}
                     />
                 </Flex>
                 <Flex align={"center"}>

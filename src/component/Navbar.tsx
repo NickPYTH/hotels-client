@@ -355,9 +355,6 @@ export const Navbar = (props: propsType) => {
                     {/*        {value: 4, label: "Наблюдатель"}*/}
                     {/*    ]}*/}
                     {/*/>*/}
-                    <div style={{width: 510, marginBottom: 5}}>
-                        {currentUserData?.roleId === 2 && <div style={{color: 'red'}}>По вопросам работы системы оставляйте заявку службе поддержки.</div>}
-                    </div>
                     <div style={{width: 110, marginBottom: 5}}>
                       {currentUser?.fio}
                     </div>

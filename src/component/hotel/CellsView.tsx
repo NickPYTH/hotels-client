@@ -208,7 +208,7 @@ export const CellsView = (props: ModalPros) => {
             dateList.push(d.format("DD-MM-YYYY"));
         }
         return base.concat(dateList.map((el: string) => ({
-            title: `${el}`,
+            title: `${dayjs(el, 'DD-MM-YYYY').format('DD.MM')}`,
             dataIndex: `${el}`,
             width: columnWidth,
             render: (val: any, record: any) => {
