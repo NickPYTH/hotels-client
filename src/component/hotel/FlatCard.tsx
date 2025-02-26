@@ -9,6 +9,8 @@ import {GuestModel} from "../../model/GuestModel";
 import Male from "../../assets/male.png";
 //@ts-ignore
 import Female from "../../assets/female.png";
+//@ts-ignore
+import ConfirmedReservation from "../../assets/confirmedReservation.png";
 import dayjs, {Dayjs} from "dayjs";
 import {GuestModal} from "../dict/GuestModal";
 
@@ -78,23 +80,32 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                                                     setSelectedGuest(guest);
                                                 }}
                                                 title={`${guest.lastname} ${guest.firstname[0]}. ${guest.secondName[0]}. ${guest.post ?? ""} ${guest.organization ?? ""}`}
-                                                description={`Даты проживания C ${guest.dateStart} По ${guest.dateFinish}. До выселения(суток): ${daysBeforeCheckouted == 0 ? "Сегодня" : daysBeforeCheckouted}`}>
-                                        {daysBeforeCheckouted < 2 ?
-                                            <Badge count={<ClockCircleOutlined style={{color: '#f5222d'}}/>}>
-                                                {guest.male ?
-                                                    <img style={{marginTop: 2}} width={22} height={22} src={Male}/>
+                                                description={
+                                                guest.isReservation ?
+                                                    `Бронирование с ${guest.dateStart} по ${guest.dateFinish}.`
                                                     :
-                                                    <img style={{marginTop: 2}} width={22} height={22} src={Female}/>
-                                                }
-                                            </Badge>
+                                                    `Даты проживания с ${guest.dateStart} по ${guest.dateFinish}. До выселения(суток): ${daysBeforeCheckouted == 0 ? "Сегодня" : daysBeforeCheckouted}`
+                                                    }>
+                                        {guest.isReservation ?
+                                            <img style={{marginTop: 2}} width={22} height={22} src={ConfirmedReservation}/>
                                             :
-                                            <>
-                                                {guest.male ?
-                                                    <img style={{marginTop: 2}} width={22} height={22} src={Male}/>
-                                                    :
-                                                    <img style={{marginTop: 2}} width={22} height={22} src={Female}/>
-                                                }
-                                            </>
+                                            daysBeforeCheckouted < 2 ?
+                                                <Badge count={<ClockCircleOutlined style={{color: '#f5222d'}}/>}>
+                                                    {
+                                                        guest.male ?
+                                                            <img style={{marginTop: 2}} width={22} height={22} src={Male}/>
+                                                            :
+                                                            <img style={{marginTop: 2}} width={22} height={22} src={Female}/>
+                                                    }
+                                                </Badge>
+                                                :
+                                                <>
+                                                    {guest.male ?
+                                                        <img style={{marginTop: 2}} width={22} height={22} src={Male}/>
+                                                        :
+                                                        <img style={{marginTop: 2}} width={22} height={22} src={Female}/>
+                                                    }
+                                                </>
                                         }
                                     </Popconfirm>)
                             })}

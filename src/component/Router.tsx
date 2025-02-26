@@ -17,6 +17,7 @@ import {Result} from "antd";
 import AboutScreen from "../screen/AboutScreen";
 import EventScreen from "../screen/EventScreen";
 import ExtraScreen from "../screen/dict/ExtraScreen";
+import ReservationScreen from "../screen/dict/ReservationScreen";
 
 
 export const Router: React.FC = () => {
@@ -63,6 +64,10 @@ export const Router: React.FC = () => {
                 <Route
                     path='hotels/guests'
                     element={<GuestScreen/>}
+                />
+                <Route
+                    path='hotels/reservations'
+                    element={<ReservationScreen/>}
                 />
                 <Route
                     path='hotels/filials/:id'

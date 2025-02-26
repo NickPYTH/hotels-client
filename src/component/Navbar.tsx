@@ -55,6 +55,10 @@ export const Navbar = (props: propsType) => {
                                 key: 'guests',
                             },
                             {
+                                label: 'Записи о бронировании',
+                                key: 'reservations',
+                            },
+                            {
                                 label: 'Договоры',
                                 key: 'contracts',
                             },
@@ -116,10 +120,10 @@ export const Navbar = (props: propsType) => {
                             },
                         ]
                     },
-                    // {
-                    //     label: 'Мероприятия',
-                    //     key: 'events',
-                    // },
+                    {
+                        label: 'Мероприятия',
+                        key: 'events',
+                    },
                     {
                         label: 'Справка',
                         key: 'about',
@@ -282,6 +286,7 @@ export const Navbar = (props: propsType) => {
         if (location.pathname === "/hotels/users") return 'users';
         if (location.pathname === "/hotels/hotels") return 'hotels';
         if (location.pathname.includes('guests')) return 'guests';
+        if (location.pathname.includes('reservations')) return 'reservations';
         if (location.pathname.includes('filials')) return 'filials';
         if (location.pathname.includes('hotels')) return 'filials';
         if (location.pathname.includes('events')) return 'events';
@@ -298,6 +303,7 @@ export const Navbar = (props: propsType) => {
             if (location.pathname === "/hotels/users") return 'users';
             if (location.pathname.includes('/hotels/hotels')) return 'hotels';
             if (location.pathname.includes('guests')) return 'guests';
+            if (location.pathname.includes('reservations')) return 'reservations';
             if (location.pathname.includes('filials')) return 'filials';
             if (location.pathname.includes('hotels')) return 'filials';
             if (location.pathname.includes('events')) return 'events';
@@ -330,6 +336,7 @@ export const Navbar = (props: propsType) => {
         if (e.key === 'extras') navigate(`hotels/extras`)
         if (e.key === 'hotels') navigate(`hotels/hotels`)
         if (e.key === 'guests') navigate(`hotels/guests`)
+        if (e.key === 'reservations') navigate(`hotels/reservations`)
         if (e.key === 'users') navigate(`hotels/users`)
         if (e.key === 'logs') navigate(`hotels/logs`)
         if (e.key === 'about') navigate(`hotels/about`)

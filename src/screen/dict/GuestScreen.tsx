@@ -169,21 +169,14 @@ const GuestScreen: React.FC = () => {
             title: 'Дата заезда',
             dataIndex: 'dateStart',
             key: 'dateStart',
-            sorter: (a, b) => {
-                let date1 = dayjs(a.dateStart, "dd-MM-yyyy").unix();
-                let date2 = dayjs(b.dateStart, "dd-MM-yyyy").unix();
-                return date1 - date2;
-            },
+            sorter: (a, b) => dayjs(a.dateStart, 'DD-MM-YYYY').diff(dayjs(b.dateStart, 'DD-MM-YYYY')),
+
         },
         {
             title: 'Дата выезда',
             dataIndex: 'dateFinish',
             key: 'dateFinish',
-            sorter: (a, b) => {
-                let date1 = dayjs(a.dateFinish, "dd-MM-yyyy").unix();
-                let date2 = dayjs(b.dateFinish, "dd-MM-yyyy").unix();
-                return date1 - date2;
-            },
+            sorter: (a, b) => dayjs(a.dateFinish, 'DD-MM-YYYY').diff(dayjs(b.dateFinish, 'DD-MM-YYYY')),
         },
         {
             title: 'Филиал',

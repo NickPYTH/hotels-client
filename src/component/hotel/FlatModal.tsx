@@ -14,6 +14,8 @@ import {RoomLockModal} from "./RoomLockModal";
 import {FlatLockModal} from "./FlatLockModal";
 import {FlatLocksTimeLineModal} from "./FlatLocksTimeLineModal";
 import {RoomLocksTimeLineModal} from './RoomLocksTimeLineModal';
+import {GuestCard} from "./GuestCard";
+import { ReservationCard } from './ReservationCard';
 
 type ModalProps = {
     flatId: number,
@@ -23,6 +25,8 @@ type ModalProps = {
 }
 
 export const FlatModal = (props: ModalProps) => {
+
+    // States
     const currentUser = useSelector((state: RootStateType) => state.currentUser.user);
     const [messageApi, messageContextHolder] = message.useMessage();
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
@@ -36,6 +40,10 @@ export const FlatModal = (props: ModalProps) => {
     const [key, setKey] = useState(""); // room id
     const [bedId, setBedId] = useState<number | null>(null);
     const [confirmCheckoutReportVisible, setConfirmCheckoutReportVisible] = useState(false);
+    // -----
+
+
+    // Web requests
     const [getFlat, {
         data: flat,
         isLoading: isFlatLoading
@@ -55,6 +63,9 @@ export const FlatModal = (props: ModalProps) => {
         data: updatedFlatTech,
         isLoading: isUpdateFlatTechLoading
     }] = flatAPI.useUpdateTechMutation();
+    // -----
+
+    // Effects
     useEffect(() => {
         if (updatedFlatTech) getFlat({flatId: props.flatId.toString(), date: props.date.format("DD-MM-YYYY HH:mm")});
     }, [updatedFlatTech]);
@@ -78,12 +89,16 @@ export const FlatModal = (props: ModalProps) => {
                 })
         }
     }, [flat]);
+    // -----
+
+    // Useful utils
     const showWarningMsg = (msg: string) => {
         messageApi.warning(msg);
     };
     const showSuccessMsg = (msg: string) => {
         messageApi.success(msg);
     };
+    // -----
 
     return (
         <Modal title={`${flat?.name}`}
@@ -190,65 +205,24 @@ export const FlatModal = (props: ModalProps) => {
                             />}
                             <Flex vertical={false} justify={'center'} align={'center'} gap={'small'} wrap={'wrap'}>
                                 {room.guests.map((guest: GuestModel) => {
-                                    return (
-                                        <Card loading={isCheckoutLoading || isDeleteGuestLoading} title={`${guest.lastname} ${guest.firstname[0]}. ${guest.secondName[0]}.`}
-                                              bordered={true}
-                                              style={{width: 340}}>
-                                            <div>
-                                                Филиал: {guest?.filialEmployee}
-                                            </div>
-                                            <div>
-                                                Должность: {guest?.post}
-                                            </div>
-                                            <div>
-                                                № договора: {guest?.note}
-                                            </div>
-                                            <div>
-                                                Общая стоимость проживания: {guest?.cost}
-                                            </div>
-                                            <div>
-                                                Стоимость проживания за ночь: {guest?.costByNight}
-                                            </div>
-                                            <div>
-                                                Количество ночей: {guest?.daysCount}
-                                            </div>
-                                            <div>
-                                                Дата заселения: {guest?.dateStart}
-                                            </div>
-                                            <div>
-                                                Дата выселения: {guest?.dateFinish}
-                                            </div>
-                                            <div>
-                                                Место: {guest?.bedName}
-                                            </div>
-                                            <Button style={{marginTop: 5, width: 280}} onClick={() => {
-                                                setVisibleGuestModal(true);
-                                                setSelectedGuest(guest);
-                                            }}>Карточка жильца</Button>
-                                            <Button style={{marginTop: 5, width: 280}} onClick={() => {
-                                                setConfirmCheckoutReportVisible(true);
-                                                setSelectedGuest(guest);
-                                            }}>Отчетный документ</Button>
-                                            {
-                                                guest?.checkouted ?
-                                                    <div style={{width: 280}}>
-                                                        <Flex justify={'center'}>
-                                                            <strong>Выселен</strong>
-                                                        </Flex>
-                                                    </div>
-                                                    :
-                                                    <Popconfirm title={"Вы уверены?"} okText={"Да"} onConfirm={() => {
-                                                        checkout(guest.id);
-                                                    }}>
-                                                        <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3} style={{marginTop: 5, width: 280}} danger>Выселить</Button>
-                                                    </Popconfirm>
-                                            }
-                                            <Popconfirm title={"Вы точно хотите удалить запись о проживани?"} okText={"Да"} onConfirm={() => {
-                                                deleteGuest(guest.id);
-                                            }}>
-                                                <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3} style={{marginTop: 5, width: 280}} danger>Удалить запись о проживании</Button>
-                                            </Popconfirm>
-                                        </Card>
+                                    if (guest.isReservation) return (
+                                        <ReservationCard
+                                            guest={guest}
+                                            getFlat={() => getFlat({flatId: props.flatId.toString(), date: props.date.format("DD-MM-YYYY HH:mm")})}
+                                        />
+                                    )
+                                    else return (
+                                        <GuestCard
+                                            guest={guest}
+                                            isCheckoutLoading={isCheckoutLoading}
+                                            isDeleteGuestLoading={isDeleteGuestLoading}
+                                            setVisibleGuestModal={setVisibleGuestModal}
+                                            setSelectedGuest={setSelectedGuest}
+                                            setConfirmCheckoutReportVisible={setConfirmCheckoutReportVisible}
+                                            checkout={checkout}
+                                            currentUser={currentUser}
+                                            deleteGuest={deleteGuest}
+                                        />
                                     )
                                 })}
                                 {(room.guests.length < room.bedsCount) && room.statusId == 1 &&

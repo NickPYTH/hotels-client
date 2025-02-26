@@ -11,6 +11,8 @@ import Male from "../../assets/male.png";
 //@ts-ignore
 import Female from "../../assets/female.png";
 import {FlatModal} from "./FlatModal";
+//@ts-ignore
+import ConfirmedReservation from "../../assets/confirmedReservation.png";
 
 type ModalProps = {
     flatsData: FlatModel[],
@@ -116,22 +118,26 @@ export const TableView = (props:ModalProps) => {
                                                             }}
                                                             title={`${guest.lastname} ${guest.firstname[0]}. ${guest.secondName[0]}. ${guest.post ?? ""} ${guest.organization ?? ""}`}
                                                             description={`Даты проживания C ${guest.dateStart} По ${guest.dateFinish}. До выселения(суток): ${daysBeforeCheckouted == 0 ? "Сегодня" : daysBeforeCheckouted}`}>
-                                                    {daysBeforeCheckouted < 2 ?
-                                                        <Badge count={<ClockCircleOutlined style={{color: '#f5222d'}}/>}>
-                                                            {guest.male ?
-                                                                <img style={{marginTop: 2}} width={22} height={22} src={Male}/>
-                                                                :
-                                                                <img style={{marginTop: 2}} width={22} height={22} src={Female}/>
-                                                            }
-                                                        </Badge>
+                                                    {guest.isReservation ?
+                                                        <img style={{marginTop: 2}} width={22} height={22} src={ConfirmedReservation}/>
                                                         :
-                                                        <>
-                                                            {guest.male ?
-                                                                <img style={{marginTop: 2}} width={22} height={22} src={Male}/>
-                                                                :
-                                                                <img style={{marginTop: 2}} width={22} height={22} src={Female}/>
-                                                            }
-                                                        </>
+                                                        daysBeforeCheckouted < 2 ?
+                                                            <Badge count={<ClockCircleOutlined style={{color: '#f5222d'}}/>}>
+                                                                {
+                                                                    guest.male ?
+                                                                        <img style={{marginTop: 2}} width={22} height={22} src={Male}/>
+                                                                        :
+                                                                        <img style={{marginTop: 2}} width={22} height={22} src={Female}/>
+                                                                }
+                                                            </Badge>
+                                                            :
+                                                            <>
+                                                                {guest.male ?
+                                                                    <img style={{marginTop: 2}} width={22} height={22} src={Male}/>
+                                                                    :
+                                                                    <img style={{marginTop: 2}} width={22} height={22} src={Female}/>
+                                                                }
+                                                            </>
                                                     }
                                                 </Popconfirm>)
                                         })}

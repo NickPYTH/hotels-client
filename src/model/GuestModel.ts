@@ -34,4 +34,5 @@ export type GuestModel = {
     bedName?: number;
     bedId?: number;
     nights?: number;
+    isReservation?: boolean;
 }

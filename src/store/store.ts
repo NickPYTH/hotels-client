@@ -18,6 +18,7 @@ import {historyAPI} from "../service/HistoryService";
 import {eventAPI} from "../service/EventService";
 import {MVZAPI} from "../service/MVZService";
 import {extraAPI} from "../service/ExtraService";
+import {reservationAPI} from "../service/ReservationService";
 
 export type RootStateType = {
     filialList: FilialModelStateType,
@@ -27,6 +28,7 @@ export type RootStateType = {
 const rootReducer = combineReducers({
     filialList: filialSlice,
     currentUser: userSlice,
+    [reservationAPI.reducerPath]: reservationAPI.reducer,
     [filialAPI.reducerPath]: filialAPI.reducer,
     [hotelAPI.reducerPath]: hotelAPI.reducer,
     [flatAPI.reducerPath]: flatAPI.reducer,
@@ -68,6 +70,7 @@ export const setupStore = () => {
                 .concat(historyAPI.middleware)
                 .concat(eventAPI.middleware)
                 .concat(extraAPI.middleware)
+                .concat(reservationAPI.middleware)
     })
 }
 

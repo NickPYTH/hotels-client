@@ -69,7 +69,6 @@ export const GuestModal = (props: ModalProps) => {
     // States
     const currentUser = useSelector((state: RootStateType) => state.currentUser.user); // Текущий пользователь системы
     const [messageApi, messageContextHolder] = message.useMessage(); // Контекст для всплывающих уведомлений
-
     const [isEmployee, setIsEmployee] = useState(true); // Является ли жилец работник Газпрома
     const [findByFioMode, setFindByFioMode] = useState(false); // Поиск данных через ФИО
     const [fio, setFio] = useState<string | null>(null);  // ФИО для поиска данных
@@ -83,6 +82,7 @@ export const GuestModal = (props: ModalProps) => {
     const [memo, setMemo] = useState(""); // Номер маршрутного листа или служебного задания
     const [reason, setReason] = useState(""); // Основание
     const [billing, setBilling] = useState(""); // Вид оплаты
+    const [noContract, setNoContract] = useState(false); // Без договора
     const [selectedContractId, setSelectedContractId] = useState<number | null>(null); // ИД выбранного договора
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
     const [contractsStep2, setContractsStep2] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) а тут по причине и оплате
@@ -117,8 +117,6 @@ export const GuestModal = (props: ModalProps) => {
     const [visibleSelectGuestModal, setVisibleSelectGuestModal] = useState(false);  // Окно выбора проживающего из ранее заселенных жильцов для авто аполнения данных
     const [visibleHistoryModal, setVisibleHistoryModal] = useState(false); // Видимость модального окна и историей изменений карточки
     const [visibleExtrasModal, setVisibleExtrasModal] = useState(false); // Видимость модального окна с доп. услугами (только для Ермака)
-    // -----
-
     // -----
 
     // Web requests
@@ -267,7 +265,7 @@ export const GuestModal = (props: ModalProps) => {
             setLastname(props.selectedGuest.lastname);
             setSecondName(props.selectedGuest.secondName);
             getAllHotels({filialId: props.selectedGuest.filialId.toString()});
-            getAllFlats({hotelId: props.selectedGuest.flatId.toString(), dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
+            getAllFlats({hotelId: props.selectedGuest.hotelId.toString(), dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
             getAllRooms({flatId: props.selectedGuest.flatId, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
             getAllBeds({roomId: props.selectedGuest.roomId, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
             setIsEmployee(!!props.selectedGuest.tabnum);
@@ -277,6 +275,8 @@ export const GuestModal = (props: ModalProps) => {
             setMale(props.selectedGuest.male);
             if (props.selectedGuest.contractId)
                 setSelectedContractId(props.selectedGuest.contractId);
+            else
+                setNoContract(true);
             setNote(props.selectedGuest.note);
             getAllExtras(props.selectedGuest.id);
         }
@@ -533,6 +533,14 @@ export const GuestModal = (props: ModalProps) => {
             setCustomOrgName("ООО \"Газпром трансгаз Сургут\"");
         }
     }
+    const switchNoContractHandler = (e) => {
+        setNoContract(e.target.checked);
+        if (e.target.checked) {
+            setReason(null);
+            setBilling(null);
+            setSelectedContractId(null);
+        }
+    }
     const selectReasonHandler = (reason:string) => {
         setReason(reason);
         setContractsStep2(() => contracts.filter((c:ContractModel) => (billing ? c.billing == billing : true) && c.reason == reason));
@@ -677,41 +685,49 @@ export const GuestModal = (props: ModalProps) => {
                     <div style={{width: 220}}>Номер марш. листа / служебного задания</div>
                     <Input value={memo} onChange={(e) => setMemo(e.target.value)}/>
                 </Flex>
-                <Flex align={"center"}>
-                    <div style={{width: 220}}>Основание</div>
-                    <Flex vertical={true}>
+                {!noContract &&
+                    <>
+                    <Flex align={"center"}>
+                        <div style={{width: 220}}>Основание</div>
+                        <Flex vertical={true}>
+                            <Select
+                                loading={isReasonsLoading}
+                                value={reason}
+                                placeholder={"Выберите основание"}
+                                style={{width: 397}}
+                                onChange={selectReasonHandler}
+                                options={reasons?.filter((r: ReasonModel) => r.isDefault).map((r: ReasonModel) => ({value: r.name, label: r.name}))}
+                            />
+                        </Flex>
+                    </Flex>
+                    <Flex align={"center"}>
+                        <div style={{width: 220}}>Вид оплаты</div>
                         <Select
-                            loading={isReasonsLoading}
-                            value={reason}
-                            placeholder={"Выберите основание"}
-                            style={{width: 397}}
-                            onChange={selectReasonHandler}
-                            options={reasons?.filter((r: ReasonModel) => r.isDefault).map((r: ReasonModel) => ({value: r.name, label: r.name}))}
+                            value={billing}
+                            placeholder={"Выберите способо оплаты"}
+                            style={{width: 560}}
+                            onChange={selectBillingHandler}
+                            options={[{value: "наличный расчет", label: "наличный расчет"}, {value: "безналичный расчет", label: "безналичный расчет"}]}
                         />
                     </Flex>
-                </Flex>
-                <Flex align={"center"}>
-                    <div style={{width: 220}}>Вид оплаты</div>
-                    <Select
-                        value={billing}
-                        placeholder={"Выберите способо оплаты"}
-                        style={{width: 560}}
-                        onChange={selectBillingHandler}
-                        options={[{value: "наличный расчет", label: "наличный расчет"}, {value: "безналичный расчет", label: "безналичный расчет"}]}
-                    />
-                </Flex>
-                <Flex align={"center"}>
-                    <div style={{width: 220}}>Договор</div>
-                    <Flex vertical={true}>
-                        <Select
-                            loading={isContractsLoading}
-                            value={selectedContractId}
-                            placeholder={"Перед выбором договора заполните предыдущие поля"}
-                            style={{width: 397}}
-                            onChange={selectContractHandler}
-                            options={contractsStep2?.map((contractModel: ContractModel) => ({value: contractModel.id, label: `Год: ${contractModel.year} №: ${contractModel.docnum}`}))}
-                        />
+                    <Flex align={"center"}>
+                        <div style={{width: 220}}>Договор</div>
+                        <Flex vertical={true}>
+                            <Select
+                                loading={isContractsLoading}
+                                value={selectedContractId}
+                                placeholder={"Перед выбором договора заполните предыдущие поля"}
+                                style={{width: 397}}
+                                onChange={selectContractHandler}
+                                options={contractsStep2?.map((contractModel: ContractModel) => ({value: contractModel.id, label: `Год: ${contractModel.year} №: ${contractModel.docnum}`}))}
+                            />
+                        </Flex>
                     </Flex>
+                    </>
+                }
+                <Flex align={"center"}>
+                    <div style={{width: 155}}>Без договора</div>
+                    <Checkbox checked={noContract} onChange={switchNoContractHandler}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 250}}>Регистрация по месту пребывания</div>

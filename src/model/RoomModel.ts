@@ -1,4 +1,5 @@
 import {GuestModel} from "./GuestModel";
+import {FlatModel} from "./FlatModel";
 
 export type RoomModel = {
     id: number;
@@ -12,4 +13,5 @@ export type RoomModel = {
     roomLockId: number;
     guests: GuestModel[];
     beds?: any[];
+    flat?: FlatModel,
 }

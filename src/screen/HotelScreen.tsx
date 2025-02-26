@@ -142,7 +142,7 @@ const HotelScreen: React.FC = () => {
             marks[i] = {
                 date: counter === 0 ? selectedDate.add(counter * -1, 'day') : dayjs(`${selectedDate.add(counter * -1, 'day').format('DD-MM-YYYY')} 12:00`, 'DD-MM-YYYY HH:mm'),
                 label: <div style={{width: 76}}>
-                    <div>{selectedDate.add(counter * -1, 'day').format('DD-MM-YYYY')}</div>
+                    <div>{selectedDate.add(counter * -1, 'day').format('DD-MM')}</div>
                 </div>
             }
             counter++;
@@ -152,7 +152,7 @@ const HotelScreen: React.FC = () => {
             marks[i] = {
                 date: dayjs(`${selectedDate.add(counter, 'day').format('DD-MM-YYYY')} 12:00`, 'DD-MM-YYYY HH:mm'),
                 label: <div style={{width: 76}}>
-                    <div>{selectedDate.add(counter, 'day').format('DD-MM-YYYY')}</div>
+                    <div>{selectedDate.add(counter, 'day').format('DD-MM')}</div>
                 </div>
             }
             counter++;
@@ -292,11 +292,6 @@ const HotelScreen: React.FC = () => {
                         <Button style={{width: '100%', marginBottom: 10}} icon={<UsergroupAddOutlined/>} type="primary" onClick={() => setVisibleManyGuestModal(true)}>
                             Массовая загрузка жильцов
                         </Button>
-                        {selectedView != "2" &&
-                            <Button style={{width: '100%'}} icon={<UserAddOutlined/>} type="primary" onClick={() => setVisibleGuestModal(true)}>
-                                Добавить жильца
-                            </Button>
-                        }
                     </Flex>
                     <Divider style={{height: dividerHeight}} type={'vertical'}/>
                     {selectedView !== "2" && <>

@@ -104,6 +104,10 @@ export const CellsView = (props: ModalPros) => {
                 return "Декабрь";
         }
     });
+    const [reservationCellsColor] = useState(() => {
+        if (localStorage.getItem("reservationCellsColor")) return localStorage.getItem('reservationCellsColor');
+        return "#B9848C";
+    });
     const [cellsColor] = useState(() => {
         if (localStorage.getItem("cellsColor")) return localStorage.getItem('cellsColor');
         return "#75a5f2";
@@ -226,13 +230,14 @@ export const CellsView = (props: ModalPros) => {
                         let note = val.split('#')[0].split('&')[3] == 'null' ? "" : val.split('#')[0].split('&')[3];
                         let post = val.split('#')[0].split('&')[4];
                         let filial = val.split('#')[0].split('&')[5] == 'emptyF' ? "" : val.split('#')[0].split('&')[5];
+                        let isReservation = val.split('#')[0].split('&')[6];
                         let coloredWidth = Math.abs(percent) + addedPixel == columnWidth ? '100%' : Math.abs(percent) + addedPixel*(Math.abs(percent)/100);
                         return (<Flex key={record.id} vertical={false} style={{background: isWeekend ? cellBackgroundColor : 'inherit', height: 31}}>
                             <div style={{
                                 marginTop: 3,
                                 marginBottom: 3,
                                 cursor: 'pointer',
-                                background: cellsColor,
+                                background: isReservation == 'true' ? reservationCellsColor: cellsColor,
                                 width: coloredWidth,
                                 height: 25,
                                 color: fontColor,
@@ -340,7 +345,7 @@ export const CellsView = (props: ModalPros) => {
                                                 <div>{personLeftNote}</div>
                                             </Flex>)}>
                                                 <div style={{paddingTop: 4, width: fioPersonLeft.length*1.5 + 15, height: 25}}>
-                                                    <Flex style={{position: "absolute", top: 6, left: -((columnWidth - (coloredLeftWidth as unknown as number))), height: 25}}
+                                                    <Flex style={{position: "absolute", top: 6, left: -((columnWidth - (coloredLeftWidth as unknown as number))+20), height: 25}}
                                                           vertical={false} align={'start'} justify={'center'}>
                                                         {personLeftMale == 'true' ?
                                                             <img style={{marginRight: 3}} width={15} height={15} src={Male} alt={'man'}/>
@@ -416,45 +421,44 @@ export const CellsView = (props: ModalPros) => {
         setCurrentMonth(value);
         switch (value) {
             case "Январь":
-                props.setChessDateRange([dayjs('01-01-2025', 'DD-MM-YYYY'), dayjs('31-01-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-01-2025', 'DD-MM-YYYY'), dayjs('14-01-2025', 'DD-MM-YYYY')])
                 break;
             case "Февраль":
-                props.setChessDateRange([dayjs('01-02-2025', 'DD-MM-YYYY'), dayjs('28-02-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-02-2025', 'DD-MM-YYYY'), dayjs('14-02-2025', 'DD-MM-YYYY')])
                 break;
             case "Март":
-                props.setChessDateRange([dayjs('01-03-2025', 'DD-MM-YYYY'), dayjs('31-03-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-03-2025', 'DD-MM-YYYY'), dayjs('14-03-2025', 'DD-MM-YYYY')])
                 break;
             case "Апрель":
-                props.setChessDateRange([dayjs('01-04-2025', 'DD-MM-YYYY'), dayjs('30-04-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-04-2025', 'DD-MM-YYYY'), dayjs('14-04-2025', 'DD-MM-YYYY')])
                 break;
             case "Май":
-                props.setChessDateRange([dayjs('01-05-2025', 'DD-MM-YYYY'), dayjs('31-05-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-05-2025', 'DD-MM-YYYY'), dayjs('14-05-2025', 'DD-MM-YYYY')])
                 break;
             case "Июнь":
-                props.setChessDateRange([dayjs('01-06-2025', 'DD-MM-YYYY'), dayjs('30-06-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-06-2025', 'DD-MM-YYYY'), dayjs('14-06-2025', 'DD-MM-YYYY')])
                 break;
             case "Июль":
-                props.setChessDateRange([dayjs('01-07-2025', 'DD-MM-YYYY'), dayjs('31-07-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-07-2025', 'DD-MM-YYYY'), dayjs('14-07-2025', 'DD-MM-YYYY')])
                 break;
             case "Август":
-                props.setChessDateRange([dayjs('01-08-2025', 'DD-MM-YYYY'), dayjs('31-08-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-08-2025', 'DD-MM-YYYY'), dayjs('14-08-2025', 'DD-MM-YYYY')])
                 break;
             case "Сентябрь":
-                props.setChessDateRange([dayjs('01-09-2025', 'DD-MM-YYYY'), dayjs('30-09-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-09-2025', 'DD-MM-YYYY'), dayjs('14-09-2025', 'DD-MM-YYYY')])
                 break;
             case "Октябрь":
-                props.setChessDateRange([dayjs('01-10-2025', 'DD-MM-YYYY'), dayjs('30-10-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-10-2025', 'DD-MM-YYYY'), dayjs('14-10-2025', 'DD-MM-YYYY')])
                 break;
             case "Ноябрь":
-                props.setChessDateRange([dayjs('01-11-2025', 'DD-MM-YYYY'), dayjs('30-11-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-11-2025', 'DD-MM-YYYY'), dayjs('14-11-2025', 'DD-MM-YYYY')])
                 break;
             case "Декабрь":
-                props.setChessDateRange([dayjs('01-12-2025', 'DD-MM-YYYY'), dayjs('31-11-2025', 'DD-MM-YYYY')])
+                props.setChessDateRange([dayjs('01-12-2025', 'DD-MM-YYYY'), dayjs('14-11-2025', 'DD-MM-YYYY')])
                 break;
         }
     };
     const selectCellHandler = (el:string, record:any) => {
-        console.log(record)
         let selectedCells = null;
         if (localStorage.getItem('selectedCells'))
             selectedCells = JSON.parse(localStorage.getItem('selectedCells'));
@@ -637,7 +641,7 @@ export const CellsView = (props: ModalPros) => {
                 value={currentMonth}
                 block={true}
                 style={{width: window.innerWidth, margin: 0}}
-                options={['Январь', 'Февраль', 'Март', 'Аперль', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']}
+                options={['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']}
                 onChange={updateCurrentMonthHandler}
             />
             {(data && columns && !isFlatsLoading) ?

@@ -1,4 +1,5 @@
 import {RoomModel} from "./RoomModel";
+import {HotelModel} from "./HotelModel";
 
 export type FlatModel = {
     id: number;
@@ -18,4 +19,5 @@ export type FlatModel = {
     rooms: RoomModel[];
     flatLockId: number;
     tech: boolean;
+    hotel?: HotelModel
 }

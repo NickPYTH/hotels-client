@@ -1,3 +1,5 @@
+import {FilialModel} from "./FilialModel";
+
 export type HotelModel = {
     id: number;
     name: string;
@@ -8,4 +10,5 @@ export type HotelModel = {
     bedsCount: number;
     emptyBedsCount: number;
     busyBedsCount: number;
+    filial?: FilialModel
 }
