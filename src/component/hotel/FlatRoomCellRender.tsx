@@ -66,7 +66,7 @@ export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
         }
     }, [availableBedFromRequest]);
     useEffect(() => {
-        if (props.dateStart && props.dateFinish){
+        if (props.dateStart && props.dateFinish && props.hotelId){
             getAllFlats({hotelId: props.hotelId.toString(), dateStart: props.dateStart, dateFinish: props.dateFinish});
         }
     }, [props.dateStart, props.dateFinish])
@@ -96,10 +96,12 @@ export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
     // Handlers
     const selectFlatHandler = (id: number | undefined = undefined) => {
         setSelectedRoomId(null);
+        setSelectedBedId(null);
         if (id !== undefined) setSelectedFlatId(id);
         else setSelectedFlatId(null);
     };
     const selectRoomHandler = (id: number | undefined = undefined) => {
+        setSelectedBedId(null);
         if (id !== undefined) setSelectedRoomId(id);
         else setSelectedRoomId(null);
     };
@@ -109,7 +111,7 @@ export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
     };
     // -----
 
-    return <Flex vertical={true}>
+    return <Flex vertical={true} style={{marginTop: 3, marginBottom: 3}}>
             <Select
                 allowClear={true}
                 value={selectedFlatId}

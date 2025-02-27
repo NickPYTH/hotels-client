@@ -4,60 +4,56 @@ import {
     Checkbox,
     DatePicker,
     Flex,
-    Input,
     Modal,
     Select,
     Table,
-    TableProps,
+    TableProps, Tag,
     TimePicker,
     Upload,
     UploadProps
 } from 'antd';
 import {InboxOutlined} from "@ant-design/icons";
 import {host} from "../../config/constants";
-import {GuestModel} from "../../model/GuestModel";
-import {ReasonModel} from "../../model/ReasonModel";
-import {reasonAPI} from "../../service/ReasonService";
-import {ContractModel} from "../../model/ContractModel";
-import {contractAPI} from "../../service/ContractService";
 import dayjs, {Dayjs} from "dayjs";
-import {GuestModal} from "../dict/GuestModal";
-import {ContractCellRender} from './ContractCellRender';
 import {DatesCellRender} from "./DatesCellRender";
 import {FlatRoomCellRenderer} from "./FlatRoomCellRender";
-import {flatAPI} from "../../service/FlatService";
+import {ReservationModel} from "../../model/ReservationModel";
+import {filialAPI} from "../../service/FilialService";
+import {FilialModel} from "../../model/FilialModel";
+import {HotelModel} from "../../model/HotelModel";
+import {hotelAPI} from "../../service/HotelService";
+import {EventModel} from "../../model/EventModel";
+import {eventAPI} from "../../service/EventService";
+import {ReservationModal} from "../dict/ReservationModal";
 
 const {Dragger} = Upload;
 
 type ModalProps = {
-    filialId: number,
-    hotelName: string,
-    hotelId: number
     visible: boolean,
     setVisible: Function,
     refresh: Function,
     showWarningMsg: Function,
 }
 
-export const ManyGuestModal = (props: ModalProps) => {
+export const GroupReservationModal = (props: ModalProps) => {
 
     // States
     const [mode, setMode] = useState<boolean>(false); // 0 - by tab, 1 - by fio
-    const [data, setData] = useState<GuestModel[] | null>(null); // Данные в таблице
-    const [reason, setReason] = useState(null); // Основание
-    const [billing, setBilling] = useState(null); // Вид оплаты
-    const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
-    const [selectedContractId, setSelectedContractId] = useState<number | null>(null); // ИД выбранного договора
-    const [visibleGuestModal, setVisibleGuestModal] = useState(false);
+    const [data, setData] = useState<ReservationModel[] | null>(null); // Данные в таблице
+    const [visibleReservationModal, setVisibleReservationModal] = useState(false);
+    const [selectedFromFilialId, setSelectedFromFilialId] = useState<number | null>(null); // ИД филиала заказчика
+    const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null); // ИД филиала
+    const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null); // ИД общежития
+    const [selectedEventId, setSelectedEventId] = useState<number | null>(null);  // ИД выбранного мероприятия
     const [dateStart, setDateStart] = useState<Dayjs | null>(null); // Дата заселения
     const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время заселения
     const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
     const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время выселения
-    const [selectedRecord, setSelectedRecord] = useState<GuestModel | null>(null);
+    const [selectedRecord, setSelectedRecord] = useState<ReservationModel | null>(null);
     // -----
 
     // Useful utils
-    const columns: TableProps<GuestModel>['columns'] = [
+    const columns: TableProps<ReservationModel>['columns'] = [
         {
             title: 'Табельный номер',
             dataIndex: 'tabnum',
@@ -82,37 +78,34 @@ export const ManyGuestModal = (props: ModalProps) => {
             key: 'secondName',
         },
         {
-            title: 'Договор',
-            dataIndex: 'contract',
-            key: 'contract',
-            render: (val, record:GuestModel) => (<ContractCellRender tabnum={record.tabnum} selectedContractId={record.contractId} reasons={reasons} contracts={contracts} setGridData={setData} hotelId={props.hotelId} />)
-        },
-        {
             title: 'Даты проживания',
             dataIndex: 'dates',
             key: 'dates',
-            render: (val, record:GuestModel) => (<DatesCellRender tabnum={record.tabnum} dateTimeStart={record.dateStart} dateTimeFinish={record.dateFinish} setGridData={setData} />)
+            render: (val, record:ReservationModel) => (<DatesCellRender tabnum={record.tabnum} dateTimeStart={record.dateStart} dateTimeFinish={record.dateFinish} setGridData={setData} />)
         },
         {
             title: 'Секция и комната',
-            dataIndex: 'flatName',
-            key: 'flatName',
-            render: (val, record: GuestModel) => (<FlatRoomCellRenderer tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.flatId} roomId={record.roomId} setGridData={setData} filialId={props.filialId} hotelId={props.hotelId} bedId={record.bedId} />)
+            dataIndex: 'bed',
+            key: 'bed',
+            render: (val, record: ReservationModel) => (<FlatRoomCellRenderer tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.bed?.room.flat.id} roomId={record.bed?.room.id} setGridData={setData} filialId={selectedFilialId} hotelId={selectedHotelId} bedId={record.bed?.id} />)
         },
         {
             title: 'Статус',
-            dataIndex: 'status',
-            key: 'status',
+            dataIndex: 'statusGrid',
+            key: 'statusGrid',
+            render: (val, record:any) => (<Tag style={{marginLeft: 15}} color={record?.statusGrid == "Забронирован" ? 'success':'volcano'}>
+                {record?.statusGrid == "Забронирован" ? 'Забронирован':'Не обработан'}
+            </Tag>)
         },
         {
             title: '',
             dataIndex: 'action',
             key: 'action',
-            render: (val, record:any) => (<Button disabled={record.status === "Заселен"}
+            render: (val, record:any) => (<Button style={{marginLeft: 15}} disabled={record?.statusGrid === "Забронирован"}
                                                   onClick={() => {
                 setSelectedRecord(record);
-                setVisibleGuestModal(true);
-            }}>Заселить</Button>)
+                setVisibleReservationModal(true);
+            }}>Забронировать</Button>)
         },
     ]
 
@@ -138,46 +131,30 @@ export const ManyGuestModal = (props: ModalProps) => {
     // -----
 
     // Web requests
-    const [getContracts, {
-        data: contractsFromRequest,
-        isLoading: isContractsLoading
-    }] = contractAPI.useGetAllMutation(); // Получение всех договоров
-    const [getAllReasons, {
-        data: reasons,
-        isLoading: isReasonsLoading
-    }] = reasonAPI.useGetAllMutation(); // Получение всех оснований
+    const [getAllFilials, {
+        data: filialsFromRequest,
+        isLoading: isFilialsLoading
+    }] = filialAPI.useGetAllMutation(); // Поулчение всех филиалов
+    const [getAllHotels, {
+        data: hotelsFromRequest,
+        isLoading: isHotelsLoading
+    }] = hotelAPI.useGetAllByFilialIdMutation(); // Получение отелей по ИД филиала
+    const [getAllEvents, {
+        data: events,
+    }] = eventAPI.useGetAllMutation(); // Получение списка мероприятий
     // -----
 
     // Effects
     useEffect(() => {
-        getContracts();
-        getAllReasons();
-    }, [])
+        getAllEvents();
+        getAllFilials();
+    }, []);
     useEffect(() => {
-        if (contractsFromRequest) {
-            setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === props.hotelId));
-        }
-    }, [contractsFromRequest]);
+        if (selectedFilialId) getAllHotels({filialId: selectedFilialId.toString()});
+    }, [selectedFilialId]);
     // -----
 
     // Handlers
-    const selectReasonHandler = (reason: string) => {
-        setReason(reason);
-        setSelectedContractId(null);
-        setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === props.hotelId && (billing ? c.billing == billing : true) && c.reason == reason));
-    }
-    const selectBillingHandler = (billing: string) => {
-        setBilling(billing);
-        setSelectedContractId(null);
-        setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === props.hotelId && (reason ? c.reason == reason : true) && c.billing == billing));
-
-    }
-    const selectContractHandler = (id: number) => {
-        let contract = contracts.find((c:ContractModel) => c.id == id);
-        setBilling(contract.billing);
-        setReason(contract.reason);
-        setSelectedContractId(id);
-    }
     const selectStartDateHandler = (date: Dayjs) => {
         setDateStart(date);
     }
@@ -191,59 +168,58 @@ export const ManyGuestModal = (props: ModalProps) => {
         setTimeFinish(time);
     }
     const fillTableHandler = () => {
-        if (selectedContractId && reason && billing && dateStart && dateFinish) {
+        if (dateStart && dateFinish) {
             if (dateStart.isAfter(dateFinish)){
                 props.showWarningMsg("Дата заселения указана после даты выселения");
                 return;
             }
-            setData((guests:GuestModel[]) => {
-                let tmp: GuestModel[] = JSON.parse(JSON.stringify(guests));
-                return tmp.map((guest:GuestModel) => ({...guest,
-                    reason,
-                    billing,
-                    contractId: selectedContractId,
+            setData((reservations:ReservationModel[]) => {
+                let tmp: ReservationModel[] = JSON.parse(JSON.stringify(reservations));
+                let event: EventModel = events?.find((e:EventModel) => e.id == selectedEventId);
+                let filial: FilialModel = filialsFromRequest?.find((f:FilialModel) => f.id == selectedFromFilialId);
+                return tmp.map((res:ReservationModel) => ({...res,
+                    fromFilial: filial,
+                    event,
                     dateStart: `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`,
                     dateFinish: `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`
-
                 }))
             });
         } else props.showWarningMsg("Некторые поля остались пустыми");
     }
+    const selectHotelHandler = (id: number | undefined = undefined) => {
+        if (id !== undefined) setSelectedHotelId(id);
+        else setSelectedHotelId(null);
+    };
     // -----
 
     return (
-        <Modal title={`Массовая загрузка жильцов`}
+        <Modal title={`Групповое бронирование`}
                open={props.visible}
                onCancel={() => {
-                   if (window.confirm("Вы уверены что хотите закрыть окно расселения?")) props.setVisible(false);
+                   if (window.confirm("Вы уверены что хотите закрыть окно бронирования?")) props.setVisible(false);
                }}
                footer={() => (<></>)}
                width={window.innerWidth - 10}
                maskClosable={false}
         >
-            {visibleGuestModal &&
-                <GuestModal
+            {visibleReservationModal &&
+                <ReservationModal
                     semiAutoParams={selectedRecord}
-                    room={null}
-                    bedId={null}
-                    setGuests={() => {
-                    }}
-                    showSuccessMsg={() => {
-                    }}
-                    isAddressDisabled={false}
-                    selectedGuest={null}
-                    visible={visibleGuestModal}
-                    setVisible={setVisibleGuestModal}
-                    refresh={(guest:GuestModel) => {
-                        if (guest) {
-                            setData((prev: GuestModel[]) => {
-                                return prev.map((g: GuestModel) => {
-                                    if (g.tabnum == guest.tabnum) return {...g, flatName: guest.flatName, roomName: guest.roomName, bedName: guest.bedName, status: "Заселен"};
-                                    else return g;
+                    selectedReservation={null}
+                    visible={visibleReservationModal}
+                    setVisible={setVisibleReservationModal}
+                    refresh={(reservation:ReservationModel) => {
+                        if (reservation) {
+                            setData((prev: ReservationModel[]) => {
+                                return prev.map((r: ReservationModel) => {
+                                    if (r.tabnum == reservation.tabnum) return {...r, bed: reservation.bed, statusGrid: "Забронирован"};
+                                    else return r;
                                 })
                             });
                         }
-                    }}/>}
+                    }}
+                />
+            }
             {data == null &&
                 <Flex gap={'small'} vertical={true} style={{marginBottom: 5}}>
                     <Flex align={"center"}>
@@ -270,42 +246,50 @@ export const ManyGuestModal = (props: ModalProps) => {
                     <Flex>
                         <Flex vertical={true}>
                             <Flex align={"center"} style={{marginBottom: 5}}>
-                                <div style={{width: 120}}>Общежитие</div>
-                                <Input disabled={true}
-                                       style={{width: 300}}
-                                       value={props.hotelName}
+                                <div style={{width: 150}}>Филиал заказчик</div>
+                                <Select
+                                    disabled={isFilialsLoading}
+                                    loading={isFilialsLoading}
+                                    value={selectedFromFilialId}
+                                    placeholder={"Выберите филиал"}
+                                    style={{minWidth: 395, maxWidth: 395}}
+                                    onChange={(e) => setSelectedFromFilialId(e)}
+                                    options={filialsFromRequest?.map((filial: FilialModel) => ({value: filial.id, label: filial.name}))}
                                 />
                             </Flex>
                             <Flex align={"center"} style={{marginBottom: 5}}>
-                                <div style={{width: 120}}>Основание</div>
+                                <div style={{width: 150}}>Филиал</div>
                                 <Select
-                                    loading={isReasonsLoading}
-                                    value={reason}
-                                    placeholder={"Выберите основание"}
-                                    style={{width: 300}}
-                                    onChange={selectReasonHandler}
-                                    options={reasons?.filter((r: ReasonModel) => r.isDefault).map((r: ReasonModel) => ({value: r.name, label: r.name}))}
+                                    disabled={isFilialsLoading}
+                                    loading={isFilialsLoading}
+                                    value={selectedFilialId}
+                                    placeholder={"Выберите филиал"}
+                                    style={{minWidth: 395, maxWidth: 395}}
+                                    onChange={(e) => setSelectedFilialId(e)}
+                                    options={filialsFromRequest?.map((filial: FilialModel) => ({value: filial.id, label: filial.name}))}
                                 />
                             </Flex>
                             <Flex align={"center"} style={{marginBottom: 5}}>
-                                <div style={{width: 120}}>Вид оплаты</div>
+                                <div style={{width: 150}}>Общежитие</div>
                                 <Select
-                                    value={billing}
-                                    placeholder={"Выберите способо оплаты"}
-                                    style={{width: 300}}
-                                    onChange={selectBillingHandler}
-                                    options={[{value: "наличный расчет", label: "наличный расчет"}, {value: "безналичный расчет", label: "безналичный расчет"}]}
+                                    allowClear={true}
+                                    value={selectedHotelId}
+                                    loading={isHotelsLoading}
+                                    placeholder={"Выберите общежитие"}
+                                    style={{minWidth: 395, maxWidth: 395}}
+                                    onChange={(id) => selectHotelHandler(id)}
+                                    onClear={() => selectHotelHandler()}
+                                    options={hotelsFromRequest?.map((hotel: HotelModel) => ({value: hotel.id, label: hotel.name}))}
                                 />
                             </Flex>
-                            <Flex align={"center"} style={{marginBottom: 5}}>
-                                <div style={{width: 120}}>Договор</div>
+                            <Flex align={"center"}>
+                                <div style={{width: 150}}>Мероприятие</div>
                                 <Select
-                                    loading={isContractsLoading}
-                                    value={selectedContractId}
-                                    placeholder={"Перед выбором договора заполните предыдущие поля"}
-                                    style={{width: 300}}
-                                    onChange={selectContractHandler}
-                                    options={contracts?.map((contractModel: ContractModel) => ({value: contractModel.id, label: `Год: ${contractModel.year} №: ${contractModel.docnum}`}))}
+                                    value={selectedEventId}
+                                    placeholder={"Выберите мероприятие"}
+                                    style={{minWidth: 395, maxWidth: 395}}
+                                    onChange={(e) => setSelectedEventId(e)}
+                                    options={events?.map((eve:EventModel) => ({value: eve.id, label: eve.name}))}
                                 />
                             </Flex>
                         </Flex>
@@ -325,18 +309,11 @@ export const ManyGuestModal = (props: ModalProps) => {
                     </Flex>
                     <Table
                         bordered={true}
-                        style={{width: '100vw'}}
+                        style={{width: '100vw', marginTop: 15}}
                         columns={columns}
                         dataSource={data}
                         pagination={{
                             defaultPageSize: 20,
-                        }}
-                        onRow={(record, rowIndex) => {
-                            return {
-                                onDoubleClick: (e) => {
-
-                                },
-                            };
                         }}
                     />
                 </Flex>

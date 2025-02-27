@@ -30,7 +30,7 @@ export const ReservationCard = (props:CardProps) => {
     // -----
 
     return(
-        <Card title={`${props.guest.lastname} ${props.guest.firstname[0]}. ${props.guest.secondName[0]}.`}
+        <Card title={`${props.guest.lastname ?? ""} ${props.guest.firstname ? props.guest.firstname[0]+"." : ""} ${props.guest.secondName ? props.guest.secondName[0]+".":""}`}
               bordered={true}
               style={{width: 340}}>
             <Tag style={{position: 'absolute', top: 8, right: 5}} color={'blue'}>Бронь #{props.guest.id}</Tag>

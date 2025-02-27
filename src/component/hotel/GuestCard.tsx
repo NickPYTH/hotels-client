@@ -16,7 +16,7 @@ type CardProps = {
 }
 export const GuestCard = (props:CardProps) => {
     return(
-        <Card loading={props.isCheckoutLoading || props.isDeleteGuestLoading} title={`${props.guest.lastname} ${props.guest.firstname[0]}. ${props.guest.secondName[0]}.`}
+        <Card loading={props.isCheckoutLoading || props.isDeleteGuestLoading} title={`${props.guest.lastname} ${props.guest.firstname ? props.guest.firstname[0]+"." : ""} ${props.guest.secondName ? props.guest.secondName[0]+".":""}`}
               bordered={true}
               style={{width: 340}}>
             <div>

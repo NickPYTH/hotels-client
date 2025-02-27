@@ -29,7 +29,7 @@ import {CellsView} from "../component/hotel/CellsView";
 import {NotCheckoutedModal} from "../component/hotel/NotCheckoutedModal";
 import {ThirdFloorPlanModal} from "../component/hotel/ThirdFloorPlanModal";
 import {GuestModal} from "../component/dict/GuestModal";
-import {ManyGuestModal} from "../component/hotel/ManyGuestModal";
+import {GroupGuestModal} from "../component/hotel/GroupGuestModal";
 import {TableView} from "../component/hotel/TableView";
 
 const HotelScreen: React.FC = () => {
@@ -213,7 +213,7 @@ const HotelScreen: React.FC = () => {
                 {(notCheckoutedModalVisible && id) && <NotCheckoutedModal hotelId={id} visible={notCheckoutedModalVisible} setVisible={setNotCheckoutedModalVisible} selectedDate={selectedDate}/>}
                 {messageContextHolder}
                 {(visibleManyGuestModal && filialId) &&
-                    <ManyGuestModal
+                    <GroupGuestModal
                         filialId={filialId}
                         hotelId={parseInt(id)}
                         hotelName={hotelName}

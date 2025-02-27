@@ -20,8 +20,10 @@ import {ReservationModel} from "../../model/ReservationModel";
 import {reservationAPI} from "../../service/ReservationService";
 import {eventAPI} from "../../service/EventService";
 import {EventModel} from "../../model/EventModel";
+import {GuestModel} from "../../model/GuestModel";
 
 type ModalProps = {
+    semiAutoParams?: ReservationModel,
     selectedReservation: ReservationModel | null,
     setSelectedReservation?: Function,
     visible: boolean,
@@ -40,8 +42,8 @@ export const ReservationModal = (props: ModalProps) => {
     const [firstname, setFirstname] = useState(""); // Имя
     const [secondname, setSecondname] = useState(""); // Отчество
     const [male, setMale] = useState<boolean | null>(null); // Пол ДА - мужской, НЕТ - женский
-    const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
-    const [selectedFromFilialId, setSelectedFromFilialId] = useState<number | null>(null);
+    const [selectedEventId, setSelectedEventId] = useState<number | null>(null);  // ИД выбранного мероприятия
+    const [selectedFromFilialId, setSelectedFromFilialId] = useState<number | null>(null); // ИД филиала отправителя заявки
     const [dateStart, setDateStart] = useState<Dayjs | null>(() => {
         if (props.selectedReservation?.dateStart) return dayjs(props.selectedReservation.dateStart, 'DD-MM-YYYY');
         else return null;
@@ -70,7 +72,6 @@ export const ReservationModal = (props: ModalProps) => {
     const [beds, setBeds] = useState<BedModel[]>([]); // Перечень доступных для выбора мест
     const [note, setNote] = useState("");
     const [visibleHistoryModal, setVisibleHistoryModal] = useState(false); // Видимость модального окна и историей изменений карточки
-    // -----
     // -----
 
     // Web requests
@@ -118,6 +119,30 @@ export const ReservationModal = (props: ModalProps) => {
     useEffect(() => {
         getAllFilials();
         getAllEvents();
+        if (props.semiAutoParams){
+            if (props.semiAutoParams.tabnum) {
+                setTabnum(props.semiAutoParams.tabnum);
+                getFioByTabnum(props.semiAutoParams.tabnum);
+            }
+            if (props.semiAutoParams.dateStart) {
+                setDateStart(dayjs(props.semiAutoParams.dateStart, 'DD-MM-YYYY'));
+                setTimeStart(dayjs(props.semiAutoParams.dateStart.split(" ")[1], 'HH:mm'));
+            }
+            if (props.semiAutoParams.dateFinish) {
+                setDateFinish(dayjs(props.semiAutoParams.dateFinish, 'DD-MM-YYYY'));
+                setTimeFinish(dayjs(props.semiAutoParams.dateFinish.split(" ")[1], 'HH:mm'));
+            }
+            setSelectedEventId(props.semiAutoParams.event?.id);
+            setSelectedFromFilialId(props.semiAutoParams.fromFilial?.id);
+            // Поля совпадают, но мне лень переделывать их под ReservationModel
+            let tmp: GuestModel = props.semiAutoParams as unknown as GuestModel;
+            setSelectedFilialId(tmp.filialId);
+            setSelectedHotelId(tmp.hotelId);
+            setSelectedFlatId(tmp.flatId);
+            setSelectedRoomId(tmp.roomId);
+            setSelectedBedId(tmp.bedId);
+            // -----
+        }
     }, []);
     useEffect(() => {
         if (fioByTabnum) {
@@ -140,6 +165,10 @@ export const ReservationModal = (props: ModalProps) => {
         if (props.selectedReservation) {
             getGuestHistory(props.selectedReservation.id);
             getFioByTabnum(props.selectedReservation.tabnum);
+            setLastname(props.selectedReservation.lastname);
+            setFirstname(props.selectedReservation.firstname);
+            setSecondname(props.selectedReservation.secondname);
+            setMale(props.selectedReservation.male)
             setSelectedFilialId(props.selectedReservation.bed.room.flat.hotel.filial.id);
             setSelectedHotelId(props.selectedReservation.bed.room.flat.hotel.id);
             setSelectedFlatId(props.selectedReservation.bed.room.flat.id);
@@ -216,7 +245,9 @@ export const ReservationModal = (props: ModalProps) => {
             if (!updatedReservation.error) {
                 props.setVisible(false);
                 if (props.setSelectedReservation) props.setSelectedReservation(null);
-                props.refresh();
+                if (props.semiAutoParams){
+                    props.refresh(updatedReservation);
+                } else props.refresh();
             }
         }
     }, [updatedReservation]);
@@ -257,8 +288,9 @@ export const ReservationModal = (props: ModalProps) => {
         if (id !== undefined) setSelectedBedId(id);
         else setSelectedBedId(null);
     };
+
     const confirmHandler = () => {
-        if (firstname && lastname && secondname && dateStart && dateFinish && selectedFlatId && selectedRoomId && male !== null && selectedEventId && selectedFromFilialId) {
+        if (dateStart && dateFinish && selectedFlatId && selectedRoomId && male !== null && selectedEventId && selectedFromFilialId) {
             if (dateStart.isAfter(dateFinish)) return;
             let ds = `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`;
             let df = `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`;
@@ -272,6 +304,7 @@ export const ReservationModal = (props: ModalProps) => {
                     firstname,
                     lastname,
                     secondname,
+                    male,
                     bed: {id: selectedBedId, name: ''},
                     dateStart: ds,
                     dateFinish: df,
@@ -313,7 +346,7 @@ export const ReservationModal = (props: ModalProps) => {
     // ------
 
     return (
-        <Modal title={props.selectedReservation ? "Редактирование" : "Создание"}
+        <Modal title={props.selectedReservation ? "Редактирование брони" : "Создание брони"}
                open={props.visible}
                onCancel={closeModalHandler}
                loading={(isFilialsLoading)}
@@ -367,15 +400,15 @@ export const ReservationModal = (props: ModalProps) => {
 
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Фамилия</div>
-                    <Input disabled={true} value={lastname} onChange={(e) => setLastname(e.target.value)}/>
+                    <Input value={lastname} onChange={(e) => setLastname(e.target.value.trim())}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Имя</div>
-                    <Input disabled={true} value={firstname} onChange={(e) => setFirstname(e.target.value)}/>
+                    <Input value={firstname} onChange={(e) => setFirstname(e.target.value.trim())}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Отчество</div>
-                    <Input disabled={true} value={secondname} onChange={(e) => setSecondname(e.target.value)}/>
+                    <Input value={secondname} onChange={(e) => setSecondname(e.target.value.trim())}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 155}}>Пол</div>

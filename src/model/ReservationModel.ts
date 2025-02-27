@@ -10,6 +10,7 @@ export type ReservationModel = {
     firstname: string;
     lastname: string;
     secondname: string;
+    male: boolean;
     dateStart: string;
     dateFinish: string;
     bed: BedModel;
@@ -21,5 +22,6 @@ export type ReservationModel = {
     // Для вывода ошибок
     error?: string,
     fio?: string
+    statusGrid?: string
     // -----
 }
