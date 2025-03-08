@@ -8,6 +8,7 @@ import {host} from "../../config/constants";
 import {ColumnType} from 'antd/es/table';
 import {SearchOutlined} from '@ant-design/icons';
 import {FilterConfirmProps} from 'antd/es/table/interface';
+import {TableTitleRender} from "../../component/TableTitleRender";
 
 export interface DataType extends GuestModel {
     key: React.Key;
@@ -116,7 +117,7 @@ const GuestScreen: React.FC = () => {
     });
     const columns: TableProps<GuestModel>['columns'] = [
         {
-            title: 'ИД',
+            title: <TableTitleRender title={'ИД'} />,
             dataIndex: 'id',
             key: 'id',
             sorter: (a, b) => a.id - b.id,
@@ -124,13 +125,13 @@ const GuestScreen: React.FC = () => {
             defaultSortOrder: 'descend',
         },
         {
-            title: 'Выселен',
+            title: <TableTitleRender title={'Выселен'} />,
             dataIndex: 'checkouted',
             key: 'checkouted',
             render: (val) => (<>{val ? "Да" : "Нет"}</>)
         },
         {
-            title: 'Табельный',
+            title: <TableTitleRender title={'Табельный номер'} />,
             dataIndex: 'tabnum',
             key: 'tabnum',
             //@ts-ignore
@@ -139,7 +140,7 @@ const GuestScreen: React.FC = () => {
             ...getColumnSearchProps('tabnum'),
         },
         {
-            title: 'Фамилия',
+            title: <TableTitleRender title={'Фамилия'} />,
             dataIndex: 'lastname',
             key: 'lastname',
             //@ts-ignore
@@ -148,7 +149,7 @@ const GuestScreen: React.FC = () => {
             ...getColumnSearchProps('lastname'),
         },
         {
-            title: 'Имя',
+            title: <TableTitleRender title={'Имя'} />,
             dataIndex: 'firstname',
             key: 'firstname',
             //@ts-ignore
@@ -157,7 +158,7 @@ const GuestScreen: React.FC = () => {
             ...getColumnSearchProps('firstname'),
         },
         {
-            title: 'Отчество',
+            title: <TableTitleRender title={'Отчество'} />,
             dataIndex: 'secondName',
             key: 'secondName',
             //@ts-ignore
@@ -166,20 +167,20 @@ const GuestScreen: React.FC = () => {
             ...getColumnSearchProps('secondName'),
         },
         {
-            title: 'Дата заезда',
+            title: <TableTitleRender title={'Дата заезда'} />,
             dataIndex: 'dateStart',
             key: 'dateStart',
             sorter: (a, b) => dayjs(a.dateStart, 'DD-MM-YYYY').diff(dayjs(b.dateStart, 'DD-MM-YYYY')),
 
         },
         {
-            title: 'Дата выезда',
+            title: <TableTitleRender title={'Дата выезда'} />,
             dataIndex: 'dateFinish',
             key: 'dateFinish',
             sorter: (a, b) => dayjs(a.dateFinish, 'DD-MM-YYYY').diff(dayjs(b.dateFinish, 'DD-MM-YYYY')),
         },
         {
-            title: 'Филиал',
+            title: <TableTitleRender title={'Филиал'} />,
             dataIndex: 'filialName',
             key: 'filialName',
             sorter: (a, b) => a.filialName.length - b.filialName.length,
@@ -195,7 +196,7 @@ const GuestScreen: React.FC = () => {
             filterSearch: true,
         },
         {
-            title: 'Общежитие',
+            title: <TableTitleRender title={'Общежитие'} />,
             dataIndex: 'hotelName',
             key: 'hotelName',
             sorter: (a, b) => a.hotelName.length - b.hotelName.length,
@@ -211,7 +212,7 @@ const GuestScreen: React.FC = () => {
             filterSearch: true,
         },
         {
-            title: 'Квартира',
+            title: <TableTitleRender title={'Секция'} />,
             dataIndex: 'flatName',
             key: 'flatName',
             sorter: (a, b) => a.flatName.length - b.flatName.length,
@@ -227,13 +228,13 @@ const GuestScreen: React.FC = () => {
             filterSearch: true,
         },
         {
-            title: 'Комната',
+            title: <TableTitleRender title={'Комната'} />,
             dataIndex: 'roomName',
             key: 'roomName',
             sortDirections: ['descend', 'ascend'],
         },
         {
-            title: 'Организация',
+            title: <TableTitleRender title={'Организация'} />,
             dataIndex: 'organization',
             key: 'organization',
             filters: guestsDataFromRequest?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
@@ -249,7 +250,7 @@ const GuestScreen: React.FC = () => {
             filterSearch: true,
         },
         {
-            title: 'Рег. по месту пребывания',
+            title: <TableTitleRender title={'Рег. по месту пребывания'} />,
             dataIndex: 'regPoMestu',
             key: 'regPoMestu',
             render: (value) => value ? "Да" : "Нет"

@@ -96,7 +96,7 @@ export const EventModal = (props: ModalProps) => {
                 dateStart,
                 description,
                 hotel,
-                id: 0,
+                id: null,
                 name,
                 type: eventType,
                 manCount,

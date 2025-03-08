@@ -128,7 +128,7 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                 )
             })}
             <Card.Meta
-                title={`${flat.name} ${flat.category === "ВИП" ? " - " + flat.category : ""} ${flat.tech ? " - Тех. помещение" : ""}`}
+                title={`${flat.name} ${flat.category === "ВИП" ? " - " + flat.category : ""} ${flat.tech ? " - Т/П" : ""}`}
                 description={
                     <div style={{margin: 5}}>
                         <div>

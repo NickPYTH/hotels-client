@@ -315,17 +315,17 @@ const HotelScreen: React.FC = () => {
                 <Divider style={{marginTop: 0, marginBottom: 5}}/>
                 {(selectedView == "1" && flats) &&
                     <>{[1, 2, 3, 4, 5, 6].map((floorNumber: number) => {
-                        let flatCount = flats?.filter((f: FlatModel) => f.floor === floorNumber)?.length;
+                        let flatCount = flats?.filter((f: FlatModel) => f.floor === floorNumber && !f.tech)?.length;
                         if (flatCount)
                             return (
                                 <Flex style={{marginRight: 15, marginLeft: 15}} gap="middle" align="start" vertical={false} justify="center">
                                     <div style={{width: 200}}>
                                         <h2>{floorNumber} этаж</h2>
                                         <div>Всего комнат {flatCount}</div>
-                                        <div>Всего мест {flats?.filter((f: FlatModel) => f.floor === floorNumber).reduce(function (acc, flat) {
+                                        <div>Всего мест {flats?.filter((f: FlatModel) => f.floor === floorNumber && !f.tech).reduce(function (acc, flat) {
                                             return acc + flat.bedsCount;
                                         }, 0)}</div>
-                                        <div>Свободных мест {flats?.filter((f: FlatModel) => f.floor === floorNumber).reduce(function (acc, flat) {
+                                        <div>Свободных мест {flats?.filter((f: FlatModel) => f.floor === floorNumber && !f.tech).reduce(function (acc, flat) {
                                             if (flat.statusId === 4) { // Комната занята боряином не считаем
                                                 return acc;
                                             } else {  // Расчет мест только в открытых комнтаха

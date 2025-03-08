@@ -7,6 +7,7 @@ import {EventModel} from "../model/EventModel";
 import {eventAPI} from "../service/EventService";
 import dayjs from "dayjs";
 import {EventModal} from "../component/event/EventModal";
+import {TableTitleRender} from "../component/TableTitleRender";
 
 export interface DataType extends EventModel {
     key: React.Key;
@@ -106,72 +107,118 @@ const EventScreen: React.FC = () => {
     });
     const columns: TableProps<EventModel>['columns'] = [
         {
-            title: 'ИД',
+            title: <TableTitleRender title={'ИД'} />,
             dataIndex: 'id',
             key: 'id',
             sorter: (a, b) => a.id - b.id,
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend',
-            ...getColumnSearchProps('id'),
             width: 70,
         },
         {
-            title: 'Наименование',
+            title: <TableTitleRender title={'Наименование'} />,
             dataIndex: 'name',
             key: 'name',
-            ...getColumnSearchProps('name'),
+            filters: events?.reduce((acc: { text: string, value: string }[], event: EventModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === event.name) === undefined)
+                    return acc.concat({text: event.name, value: event.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, event: EventModel) => {
+                return event.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Описание',
+            title: <TableTitleRender title={'Описание'} />,
             dataIndex: 'description',
             key: 'description',
-            ...getColumnSearchProps('description'),
+            filters: events?.reduce((acc: { text: string, value: string }[], event: EventModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === event.description) === undefined)
+                    return acc.concat({text: event.description, value: event.description});
+                else return acc;
+            }, []),
+            onFilter: (value: any, event: EventModel) => {
+                return event.description.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Тип',
+            title: <TableTitleRender title={'Тип'} />,
             dataIndex: 'type',
             key: 'type',
-            render: (_, record) => (<div>{record.type.name}</div>)
+            render: (_, record) => (<div>{record.type.name}</div>),
+            filters: events?.reduce((acc: { text: string, value: string }[], event: EventModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === event.type.name) === undefined)
+                    return acc.concat({text: event.type.name, value: event.type.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, event: EventModel) => {
+                return event.type.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Филиал',
+            title: <TableTitleRender title={'Филиал'} />,
             dataIndex: 'hotel',
             key: 'filial',
-            render: (_, record) => (<div>{record.hotel.filialName}</div>)
+            render: (_, record) => (<div>{record.hotel.filialName}</div>),
+            filters: events?.reduce((acc: { text: string, value: string }[], event: EventModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === event.hotel.filialName) === undefined)
+                    return acc.concat({text: event.hotel.filialName, value: event.hotel.filialName});
+                else return acc;
+            }, []),
+            onFilter: (value: any, event: EventModel) => {
+                return event.hotel.filialName.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Общежитие',
+            title: <TableTitleRender title={'Общежитие'} />,
             dataIndex: 'hotel',
             key: 'hotel',
-            render: (_, record) => (<div>{record.hotel.name}</div>)
+            render: (_, record) => (<div>{record.hotel.name}</div>),
+            filters: events?.reduce((acc: { text: string, value: string }[], event: EventModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === event.hotel.name) === undefined)
+                    return acc.concat({text: event.hotel.name, value: event.hotel.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, event: EventModel) => {
+                return event.hotel.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Дата начала',
+            title: <TableTitleRender title={'Дата начала'} />,
             dataIndex: 'dateStart',
             key: 'dateStart',
-            ...getColumnSearchProps('dateStart'),
             render: (_, record) => (<div>{dayjs(record.dateStart).format("DD-MM-YYYY")}</div>),
+            sorter: (a, b) => dayjs(a.dateStart, 'DD-MM-YYYY').diff(dayjs(b.dateStart, 'DD-MM-YYYY')),
             width: 140,
         },
         {
-            title: 'Дата окончания',
+            title: <TableTitleRender title={'Дата окончания'} />,
             dataIndex: 'dateFinish',
             key: 'dateFinish',
-            ...getColumnSearchProps('dateFinish'),
             render: (_, record) => (<div>{dayjs(record.dateFinish).format("DD-MM-YYYY")}</div>),
+            sorter: (a, b) => dayjs(a.dateFinish, 'DD-MM-YYYY').diff(dayjs(b.dateFinish, 'DD-MM-YYYY')),
             width: 140,
         },
         {
-            title: 'Кол-во мужчин',
+            title: <TableTitleRender title={'Кол-во мужчин'} />,
             dataIndex: 'manCount',
             key: 'manCount',
             width: 120,
+            sorter: (a, b) => a.manCount - b.manCount,
+            sortDirections: ['descend', 'ascend'],
         },
         {
-            title: 'Кол-во женщин',
+            title: <TableTitleRender title={'Кол-во женщин'} />,
             dataIndex: 'womenCount',
             key: 'womenCount',
             width: 120,
+            sorter: (a, b) => a.womenCount - b.womenCount,
+            sortDirections: ['descend', 'ascend'],
         },
     ]
     // -----

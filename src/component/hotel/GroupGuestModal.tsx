@@ -8,7 +8,7 @@ import {
     Modal,
     Select,
     Table,
-    TableProps,
+    TableProps, Tag,
     TimePicker,
     Upload,
     UploadProps
@@ -103,6 +103,9 @@ export const GroupGuestModal = (props: ModalProps) => {
             title: 'Статус',
             dataIndex: 'status',
             key: 'status',
+            render: (val, record:any) => (<Tag style={{marginLeft: 15}} color={record?.status == "Заселен" ? 'success':'volcano'}>
+                {record?.status == "Заселен" ? 'Заселен':'Не обработан'}
+            </Tag>)
         },
         {
             title: '',

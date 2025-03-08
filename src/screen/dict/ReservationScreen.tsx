@@ -9,6 +9,9 @@ import {FilialModel} from "../../model/FilialModel";
 import {ReservationModal} from "../../component/dict/ReservationModal";
 import {UserAddOutlined, UsergroupAddOutlined} from "@ant-design/icons";
 import {GroupReservationModal} from "../../component/hotel/GroupReservationModal";
+import {TableTitleRender} from "../../component/TableTitleRender";
+import {GuestModel} from "../../model/GuestModel";
+import * as events from "events";
 
 const ReservationScreen: React.FC = () => {
 
@@ -50,7 +53,7 @@ const ReservationScreen: React.FC = () => {
     // Useful utils
     const columns: TableProps<ReservationModel>['columns'] = [
         {
-            title: 'ИД',
+            title: <TableTitleRender title={"ИД"} />,
             dataIndex: 'id',
             key: 'id',
             sorter: (a, b) => a.id - b.id,
@@ -58,61 +61,115 @@ const ReservationScreen: React.FC = () => {
             defaultSortOrder: 'descend'
         },
         {
-            title: 'Тип мероприятия',
+            title: <TableTitleRender title={"Тип мероприятия"} /> ,
             dataIndex: 'event',
             key: 'eventType',
-            render: (val: EventModel, record: ReservationModel) => (<div>{val.type.name}</div>)
+            render: (val: EventModel, record: ReservationModel) => (<div>{val.type.name}</div>),
+            filters: reservations?.reduce((acc: { text: string, value: string }[], reservation: ReservationModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === reservation.event.type.name) === undefined)
+                    return acc.concat({text: reservation.event.type.name, value: reservation.event.type.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, record: ReservationModel) => {
+                return record.event.type.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Мероприятие',
+            title: <TableTitleRender title={'Мероприятие'} />,
             dataIndex: 'event',
             key: 'event',
-            render: (val: EventModel, record: ReservationModel) => (<div>{val.name}</div>)
+            render: (val: EventModel, record: ReservationModel) => (<div>{val.name}</div>),
+            filters: reservations?.reduce((acc: { text: string, value: string }[], reservation: ReservationModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === reservation.event.name) === undefined)
+                    return acc.concat({text: reservation.event.name, value: reservation.event.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, record: ReservationModel) => {
+                return record.event.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Филиал заказчик',
+            title: <TableTitleRender title={'Филиал заказчик'} />,
             dataIndex: 'fromFilial',
             key: 'fromFilial',
-            render: (val: FilialModel, record: ReservationModel) => (<div>{val.name}</div>)
+            render: (val: FilialModel, record: ReservationModel) => (<div>{val.name}</div>),
+            filters: reservations?.reduce((acc: { text: string, value: string }[], reservation: ReservationModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === reservation.fromFilial.name) === undefined)
+                    return acc.concat({text: reservation.fromFilial.name, value: reservation.fromFilial.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, record: ReservationModel) => {
+                return record.fromFilial.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Табельный номер',
+            title: <TableTitleRender title={'Табельный номер'} />,
             dataIndex: 'tabnum',
             key: 'tabnum',
             sorter: (a, b) => a.tabnum - b.tabnum,
             sortDirections: ['descend', 'ascend'],
         },
         {
-            title: 'Дата заезда',
+            title: <TableTitleRender title={'Дата заезда'} />,
             dataIndex: 'dateStart',
             key: 'dateStart',
             sorter: (a, b) => dayjs(a.dateStart, 'DD-MM-YYYY').diff(dayjs(b.dateStart, 'DD-MM-YYYY')),
             sortDirections: ['descend', 'ascend'],
         },
         {
-            title: 'Дата выезда',
+            title: <TableTitleRender title={'Дата выезда'} />,
             dataIndex: 'dateFinish',
             key: 'dateFinish',
             sorter: (a, b) => dayjs(a.dateFinish, 'DD-MM-YYYY').diff(dayjs(b.dateFinish, 'DD-MM-YYYY')),
             sortDirections: ['descend', 'ascend'],
         },
         {
-            title: 'Филиал',
+            title: <TableTitleRender title={'Филиал'} />,
             dataIndex: 'bed',
             key: 'filial',
-            render: (val: BedModel, record: ReservationModel) => (<div>{val.room?.flat?.hotel?.filial?.name}</div>)
+            render: (val: BedModel, record: ReservationModel) => (<div>{val.room?.flat?.hotel?.filial?.name}</div>),
+            filters: reservations?.reduce((acc: { text: string, value: string }[], reservation: ReservationModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === reservation.bed?.room.flat.hotel.filial.name) === undefined)
+                    return acc.concat({text: reservation.bed?.room.flat.hotel.filial.name, value: reservation.bed?.room.flat.hotel.filial.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, record: ReservationModel) => {
+                return record.bed?.room.flat.hotel.filial.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Общежитие',
+            title: <TableTitleRender title={'Общежитие'} />,
             dataIndex: 'bed',
             key: 'hotel',
-            render: (val: BedModel, record: ReservationModel) => (<div>{val.room?.flat?.hotel?.name}</div>)
+            render: (val: BedModel, record: ReservationModel) => (<div>{val.room?.flat?.hotel?.name}</div>),
+            filters: reservations?.reduce((acc: { text: string, value: string }[], reservation: ReservationModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === reservation.bed?.room.flat.hotel.name) === undefined)
+                    return acc.concat({text: reservation.bed?.room.flat.hotel.name, value: reservation.bed?.room.flat.hotel.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, record: ReservationModel) => {
+                return record.bed?.room.flat.hotel.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
-            title: 'Секция',
+            title: <TableTitleRender title={'Секция'} />,
             dataIndex: 'bed',
             key: 'flat',
-            render: (val: BedModel, record: ReservationModel) => (<div>{val.room?.flat?.name}</div>)
+            render: (val: BedModel, record: ReservationModel) => (<div>{val.room?.flat?.name}</div>),
+            filters: reservations?.reduce((acc: { text: string, value: string }[], reservation: ReservationModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === reservation.bed?.room.flat.name) === undefined)
+                    return acc.concat({text: reservation.bed?.room.flat.name, value: reservation.bed?.room.flat.name});
+                else return acc;
+            }, []),
+            onFilter: (value: any, record: ReservationModel) => {
+                return record.bed?.room.flat.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
             title: '',

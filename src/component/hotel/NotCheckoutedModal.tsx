@@ -252,17 +252,6 @@ export const NotCheckoutedModal = (props: ModalProps) => {
             title: 'Организация',
             dataIndex: 'organization',
             key: 'organization',
-            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (guest.organization) {
-                    if (acc.find((g: { text: string, value: string }) => g.text === guest.organization.toString()) === undefined)
-                        return acc.concat({text: guest.organization.toString(), value: guest.organization.toString()});
-                }
-                return acc;
-            }, []),
-            onFilter: (value: any, record: GuestModel) => {
-                return record.organization?.toString().indexOf(value) === 0
-            },
-            filterSearch: true,
         },
         {
             title: 'Рег. по месту пребывания',
@@ -295,7 +284,6 @@ export const NotCheckoutedModal = (props: ModalProps) => {
                     onRow={(record, rowIndex) => {
                         return {
                             onDoubleClick: (e) => {
-                                //setVisible(true);
                                 setSelectedGuest(record);
                             },
                         };

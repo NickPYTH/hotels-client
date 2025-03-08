@@ -10,6 +10,7 @@ import {ReportMonthModal} from "./report/ReportMonthModal";
 import {GuestReportModal} from "./report/GuestReportModal";
 import {HotelReportModal} from "./report/HotelReportModal";
 import {ReportMVZModal} from "./report/ReportMVZModal";
+import {LoadStatsReportModal} from "./report/LoadStatsReportModal";
 
 type propsType = {}
 
@@ -22,6 +23,7 @@ export const Navbar = (props: propsType) => {
     const [guestModalReport, setGuestModalReport] = useState(false);
     const [hotelModalReport, setHotelModalReport] = useState(false);
     const [mvzModalReport, setMvzModalReport] = useState(false);
+    const [loadStatsModalReport, setVisibleLoadStatsModalReport] = useState(false);
     const [getCurrentUser, {
         data: currentUserData,
         isLoading: isCurrentUserLoading
@@ -101,8 +103,12 @@ export const Navbar = (props: propsType) => {
                                 key: 'guestReport',
                             },
                             {
-                                label: 'Загрузка общежитий',
+                                label: 'Диаграмма загрузки общежитий',
                                 key: 'hotelReport',
+                            },
+                            {
+                                label: 'Отчет загрузки общежитий',
+                                key: 'loadStatsReport',
                             },
                         ]
                     },
@@ -142,6 +148,10 @@ export const Navbar = (props: propsType) => {
                             {
                                 label: 'Записи о проживании',
                                 key: 'guests',
+                            },
+                            {
+                                label: 'Записи о бронировании',
+                                key: 'reservations',
                             },
                             {
                                 label: 'Договоры',
@@ -186,10 +196,18 @@ export const Navbar = (props: propsType) => {
                                 key: 'guestReport',
                             },
                             {
-                                label: 'Загрузка общежитий',
+                                label: 'Диаграмма загрузки общежитий',
                                 key: 'hotelReport',
                             },
+                            {
+                                label: 'Отчет загрузки общежитий',
+                                key: 'loadStatsReport',
+                            },
                         ]
+                    },
+                    {
+                        label: 'Мероприятия',
+                        key: 'events',
                     },
                     {
                         label: 'Справка',
@@ -225,8 +243,12 @@ export const Navbar = (props: propsType) => {
                                 key: 'guestReport',
                             },
                             {
-                                label: 'Загрузка общежитий',
+                                label: 'Диаграмма загрузки общежитий',
                                 key: 'hotelReport',
+                            },
+                            {
+                                label: 'Отчет загрузки общежитий',
+                                key: 'loadStatsReport',
                             },
                             {
                                 label: 'Отчет по МВЗ',
@@ -258,8 +280,12 @@ export const Navbar = (props: propsType) => {
                                 key: 'guestReport',
                             },
                             {
-                                label: 'Загрузка общежитий',
+                                label: 'Диаграмма загрузки общежитий',
                                 key: 'hotelReport',
+                            },
+                            {
+                                label: 'Отчет загрузки общежитий',
+                                key: 'loadStatsReport',
                             },
                             {
                                 label: 'Отчет по МВЗ',
@@ -329,6 +355,9 @@ export const Navbar = (props: propsType) => {
         if (e.key === 'hotelReport') {
             setHotelModalReport(true);
         }
+        if (e.key === 'loadStatsReport') {
+            setVisibleLoadStatsModalReport(true);
+        }
         if (e.key === 'reasons') navigate(`hotels/reasons`)
         if (e.key === 'contracts') navigate(`hotels/contracts`)
         if (e.key === 'filials') navigate(`hotels/filials`)
@@ -363,7 +392,7 @@ export const Navbar = (props: propsType) => {
                     {/*    ]}*/}
                     {/*/>*/}
                     <div style={{width: 110, marginBottom: 5}}>
-                      {currentUser?.fio}
+                        {currentUser?.fio}
                     </div>
                 </Flex>
             </div>
@@ -372,6 +401,7 @@ export const Navbar = (props: propsType) => {
             {mvzModalReport && <ReportMVZModal visible={mvzModalReport} setVisible={setMvzModalReport}/>}
             {guestModalReport && <GuestReportModal visible={guestModalReport} setVisible={setGuestModalReport}/>}
             {hotelModalReport && <HotelReportModal visible={hotelModalReport} setVisible={setHotelModalReport}/>}
+            {loadStatsModalReport && <LoadStatsReportModal visible={loadStatsModalReport} setVisible={setVisibleLoadStatsModalReport}/>}
         </>
 
     );

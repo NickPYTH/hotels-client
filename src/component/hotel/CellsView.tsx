@@ -269,31 +269,26 @@ export const CellsView = (props: ModalPros) => {
                                             <div>{datesRange}</div>
                                             <div>{note}</div>
                                         </Flex>)}>
-                                            {Math.abs(percent) === 100 ?
-                                                <div style={{paddingTop: 4, width: '100%', height: 25}}></div>
-                                                :
+                                            {Math.abs(percent) === 100 ? // Для обычных ячеек
                                                 <div style={{position: 'absolute', width: columnWidth, top: 7, left: -((columnWidth - (coloredWidth as unknown as number)))}}>
-                                                    {percent < 0 ?
-                                                        <Flex vertical={false} align={'start'} justify={'center'}>
-                                                            {male == 'true' ?
-                                                                <img style={{marginRight: 3}} width={15} height={15} src={Male} alt={'man'}/>
-                                                                :
-                                                                <img style={{marginRight: 3}} width={15} height={15} src={Female} alt={'woman'}/>
-                                                            }
-                                                            {fio}
-                                                        </Flex>
-                                                        :
-                                                        <div style={{position: 'absolute', right:0, width: coloredWidth, height: 25}}/>
-                                                    }
+                                                    <Flex vertical={false} align={'start'} justify={'center'}>
+                                                        {male == 'true' ?
+                                                            <img style={{marginRight: 3}} width={15} height={15} src={Male} alt={'man'}/>
+                                                            :
+                                                            <img style={{marginRight: 3}} width={15} height={15} src={Female} alt={'woman'}/>
+                                                        }
+                                                        {fio}
+                                                    </Flex>
                                                 </div>
+                                                :
+                                                <div style={{paddingTop: 4, width: '100%', height: 25}}></div>
                                             }
                                         </Popover>
                                     </Popconfirm>
                                 </Flex>
                             </div>
                         </Flex>)
-                    }
-                    else {  // Если ячейка с двумя жильцами
+                    } else {  // Если ячейка с двумя жильцами
 
                         // Разбор данных по жильцу в левой ячейке
                         let personLeft = val.split('||')[0];

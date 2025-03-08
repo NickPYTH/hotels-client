@@ -113,6 +113,14 @@ const ContractScreen: React.FC = () => {
             dataIndex: 'cost',
             key: 'cost',
             sorter: (a, b) => a.cost - b.cost,
+            filters: contracts?.reduce((acc: { text: string, value: string }[], contract: ContractModel) => {
+                if (acc.find((g: { text: string, value: string }) => g.text === contract.cost?.toString()) === undefined)
+                    return acc.concat({text: contract.cost.toString(), value: contract.cost.toString()});
+                return acc;
+            }, []),
+            onFilter: (value: any, record: ContractModel) => {
+                return record.cost?.toString().indexOf(value) === 0
+            },
         },
         {
             title: 'Основание',
@@ -151,7 +159,7 @@ const ContractScreen: React.FC = () => {
                 return acc;
             }, []),
             onFilter: (value: any, record: ContractModel) => {
-                return record.note.indexOf(value) === 0
+                return record.note?.indexOf(value) === 0
             },
         },
         {

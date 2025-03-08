@@ -35,4 +35,5 @@ export type GuestModel = {
     bedId?: number;
     nights?: number;
     isReservation?: boolean;
+    familyMemberOfEmployee: number | null;
 }
