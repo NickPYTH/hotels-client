@@ -10,9 +10,13 @@ type ModalProps = {
 export const CellsViewSettingsModal = (props: ModalProps) => {
 
     // States
-    const [cellsColor, setCellsColor] = useState(() => {
-        if (localStorage.getItem("cellsColor")) return localStorage.getItem('cellsColor');
+    const [cellsMaleColor, setCellsMaleColor] = useState(() => {
+        if (localStorage.getItem("cellsMaleColor")) return localStorage.getItem('cellsMaleColor');
         return "#75a5f2";
+    });
+    const [cellsFemaleColor, setCellsFemaleColor] = useState(() => {
+        if (localStorage.getItem("cellsFemaleColor")) return localStorage.getItem('cellsFemaleColor');
+        return "#f1259b";
     });
     const [reservationCellsColor, setReservationCellsColor] = useState(() => {
         if (localStorage.getItem("reservationCellsColor")) return localStorage.getItem('reservationCellsColor');
@@ -38,8 +42,9 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
 
     // Handlers
     const saveHandler = () => {
-        if (cellsColor != null && fontColor != null && columnWidth != null && fontSize != null && cellBackgroundColor != null && reservationCellsColor != null) {
-            localStorage.setItem("cellsColor", cellsColor);
+        if (cellsMaleColor != null && cellsFemaleColor && fontColor != null && columnWidth != null && fontSize != null && cellBackgroundColor != null && reservationCellsColor != null) {
+            localStorage.setItem("cellsMaleColor", cellsMaleColor);
+            localStorage.setItem("cellsFemaleColor", cellsFemaleColor);
             localStorage.setItem("reservationCellsColor", reservationCellsColor);
             localStorage.setItem("fontColor", fontColor);
             localStorage.setItem("cellBackgroundColor", cellBackgroundColor);
@@ -48,8 +53,11 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
             window.location.reload();
         }
     }
-    const updateCellsColor = (_, css:string) => {
-        setCellsColor(css);
+    const updateMaleCellsColor = (_, css:string) => {
+        setCellsMaleColor(css);
+    }
+    const updateFemaleCellsColor = (_, css:string) => {
+        setCellsFemaleColor(css);
     }
     const updateReservationCellsColor = (_, css:string) => {
         setReservationCellsColor(css);
@@ -70,8 +78,12 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
         >
             <Flex vertical={true}>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
-                    <div style={{width: 200, marginRight: 15}}>Цвет записей</div>
-                    <ColorPicker value={cellsColor} onChange={updateCellsColor} defaultValue={cellsColor}/>
+                    <div style={{width: 200, marginRight: 15}}>Цвет записей мужчин</div>
+                    <ColorPicker value={cellsMaleColor} onChange={updateMaleCellsColor} defaultValue={cellsMaleColor}/>
+                </Flex>
+                <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
+                    <div style={{width: 200, marginRight: 15}}>Цвет записей женщин</div>
+                    <ColorPicker value={cellsFemaleColor} onChange={updateFemaleCellsColor} defaultValue={cellsFemaleColor}/>
                 </Flex>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
                     <div style={{width: 200, marginRight: 15}}>Цвет броней</div>

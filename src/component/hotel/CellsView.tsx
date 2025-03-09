@@ -1,5 +1,5 @@
 import '../../index.scss';
-import {Button, DatePicker, Flex, Popconfirm, Popover, Segmented, Skeleton, Table} from 'antd';
+import {Button, DatePicker, Flex, Popover, Segmented, Table} from 'antd';
 import dayjs, {Dayjs} from 'dayjs';
 import React, {useEffect, useRef, useState} from 'react';
 import {flatAPI} from "../../service/FlatService";
@@ -8,10 +8,6 @@ import Search from "antd/lib/input/Search";
 import {GuestModal} from "../dict/GuestModal";
 import {CellsViewSettingsModal} from "./CellsViewSettingsModal";
 import {AppstoreAddOutlined, SettingOutlined, UserAddOutlined} from "@ant-design/icons";
-//@ts-ignore
-import Male from "../../assets/maleSVG.svg";
-//@ts-ignore
-import Female from "../../assets/femaleSVG.svg";
 
 const {RangePicker} = DatePicker;
 
@@ -40,6 +36,35 @@ type SelectedCellType = {
     roomId: number;
     bedId: number;
     date: string;
+}
+
+const selectMonthByDate = (date: Dayjs) => {
+    switch (date.month()) {
+        case 0:
+            return "Январь";
+        case 1:
+            return "Февраль";
+        case 2:
+            return "Март";
+        case 3:
+            return "Апрель";
+        case 4:
+            return "Май";
+        case 5:
+            return "Июнь";
+        case 6:
+            return "Июль";
+        case 7:
+            return "Август";
+        case 8:
+            return "Сентябрь";
+        case 9:
+            return "Октябрь";
+        case 10:
+            return "Ноябрь";
+        case 11:
+            return "Декабрь";
+    }
 }
 
 // Table component
@@ -76,44 +101,20 @@ export const CellsView = (props: ModalPros) => {
     const [selectedFlatId, setSelectedFlatId] = useState<number | null>(null);
     const [data, setData] = useState<any[] | null>(null);
     const [columns, setColumns] = useState<any[] | null>(null);
-    const [isFilialUEZS] = useState(() => props.hotelId === '182' || props.hotelId === '183' || props.hotelId === '184' || props.hotelId === '327');
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(false);
-    const [currentMonth, setCurrentMonth] = useState<string>(() => {
-        switch (props.selectedDate.month()) {
-            case 0:
-                return "Январь";
-            case 1:
-                return "Февраль";
-            case 2:
-                return "Март";
-            case 3:
-                return "Апрель";
-            case 4:
-                return "Май";
-            case 5:
-                return "Июнь";
-            case 6:
-                return "Июль";
-            case 7:
-                return "Август";
-            case 8:
-                return "Сентябрь";
-            case 9:
-                return "Октябрь";
-            case 10:
-                return "Ноябрь";
-            case 11:
-                return "Декабрь";
-        }
-    });
+    const [currentMonth, setCurrentMonth] = useState<string>(() => selectMonthByDate(props.selectedDate));
     const [reservationCellsColor] = useState(() => {
         if (localStorage.getItem("reservationCellsColor")) return localStorage.getItem('reservationCellsColor');
         return "#B9848C";
     });
-    const [cellsColor] = useState(() => {
-        if (localStorage.getItem("cellsColor")) return localStorage.getItem('cellsColor');
+    const [cellsMaleColor] = useState(() => {
+        if (localStorage.getItem("cellsMaleColor")) return localStorage.getItem('cellsMaleColor');
         return "#75a5f2";
+    });
+    const [cellsFemaleColor] = useState(() => {
+        if (localStorage.getItem("cellsFemaleColor")) return localStorage.getItem('cellsFemaleColor');
+        return "#f1259b";
     });
     const [fontColor] = useState(() => {
         if (localStorage.getItem("fontColor")) return localStorage.getItem('fontColor');
@@ -133,10 +134,6 @@ export const CellsView = (props: ModalPros) => {
     });
     const [interactiveMode, setInteractiveMode] = useState(false);
     // -----
-
-    useEffect(() => {
-        if (columns) console.info(columns, new Date())
-    }, [columns]);
 
     // Web requests
     const [getAllFlats, {
@@ -231,20 +228,37 @@ export const CellsView = (props: ModalPros) => {
                     if (val.split('||').length === 1) { // Если ячейка с одним жильцом
                         let percent = val.split('#')[1]; // Формат строки можно подсмотреть в запросах браузера
                         let fio = val.split('#')[0].split('&')[0];
+                        let startCell = !data.find(d => {
+                            if (d.bedId == record.bedId){
+                                let prevDay = dayjs(el, "DD-MM-YYYY").subtract(1, 'day').format("DD-MM-YYYY");
+                                if (record[prevDay]) {
+                                    if (record[prevDay].toLowerCase().indexOf(fio.toLowerCase()) > -1) {
+                                        return true;
+                                    }
+                                }
+                            }
+                            return false;
+                        });
                         let datesRange = val.split('#')[0].split('&')[1];
                         let dateTime: string[] = val.split('#')[0].split('&')[1].split(' :: ');
-                        let male = val.split('#')[0].split('&')[2];
+                        let male = val.split('#')[0].split('&')[2] == 'true';
                         let note = val.split('#')[0].split('&')[3] == 'null' ? "" : val.split('#')[0].split('&')[3];
                         let post = val.split('#')[0].split('&')[4];
                         let filial = val.split('#')[0].split('&')[5] == 'emptyF' ? "" : val.split('#')[0].split('&')[5];
                         let isReservation = val.split('#')[0].split('&')[6];
                         let coloredWidth = Math.abs(percent) + addedPixel == columnWidth ? '100%' : Math.abs(percent) + addedPixel*(Math.abs(percent)/100);
                         return (<Flex key={record.id} vertical={false} style={{background: isWeekend ? cellBackgroundColor : 'inherit', height: 31}}>
-                            <div style={{
+                            <div onClick={() => {
+                                setSelectedFlatId(record.sectionId);
+                                if (percent == 100)
+                                    setSelectedDate(dayjs(`${el} 12:00`, "DD-MM-YYYY HH:mm"));
+                                else
+                                    setSelectedDate(dayjs((percent > 0 && percent < 100) ? dateTime[0] : dateTime[1], "DD-MM-YYYY HH:mm"));
+                            }} style={{
                                 marginTop: 3,
                                 marginBottom: 3,
                                 cursor: 'pointer',
-                                background: isReservation == 'true' ? reservationCellsColor: cellsColor,
+                                background: isReservation == 'true' ? reservationCellsColor: male ? cellsMaleColor: cellsFemaleColor,
                                 width: coloredWidth,
                                 height: 25,
                                 color: fontColor,
@@ -262,62 +276,95 @@ export const CellsView = (props: ModalPros) => {
                                 // -----
                             }}>
                                 <Flex justify="center" align="center">
-
                                         <Popover placement={'bottom'} title={`${fio}`} content={() => (<Flex vertical={true}>
                                             <div>{post} {filial}</div>
                                             <div>{datesRange}</div>
                                             <div>{note}</div>
                                         </Flex>)}>
                                             {Math.abs(percent) === 100 ? // Для обычных ячеек
-                                                <div style={{position: 'absolute', width: columnWidth, top: 7, left: -((columnWidth - (coloredWidth as unknown as number)))}}>
-                                                    <Flex vertical={false} align={'start'} justify={'center'}>
-                                                        {male == 'true' ?
-                                                            <img style={{marginRight: 3}} width={15} height={15} src={Male} alt={'man'}/>
-                                                            :
-                                                            <img style={{marginRight: 3}} width={15} height={15} src={Female} alt={'woman'}/>
-                                                        }
-                                                        {fio}
+                                                <div style={{position: 'absolute', width: columnWidth, top: 7, left: 0, height: 25}}>
+                                                    <Flex vertical={false}>
+                                                        {startCell && <div style={{position: "absolute", width: 100, zIndex: 100, height: 25}}>
+                                                            <div>{fio}</div>
+                                                        </div>}
                                                     </Flex>
                                                 </div>
                                                 :
-                                                <div style={{paddingTop: 4, width: '100%', height: 25}}></div>
+                                                <div style={{paddingTop: 4, width: '100%', height: 25}}>
+                                                    <Flex vertical={false}>
+                                                        {startCell &&
+                                                            <div style={{position: "absolute", width: 100, zIndex: 100, height: 25}}>
+                                                            <div>{fio}</div>
+                                                        </div>}
+                                                    </Flex>
+                                                </div>
                                             }
                                         </Popover>
                                 </Flex>
                             </div>
                         </Flex>)
-                    } else {  // Если ячейка с двумя жильцами
+                    }
+                    else {  // Если ячейка с двумя жильцами
+
+                        // Проверка если перевернуты жильцы в ячейке (запрос может достать не в том порядке) -> swap
+                        let personLeft:any = "";
+                        let personRight:any = "";
+                        let personLeftFinishDate = dayjs(val.split('||')[0].split('#')[0].split('&')[1].split(" :: ")[1], "DD-MM-YYYY HH:mm");
+                        let personRightFinishDate = dayjs(val.split('||')[1].split('#')[0].split('&')[1].split(" :: ")[0], "DD-MM-YYYY HH:mm");
+                        if (personLeftFinishDate.isAfter(personRightFinishDate)){
+                            personLeft = val.split('||')[1];
+                            personRight = val.split('||')[0];
+                        }
+                        else {
+                            personLeft = val.split('||')[0];
+                            personRight = val.split('||')[1];
+                        }
+                        // -----
 
                         // Разбор данных по жильцу в левой ячейке
-                        let personLeft = val.split('||')[0];
                         let fioPersonLeft = personLeft.split('#')[0].split('&')[0];
                         let personLeftDates = personLeft.split('#')[0].split('&')[1];
-                        let personLeftMale = personLeft.split('#')[0].split('&')[2];
+                        let personLeftMale = personLeft.split('#')[0].split('&')[2] == 'true';
                         let personLeftNote = personLeft.split('#')[0].split('&')[3] == 'null' ? "" : personLeft.split('#')[0].split('&')[3];
                         let personLeftPost = personLeft.split('#')[0].split('&')[4];
                         let personLeftFilial = personLeft.split('#')[0].split('&')[5] == 'emptyF' ? "" : personLeft.split('#')[0].split('&')[5];
                         let personLeftPercent = Math.abs(personLeft.split('#')[1]);
-                        let coloredLeftWidth = Math.abs(personLeftPercent) + addedPixel*(Math.abs(personLeftPercent)/100);
+                        let coloredLeftWidth = columnWidth * (personLeftPercent/100);
                         // -----
 
                         // Разбор данных по жильцу в левой ячейке
-                        let personRight = val.split('||')[1];
-                        let fioPersonRight = val.split('||')[1].split('#')[0].split('&')[0];
+                        let fioPersonRight = personRight.split('#')[0].split('&')[0];
+                        let startCell = !data.find(d => {
+                            if (d.bedId == record.bedId){
+                                let prevDay = dayjs(el, "DD-MM-YYYY").subtract(1, 'day').format("DD-MM-YYYY");
+                                if (record[prevDay]) {
+                                    if (record[prevDay].toLowerCase().indexOf(fioPersonRight.toLowerCase()) > -1) {
+                                        return true;
+                                    }
+                                }
+                            }
+                            return false;
+                        });
                         let personRightDates = personRight.split('#')[0].split('&')[1]
+                        let personRightMale = personRight.split('#')[0].split('&')[2] == 'true';
                         let personRightNote = personRight.split('#')[0].split('&')[3] == 'null' ? "" : personRight.split('#')[0].split('&')[3];
                         let personRightPost = personRight.split('#')[0].split('&')[4];
                         let personRightFilial = personRight.split('#')[0].split('&')[5] == 'emptyF' ? "" : personRight.split('#')[0].split('&')[5];
                         let personRightPercent = Math.abs(personRight.split('#')[1]);
-                        let coloredRightWidth = Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100);
+                        let coloredRightWidth = columnWidth * (personRightPercent/100);
                         // -----
 
                         return (<Flex key={record.id} vertical={false} style={{height: 31, background: isWeekend ? cellBackgroundColor : 'inherit'}}>
                             <>
-                                <div style={{
+                                <div onClick={() => {
+                                    setSelectedFlatId(record.sectionId);
+                                    setSelectedDate(dayjs(personLeftDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
+                                }}
+                                    style={{
                                     marginTop: 3,
                                     marginBottom: 3,
                                     cursor: 'pointer',
-                                    background: cellsColor,
+                                    background: personLeftMale ? cellsMaleColor: cellsFemaleColor,
                                     height: 25,
                                     color: fontColor,
                                     fontSize,
@@ -332,24 +379,21 @@ export const CellsView = (props: ModalPros) => {
                                                 <div>{personLeftNote}</div>
                                             </Flex>)}>
                                                 <div style={{paddingTop: 4, width: fioPersonLeft.length*1.5 + 15, height: 25}}>
-                                                    <Flex style={{position: "absolute", top: 6, left: -((columnWidth - (coloredLeftWidth as unknown as number))+20), height: 25}}
-                                                          vertical={false} align={'start'} justify={'center'}>
-                                                        {personLeftMale == 'true' ?
-                                                            <img style={{marginRight: 3}} width={15} height={15} src={Male} alt={'man'}/>
-                                                            :
-                                                            <img style={{marginRight: 3}} width={15} height={15} src={Female} alt={'woman'}/>
-                                                        }
-                                                        {fioPersonLeft}
-                                                    </Flex>
                                                 </div>
                                             </Popover>
                                     </Flex>
                                 </div>
                                 <div style={{width: 3}}></div>
-                                <div style={{
+                                <div
+                                    onClick={() => {
+                                        setSelectedFlatId(record.sectionId);
+                                        setSelectedDate(dayjs(personRightDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
+                                    }}
+                                    style={{
                                     marginTop: 3,
                                     marginBottom: 3,
-                                    cursor: 'pointer', background: cellsColor, height: 25, color: fontColor, fontSize,
+                                    cursor: 'pointer',
+                                    background: personRightMale ? cellsMaleColor: cellsFemaleColor, height: 25, color: fontColor, fontSize,
                                     borderBottomLeftRadius: 8,
                                     borderTopLeftRadius: 8,
                                     width: coloredRightWidth,
@@ -361,9 +405,16 @@ export const CellsView = (props: ModalPros) => {
                                                 <div>{personRightDates}</div>
                                                 <div>{personRightNote}</div>
                                             </Flex>)}>
-                                                <div style={{paddingTop: 6, width: Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100), height: 25}}></div>
+                                                <div style={{paddingTop: 4, width: Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100), height: 25}}>
+                                                    {startCell &&
+                                                        <div style={{left: 0, position: "absolute", width: 100, zIndex: 100, height: 25}}>
+                                                            <Flex vertical={false} align={'center'}>
+                                                                {fioPersonRight}
+                                                            </Flex>
+                                                        </div>
+                                                    }
+                                                </div>
                                             </Popover>
-
                                     </Flex>
                                 </div>
                             </>
@@ -390,7 +441,6 @@ export const CellsView = (props: ModalPros) => {
         }
     };
     const updateCurrentMonthHandler = (value: string) => {
-        console.info('click', new Date())
          setCurrentMonth(value);
         switch (value) {
             case "Январь":
@@ -570,24 +620,24 @@ export const CellsView = (props: ModalPros) => {
                 </Flex>
                 <Flex vertical={false}>
                     {/*//@ts-ignore*/}
-                    <RangePicker style={{marginRight: 15, width: 285}} format={"DD-MM-YYYY"} value={props.chessDateRange} onChange={(e) => {
+                    <RangePicker style={{width: 285, marginRight: 5}} format={"DD-MM-YYYY"} value={props.chessDateRange} onChange={(e) => {
                         props.setChessDateRange(e as any)
                     }}/>
-                    <Flex align={'center'} vertical={false}>
-                        <Search ref={searchInputRef} style={{width: 300}} size={'middle'}
-                                placeholder={'Общий поиск комнаты жильца'}
-                                onSearch={searchGuestHandler}
-                                allowClear={true}
-                                onChange={(e) => {
-                                    if (e.target.value == ""){
-                                        setData(flatsData ?? []);
-                                        if (searchInputRef) searchInputRef.current.input.value = "";
-                                    }
-                                }}
-                        />
-                    </Flex>
+                    <Search ref={searchInputRef} style={{width: 285, marginLeft: 5}} size={'middle'}
+                            placeholder={'Общий поиск комнаты жильца'}
+                            onSearch={searchGuestHandler}
+                            allowClear={true}
+                            onChange={(e) => {
+                                if (e.target.value == ""){
+                                    setData(flatsData ?? []);
+                                    if (searchInputRef) searchInputRef.current.input.value = "";
+                                }
+                            }}
+                    />
                 </Flex>
-                <Button icon={<SettingOutlined />} style={{marginRight: 10}} onClick={() => setVisibleCellsViewSettings(true)}>Настройки</Button>
+                <Flex style={{width: 232}} justify={'flex-end'}>
+                    <Button icon={<SettingOutlined />} style={{marginRight: 10}} onClick={() => setVisibleCellsViewSettings(true)}>Настройки</Button>
+                </Flex>
             </Flex>
             <Segmented<string>
                 value={currentMonth}
@@ -597,11 +647,6 @@ export const CellsView = (props: ModalPros) => {
                 onChange={updateCurrentMonthHandler}
             />
             <MemoizedChess columns={columns} data={data}/>
-            {/*{(data && columns && !isFlatsLoading) &&*/}
-            {/*     }*/}
-            {/*{isFlatsLoading &&*/}
-            {/*    <Skeleton active={true} style={{width: window.innerWidth}}/>*/}
-            {/*}*/}
         </>
     )
 };
