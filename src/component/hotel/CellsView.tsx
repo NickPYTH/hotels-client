@@ -31,18 +31,6 @@ interface ModalPros {
     showWarningMsg: Function
 }
 
-const ChessComponent = ({columns, data}) => {
-    return (<Table<DataType>
-        style={{width: window.innerWidth}}
-        columns={columns}
-        dataSource={data}
-        bordered={true}
-        pagination={{
-            defaultPageSize: 400//isFilialUEZS ? 100 : 20,
-        }}
-        scroll={{x: window.innerWidth, y: window.innerHeight - 330}}
-    />)
-}
 
 type SelectedCellType = {
     recordId: string;
@@ -54,7 +42,22 @@ type SelectedCellType = {
     date: string;
 }
 
+// Table component
+const ChessComponent = ({columns, data}) => {
+    return (<Table<DataType>
+        style={{width: window.innerWidth}}
+        loading={data == null}
+        columns={columns}
+        dataSource={data}
+        bordered={true}
+        pagination={{
+            defaultPageSize: 400//isFilialUEZS ? 100 : 20,
+        }}
+        scroll={{x: window.innerWidth, y: window.innerHeight - 330}}
+    />)
+}
 const MemoizedChess = React.memo(ChessComponent);
+// -----
 
 export const CellsView = (props: ModalPros) => {
 
@@ -130,6 +133,10 @@ export const CellsView = (props: ModalPros) => {
     });
     const [interactiveMode, setInteractiveMode] = useState(false);
     // -----
+
+    useEffect(() => {
+        if (columns) console.info(columns, new Date())
+    }, [columns]);
 
     // Web requests
     const [getAllFlats, {
@@ -255,15 +262,7 @@ export const CellsView = (props: ModalPros) => {
                                 // -----
                             }}>
                                 <Flex justify="center" align="center">
-                                    <Popconfirm onConfirm={() => {
-                                        setSelectedFlatId(record.sectionId);
-                                        if (percent == 100)
-                                            setSelectedDate(dayjs(`${el} 12:00`, "DD-MM-YYYY HH:mm"));
-                                        else
-                                            setSelectedDate(dayjs((percent > 0 && percent < 100) ? dateTime[0] : dateTime[1], "DD-MM-YYYY HH:mm"));
-                                    }} cancelText={"Отмена"} okText={"Открыть"}
-                                                title={`${fio} ${post} ${filial}`}
-                                                description={`Даты проживания ${val.split('#')[0].split('&')[1]}`}>
+
                                         <Popover placement={'bottom'} title={`${fio}`} content={() => (<Flex vertical={true}>
                                             <div>{post} {filial}</div>
                                             <div>{datesRange}</div>
@@ -284,7 +283,6 @@ export const CellsView = (props: ModalPros) => {
                                                 <div style={{paddingTop: 4, width: '100%', height: 25}}></div>
                                             }
                                         </Popover>
-                                    </Popconfirm>
                                 </Flex>
                             </div>
                         </Flex>)
@@ -328,12 +326,6 @@ export const CellsView = (props: ModalPros) => {
                                     width: coloredLeftWidth,
                                 }}>
                                     <Flex justify="center" align="center">
-                                        <Popconfirm onConfirm={() => {
-                                            setSelectedFlatId(record.sectionId);
-                                            setSelectedDate(dayjs(personLeftDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
-                                        }} cancelText={"Отмена"} okText={"Открыть"}
-                                                    title={`${fioPersonLeft} ${personLeftPost} ${personLeftFilial}`}
-                                                    description={`Даты проживания ${personLeftDates}`}>
                                             <Popover placement={'bottom'} title={`${fioPersonLeft}`} content={() => (<Flex vertical={true}>
                                                 <div>{personLeftPost} {personLeftFilial}</div>
                                                 <div>{personLeftDates}</div>
@@ -351,7 +343,6 @@ export const CellsView = (props: ModalPros) => {
                                                     </Flex>
                                                 </div>
                                             </Popover>
-                                        </Popconfirm>
                                     </Flex>
                                 </div>
                                 <div style={{width: 3}}></div>
@@ -365,12 +356,6 @@ export const CellsView = (props: ModalPros) => {
                                     position: 'absolute', right: 0
                                 }}>
                                     <Flex justify="center" align="center">
-                                        <Popconfirm onConfirm={() => {
-                                            setSelectedFlatId(record.sectionId);
-                                            setSelectedDate(dayjs(personRightDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
-                                        }} cancelText={"Отмена"} okText={"Открыть"}
-                                                    title={`${fioPersonRight} ${personRightPost} ${personRightFilial}`}
-                                                    description={`Даты проживания ${personRightDates}`}>
                                             <Popover placement={'bottom'} title={`${fioPersonRight}`} content={() => (<Flex vertical={true}>
                                                 <div>{personRightPost} {personRightFilial}</div>
                                                 <div>{personRightDates}</div>
@@ -378,7 +363,7 @@ export const CellsView = (props: ModalPros) => {
                                             </Flex>)}>
                                                 <div style={{paddingTop: 6, width: Math.abs(personRightPercent) + addedPixel*(Math.abs(personRightPercent)/100), height: 25}}></div>
                                             </Popover>
-                                        </Popconfirm>
+
                                     </Flex>
                                 </div>
                             </>
@@ -389,17 +374,9 @@ export const CellsView = (props: ModalPros) => {
                     return <div id={"$$$"+record.bedId.toString() + el} onClick={() => selectCellHandler(el, record)}
                                 style={{cursor: 'pointer', width: "100%", height: 31, background: isWeekend ? cellBackgroundColor : 'inherit'}}>
                     </div>
-                else return <Popconfirm title={'Добавить запись о проживании?'} okText={"Да"} cancelText={"Отмена"} onConfirm={() => {
-                        setFilialId(record.filialId);
-                        setHotelId(record.hotelId);
-                        setFlatId(record.sectionId);
-                        setRoomId(record.room);
-                        setBedId(record.bedId);
-                        setVisibleGuestModal(true);
-                    }}>
-                        <div style={{cursor: 'pointer', width: "100%", height: 31, background: isWeekend ? cellBackgroundColor : 'inherit'}}>
+                else return <div style={{cursor: 'pointer', width: "100%", height: 31, background: isWeekend ? cellBackgroundColor : 'inherit'}}>
                         </div>
-                    </Popconfirm>
+
             }
         })));
     }
@@ -413,7 +390,8 @@ export const CellsView = (props: ModalPros) => {
         }
     };
     const updateCurrentMonthHandler = (value: string) => {
-        setCurrentMonth(value);
+        console.info('click', new Date())
+         setCurrentMonth(value);
         switch (value) {
             case "Январь":
                 props.setChessDateRange([dayjs('01-01-2025', 'DD-MM-YYYY'), dayjs('14-01-2025', 'DD-MM-YYYY')])
@@ -542,33 +520,13 @@ export const CellsView = (props: ModalPros) => {
     }, [flatsData]);
     useEffect(() => {
         if (props.chessDateRange && data && columns && props.hotelId) {
-            setColumns((prev: any) => {
-                let dateStart = props.chessDateRange[0];
-                let dateFinish = props.chessDateRange[1];
-                let dateList = [];
-                for (let d = dateStart; d.isBefore(dateFinish); d = d.add(1, 'days')) {
-                    dateList.push(d.format("DD-MM-YYYY"));
-                }
-                return prev.concat(dateList.map((el: string) => ({
-                    title: `${el}`,
-                    dataIndex: `${el}`,
-                    width: 80,
-                    render: (val: any) => {
-                        if (val) {
-                            return (<div style={{cursor: 'pointer', background: cellsColor, width: 80, height: 25, padding: 5}}>
-                                {el}
-                            </div>);
-                        } else return <></>;
-                    }
-                })));
-            });
             getAllFlats({hotelId: props.hotelId, dateStart: props.chessDateRange[0].format("DD-MM-YYYY"), dateFinish: props.chessDateRange[1].format("DD-MM-YYYY")});
         }
+        setData(null);
     }, [props.chessDateRange]);
     useEffect(() => {
-        if (data) {
+        if (data)
             setColumns(settingColumnsHandler(false));
-        }
     }, [data]);
     useEffect(() => {
         if (!interactiveMode){
@@ -577,8 +535,7 @@ export const CellsView = (props: ModalPros) => {
                 el.classList.remove('selectedCell');
             }));
         }
-        if (data)
-            setColumns(settingColumnsHandler(interactiveMode));
+        if (data) setColumns(settingColumnsHandler(interactiveMode));
     }, [interactiveMode]);
     // -----
 
@@ -639,10 +596,12 @@ export const CellsView = (props: ModalPros) => {
                 options={['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']}
                 onChange={updateCurrentMonthHandler}
             />
-            {(data && columns && !isFlatsLoading) ?
-                <MemoizedChess data={data} columns={columns} /> :
-                <Skeleton active={true} style={{width: window.innerWidth}}/>
-            }
+            <MemoizedChess columns={columns} data={data}/>
+            {/*{(data && columns && !isFlatsLoading) &&*/}
+            {/*     }*/}
+            {/*{isFlatsLoading &&*/}
+            {/*    <Skeleton active={true} style={{width: window.innerWidth}}/>*/}
+            {/*}*/}
         </>
     )
 };
