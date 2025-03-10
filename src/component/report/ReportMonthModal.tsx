@@ -110,32 +110,42 @@ export const ReportMonthModal = (props: ModalProps) => {
                 {!orgMode ?
                     <>
                         <Select
-                            allowClear={true}
                             value={selectedEmpFilialId}
                             placeholder={"Выберите филиал работников"}
                             style={{width: '100%'}}
                             onChange={(e) => setSelectedEmpFilialId(e)}
                             options={filials?.map((filial: FilialModel) => ({value: filial.id, label: filial.name}))}
+                            allowClear={true}
+                            showSearch
+                            filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                            filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
+
                         />
                         {selectedEmpFilialId === 928 &&
                             <Select
-                                allowClear={true}
                                 value={selectedCehId}
                                 placeholder={"Вы можете выьрать цех (НЕОБЯЗАТЕЛЬНО)"}
                                 style={{width: '100%'}}
                                 onChange={(e) => setSelectedCehId(e)}
                                 options={uttistCehs?.map((filial: FilialModel) => ({value: filial.id, label: filial.name}))}
+                                allowClear={true}
+                                showSearch
+                                filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                                filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                             />
                         }
                     </>
                     :
                     <Select
-                        allowClear={true}
                         value={selectedOrganizationsId}
                         placeholder={"Выберите организацию работников"}
                         style={{width: '100%'}}
                         onChange={(e) => setSelectedOrganizationsId(e)}
                         options={organizations?.map((org: OrganizationModel) => ({value: org.id, label: org.name}))}
+                        allowClear={true}
+                        showSearch
+                        filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                        filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                     />
                 }
                 <Flex align={"center"}>
@@ -153,6 +163,11 @@ export const ReportMonthModal = (props: ModalProps) => {
                         :
                         filials?.filter((filial: FilialModel) => !filial.excluded).map((filial: FilialModel) => ({value: filial.id, label: filial.name}))
                     }
+                    allowClear={true}
+                    showSearch
+                    filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                    filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
+
                 />
                 <Select
                     loading={isHotelsLoading}
@@ -162,6 +177,10 @@ export const ReportMonthModal = (props: ModalProps) => {
                     style={{width: '100%'}}
                     onChange={(e) => setSelectedHotelId(e)}
                     options={hotels?.map((hotel: HotelModel) => ({value: hotel.id, label: hotel.name}))}
+                    allowClear={true}
+                    showSearch
+                    filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                    filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                 />
                 <Select
                     loading={isResponsibilityLoading}
@@ -171,6 +190,10 @@ export const ReportMonthModal = (props: ModalProps) => {
                     style={{width: '100%'}}
                     onChange={(e) => setResponsibilityId(e)}
                     options={responsibilities?.map((responsibilityModel: ResponsibilityModel) => ({value: responsibilityModel.id, label: responsibilityModel.fio}))}
+                    allowClear={true}
+                    showSearch
+                    filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                    filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                 />
                 <Select
                     loading={isReasonsLoading}
@@ -179,6 +202,10 @@ export const ReportMonthModal = (props: ModalProps) => {
                     style={{width: '100%'}}
                     onChange={(e) => setReasonId(e)}
                     options={reasons?.map((reasonModel: ReasonModel) => ({value: reasonModel.id, label: reasonModel.name}))}
+                    allowClear={true}
+                    showSearch
+                    filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                    filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                 />
                 <Select
                     allowClear={false}

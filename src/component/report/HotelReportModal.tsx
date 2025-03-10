@@ -118,6 +118,10 @@ export const HotelReportModal = (props: ModalProps) => {
                     placeholder={"Выберите филиал"}
                     onChange={(e) => setSelectedFilialId(e)}
                     options={filials?.filter((filial:FilialModel) => !filial.excluded).map((filial: FilialModel) => ({value: filial.id, label: filial.name}))}
+                    allowClear={true}
+                    showSearch
+                    filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                    filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                 />
             </Flex>
             <Flex gap={'small'} vertical={true}>
@@ -141,6 +145,10 @@ export const HotelReportModal = (props: ModalProps) => {
                         placeholder={"Выберите общежитие"}
                         onChange={(e) => setSelectedHotelId(e)}
                         options={hotels?.map((hotel: HotelModel) => ({value: hotel.id, label: hotel.name}))}
+                        allowClear={true}
+                        showSearch
+                        filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                        filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                     />
                     <Column {...config} />
                 </> :

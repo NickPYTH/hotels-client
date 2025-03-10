@@ -121,6 +121,10 @@ export const ContractModal = (props: ModalProps) => {
                     style={{width: '100%'}}
                     onChange={(e) => setFilial(e)}
                     options={filials?.map((f: FilialModel) => ({value: f.id, label: f.name}))}
+                    allowClear={true}
+                    showSearch
+                    filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                    filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                 />
                 <Select
                     disabled={filial === null || isGetAllHotelsLoading}
@@ -130,6 +134,10 @@ export const ContractModal = (props: ModalProps) => {
                     style={{width: '100%'}}
                     onChange={(e) => setHotel(e)}
                     options={hotels?.map((f: HotelModel) => ({value: f.id, label: f.name}))}
+                    allowClear={true}
+                    showSearch
+                    filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                    filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                 />
                 <Select
                     disabled={isGetAllOrganizationsLoading}
@@ -139,6 +147,10 @@ export const ContractModal = (props: ModalProps) => {
                     style={{width: '100%'}}
                     onChange={(e) => setOrganization(e)}
                     options={organizations?.map((f: OrganizationModel) => ({value: f.id, label: f.name}))}
+                    allowClear={true}
+                    showSearch
+                    filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                    filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                 />
                 <Flex align={"center"}>
                     <div style={{width: 180}}>Номер договора</div>
@@ -162,6 +174,10 @@ export const ContractModal = (props: ModalProps) => {
                         onChange={(e) => setBilling(e)}
                         options={[{value: "наличный расчет", label: "наличный расчет"}, {value: "безналичный расчет", label: "безналичный расчет"}]}
                         style={{width: '100%'}}
+                        allowClear={true}
+                        showSearch
+                        filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                        filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                     />
                 </Flex>
                 <Flex align={"center"}>
@@ -174,6 +190,10 @@ export const ContractModal = (props: ModalProps) => {
                         style={{width: '100%'}}
                         onChange={(e) => setReason(e)}
                         options={reasons?.map((f: ReasonModel) => ({value: f.id, label: f.name}))}
+                        allowClear={true}
+                        showSearch
+                        filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                        filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                     />
                 </Flex>
                 <Flex align={"center"}>

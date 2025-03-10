@@ -95,6 +95,10 @@ export const ReportMVZModal = (props: ModalProps) => {
                             :
                             filials?.filter((filial: FilialModel) => !filial.excluded).map((filial: FilialModel) => ({value: filial.id, label: filial.name}))
                         }
+                        allowClear={true}
+                        showSearch
+                        filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                        filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                     />
                 }
                 {/*//@ts-ignore*/}
@@ -117,6 +121,10 @@ export const ReportMVZModal = (props: ModalProps) => {
                         onChange={(e) => setSelectedEmployeeFilialId(e)}
                         options={filials?.map((filial: FilialModel) => ({value: filial.id, label: filial.name}))
                         }
+                        allowClear={true}
+                        showSearch
+                        filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                        filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                     />
                 }
             </Flex>

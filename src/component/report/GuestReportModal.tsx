@@ -83,6 +83,10 @@ export const GuestReportModal = (props: ModalProps) => {
                             placeholder={"Выберите филиал"}
                             onChange={(e) => setSelectedFilialId(e)}
                             options={filials?.filter((filial: FilialModel) => !filial.excluded).map((filial: FilialModel) => ({value: filial.id, label: filial.name}))}
+                            allowClear={true}
+                            showSearch
+                            filterOption={(inputValue, option) =>  (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                            filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                         />
                     </Flex>
                 }
