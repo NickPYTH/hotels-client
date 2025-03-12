@@ -102,6 +102,7 @@ export const GuestModal = (props: ModalProps) => {
     const [visibleSelectGuestModal, setVisibleSelectGuestModal] = useState(false);  // Окно выбора проживающего из ранее заселенных жильцов для авто аполнения данных
     const [visibleHistoryModal, setVisibleHistoryModal] = useState(false); // Видимость модального окна и историей изменений карточки
     const [visibleExtrasModal, setVisibleExtrasModal] = useState(false); // Видимость модального окна с доп. услугами (только для Ермака)
+    const [errorType, setErrorType] = useState<number|null>(null);
     // -----
 
     // Web requests
@@ -374,6 +375,12 @@ export const GuestModal = (props: ModalProps) => {
                         }
                         : p));
                 }
+            } else {
+                if (updatedGuest.error == 'datesError') setErrorType(1);
+                if (updatedGuest.error == 'roomLock') setErrorType(2);
+                if (updatedGuest.error == 'flatLock') setErrorType(3);
+                if (updatedGuest.error == 'roomOrg') setErrorType(4);
+                if (updatedGuest.error == 'flatOrg') setErrorType(5);
             }
         }
     }, [updatedGuest]);
@@ -407,6 +414,13 @@ export const GuestModal = (props: ModalProps) => {
                         }
                         : p));
                 }
+            }
+            else {
+                if (createdGuest.error == 'datesError') setErrorType(1);
+                if (createdGuest.error == 'roomLock') setErrorType(2);
+                if (createdGuest.error == 'flatLock') setErrorType(3);
+                if (createdGuest.error == 'roomOrg') setErrorType(4);
+                if (createdGuest.error == 'flatOrg') setErrorType(5);
             }
         }
     }, [createdGuest]);
@@ -792,16 +806,36 @@ export const GuestModal = (props: ModalProps) => {
                     <TimePicker needConfirm={false} value={timeFinish} style={{width: 170}} onChange={selectFinishTimeHandler} minuteStep={15} showSecond={false} hourStep={1} allowClear={false}/>
                 </Flex>
                 <Flex vertical={true} align={"center"}>
-                    {updatedGuest?.error &&
+                    {(errorType == 1 && updatedGuest) &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
-                               description={`Указанные даты пересекают существующий период проживания работника ${updatedGuest.lastname} ${updatedGuest.firstname} ${updatedGuest.secondName} (с ${updatedGuest.dateStart} по ${updatedGuest.dateFinish}) 
-                        в филиале: "${updatedGuest.filialName}", общежитии: "${updatedGuest.hotelName}", секции: "${updatedGuest.flatName}", комнате  "${updatedGuest.roomName}", месте  "${updatedGuest.bedName}"`}
+                               description={`Указанные даты пересекают существующий период проживания работника ${updatedGuest?.lastname} ${updatedGuest?.firstname} ${updatedGuest?.secondName} (с ${updatedGuest?.dateStart} по ${updatedGuest?.dateFinish}) 
+                        в филиале: "${updatedGuest?.filialName}", общежитии: "${updatedGuest?.hotelName}", секции: "${updatedGuest?.flatName}", комнате  "${updatedGuest?.roomName}", месте  "${updatedGuest?.bedName}"`}
                                showIcon/>
                     }
-                    {createdGuest?.error &&
+                    {(errorType == 1 && createdGuest) &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
-                               description={`Указанные даты пересекают существующий период проживания работника ${createdGuest.lastname} ${createdGuest.firstname} ${createdGuest.secondName} (с ${createdGuest.dateStart} по ${createdGuest.dateFinish}) 
-                        в филиале: "${createdGuest.filialName}", общежитии: "${createdGuest.hotelName}", секции: "${createdGuest.flatName}", комнате  "${createdGuest.roomName}", месте  "${createdGuest.bedName}"`}
+                               description={`Указанные даты пересекают существующий период проживания работника ${createdGuest?.lastname} ${createdGuest?.firstname} ${createdGuest.secondName} (с ${createdGuest?.dateStart} по ${createdGuest?.dateFinish}) 
+                        в филиале: "${createdGuest?.filialName}", общежитии: "${createdGuest?.hotelName}", секции: "${createdGuest?.flatName}", комнате  "${createdGuest?.roomName}", месте  "${createdGuest?.bedName}"`}
+                               showIcon/>
+                    }
+                    {errorType == 2 &&
+                        <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
+                               description={`На указанный период комната отмечена статусом "Занято", проверьте тайм-лайн статусов в карточке секции.`}
+                               showIcon/>
+                    }
+                    {errorType == 3 &&
+                        <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
+                               description={`На указанный период секция отмечена статусом "Занято", проверьте тайм-лайн статусов в карточке секции.`}
+                               showIcon/>
+                    }
+                    {errorType == 4 &&
+                        <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
+                               description={`На указанный период комната отмечена статусом "Выкуплено организацией", проверьте тайм-лайн статусов в карточке секции.`}
+                               showIcon/>
+                    }
+                    {errorType == 5 &&
+                        <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
+                               description={`На указанный период секция отмечена статусом "Выкуплено организацией", проверьте тайм-лайн статусов в карточке секции.`}
                                showIcon/>
                     }
                 </Flex>
@@ -843,6 +877,7 @@ export const GuestModal = (props: ModalProps) => {
                         allowClear={true}
                         value={selectedFlatId}
                         loading={isFlatsLoading}
+                        disabled={isFlatsLoading}
                         placeholder={"Выберите секцию"}
                         style={{width: '100%'}}
                         onChange={(e) => selectFlatHandler(e)}
@@ -861,6 +896,7 @@ export const GuestModal = (props: ModalProps) => {
                         allowClear={true}
                         value={selectedRoomId}
                         loading={isRoomsLoading}
+                        disabled={isRoomsLoading}
                         placeholder={"Выберите комнату"}
                         style={{width: '100%'}}
                         onChange={(e) => selectRoomHandler(e)}
@@ -880,6 +916,7 @@ export const GuestModal = (props: ModalProps) => {
                         value={selectedBedId}
                         loading={isBedsLoading}
                         placeholder={"Выберите койко-место"}
+                        disabled={isBedsLoading}
                         style={{width: '100%'}}
                         onChange={(e) => selectBedHandler(e)}
                         onClear={() => selectBedHandler()}

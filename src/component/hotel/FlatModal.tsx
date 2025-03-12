@@ -225,7 +225,7 @@ export const FlatModal = (props: ModalProps) => {
                                         />
                                     )
                                 })}
-                                {(room.guests.length < room.bedsCount) && room.statusId == 1 &&
+                                {(room.guests.length < room.bedsCount) && room.statusId == 1 && flat.statusId == 1 &&
                                     <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3} type={'primary'} style={{height: 50, width: 330}} onClick={() => {
                                         setSelectedRoom(room);
                                         setVisibleGuestModal(true);
