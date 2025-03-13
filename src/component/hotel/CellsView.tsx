@@ -248,7 +248,7 @@ export const CellsView = (props: ModalPros) => {
                         let post = val.split('#')[0].split('&')[4];
                         let filial = val.split('#')[0].split('&')[5] == 'emptyF' ? "" : val.split('#')[0].split('&')[5];
                         let isReservation = val.split('#')[0].split('&')[6];
-                        let coloredWidth = Math.abs(percent) + addedPixel == columnWidth ? '100%' : Math.abs(percent) + addedPixel*(Math.abs(percent)/100);
+                        let coloredWidth = columnWidth * (Math.abs(percent)/100);
                         return (<Flex key={record.id} vertical={false} style={{background: isWeekend ? cellBackgroundColor : 'inherit', height: 31}}>
                             <div onClick={() => {
                                 setSelectedFlatId(record.sectionId);
