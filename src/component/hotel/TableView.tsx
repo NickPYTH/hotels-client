@@ -15,6 +15,7 @@ import {FlatModal} from "./FlatModal";
 import ConfirmedReservation from "../../assets/confirmedReservation.png";
 
 type ModalProps = {
+    hotelId: string,
     flatsData: FlatModel[],
     visibleGuestModal: boolean,
     setVisibleGuestModal: Function,
@@ -232,7 +233,7 @@ export const TableView = (props:ModalProps) => {
     return(
         <Flex>
             {selectedFlatId &&
-                <FlatModal date={props.selectedDate} flatId={selectedFlatId} visible={flatModalVisible} setVisible={setFlatModalVisible} />
+                <FlatModal hotelId={props.hotelId} date={props.selectedDate} flatId={selectedFlatId} visible={flatModalVisible} setVisible={setFlatModalVisible} />
             }
             <Table
                 bordered={true}

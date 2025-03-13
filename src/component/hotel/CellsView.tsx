@@ -7,7 +7,8 @@ import {FlatModal} from "./FlatModal";
 import Search from "antd/lib/input/Search";
 import {GuestModal} from "../dict/GuestModal";
 import {CellsViewSettingsModal} from "./CellsViewSettingsModal";
-import {AppstoreAddOutlined, SettingOutlined, UserAddOutlined} from "@ant-design/icons";
+import {AppstoreAddOutlined, SettingOutlined, TagOutlined, UserAddOutlined} from "@ant-design/icons";
+import {ReservationModal} from "../dict/ReservationModal";
 
 const {RangePicker} = DatePicker;
 
@@ -102,6 +103,7 @@ export const CellsView = (props: ModalPros) => {
     const [data, setData] = useState<any[] | null>(null);
     const [columns, setColumns] = useState<any[] | null>(null);
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
+    const [visibleReservationModal, setVisibleReservationModal] = useState(false);
     const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(false);
     const [currentMonth, setCurrentMonth] = useState<string>(() => selectMonthByDate(props.selectedDate));
     const [reservationCellsColor] = useState(() => {
@@ -133,12 +135,12 @@ export const CellsView = (props: ModalPros) => {
         return '#e1e1e1';
     });
     const [interactiveMode, setInteractiveMode] = useState(false);
+    const [isFilialUEZS] = useState(() => props.hotelId === '182' || props.hotelId === '183' || props.hotelId === '184' || props.hotelId === '327');
     // -----
 
     // Web requests
     const [getAllFlats, {
         data: flatsData,
-        isLoading: isFlatsLoading
     }] = flatAPI.useGetAllChessMutation();
     // -----
 
@@ -547,7 +549,6 @@ export const CellsView = (props: ModalPros) => {
         let sorted = selectedCells.sort((a,b) => dayjs(a.date, 'DD-MM-YYYY').diff(dayjs(b.date, 'DD-MM-YYYY')));
         let startCell = sorted[0];
         let finishCell = sorted[sorted.length-1];
-        setInteractiveMode(false);
         setFilialId(startCell.filialId);
         setHotelId(startCell.hotelId);
         setFlatId(startCell.sectionId);
@@ -556,6 +557,27 @@ export const CellsView = (props: ModalPros) => {
         setDateStart(dayjs(startCell.date, 'DD-MM-YYYY'));
         setDateFinish(dayjs(finishCell.date, 'DD-MM-YYYY'));
         setVisibleGuestModal(true);
+    };
+    const addReservationHandler = () => {
+        if (localStorage.getItem('selectedCells') == null){
+            props.showWarningMsg('Вы не выбрали ни одного дня');
+            return;
+        }
+        let selectedCells: SelectedCellType[] = JSON.parse(localStorage.getItem('selectedCells'));
+        let sorted = selectedCells.sort((a,b) => dayjs(a.date, 'DD-MM-YYYY').diff(dayjs(b.date, 'DD-MM-YYYY')));
+        let startCell = sorted[0];
+        let finishCell = sorted[sorted.length-1];
+        setFilialId(startCell.filialId);
+        setHotelId(startCell.hotelId);
+        setFlatId(startCell.sectionId);
+        setRoomId(startCell.roomId);
+        setBedId(startCell.bedId);
+        setDateStart(dayjs(startCell.date, 'DD-MM-YYYY'));
+        setDateFinish(dayjs(finishCell.date, 'DD-MM-YYYY'));
+        setVisibleReservationModal(true);
+    };
+    const refreshHandler = () => {
+        if (props.hotelId) getAllFlats({hotelId: props.hotelId, dateStart: props.chessDateRange[0].format("DD-MM-YYYY"), dateFinish: props.chessDateRange[1].format("DD-MM-YYYY")});
     };
     // -----
 
@@ -587,6 +609,12 @@ export const CellsView = (props: ModalPros) => {
         }
         if (data) setColumns(settingColumnsHandler(interactiveMode));
     }, [interactiveMode]);
+    useEffect(() => {
+        if (!visibleGuestModal) setInteractiveMode(false);
+    }, [visibleGuestModal]);
+    useEffect(() => {
+        if (!visibleReservationModal) setInteractiveMode(false);
+    }, [visibleReservationModal]);
     // -----
 
     return (
@@ -607,8 +635,24 @@ export const CellsView = (props: ModalPros) => {
                         if (props.hotelId)
                             getAllFlats({hotelId: props.hotelId, dateStart: props.chessDateRange[0].format("DD-MM-YYYY"), dateFinish: props.chessDateRange[1].format("DD-MM-YYYY")});
                     }}/>}
+            {visibleReservationModal &&
+                <ReservationModal
+                    dateStart={dateStart}
+                    dateFinish={dateFinish}
+                    filialId={filialId}
+                    hotelId={hotelId}
+                    flatId={flatId}
+                    roomId={roomId}
+                    bedId={bedId}
+                    selectedReservation={null}
+                    visible={visibleReservationModal}
+                    setVisible={setVisibleReservationModal}
+                    refresh={() => {
+                    if (props.hotelId)
+                        getAllFlats({hotelId: props.hotelId, dateStart: props.chessDateRange[0].format("DD-MM-YYYY"), dateFinish: props.chessDateRange[1].format("DD-MM-YYYY")});
+                }}/>}
             {(selectedFlatId && selectedDate && data) &&
-                <FlatModal date={selectedDate} flatId={selectedFlatId} visible={true} setVisible={() => {
+                <FlatModal hotelId={props.hotelId} date={selectedDate} flatId={selectedFlatId} visible={true} setVisible={() => {
                     setSelectedFlatId(null);
                     setSelectedDate(null);
                 }}/>
@@ -616,13 +660,17 @@ export const CellsView = (props: ModalPros) => {
             <Flex vertical={false} justify={'space-between'} style={{width: window.innerWidth}}>
                 <Flex>
                     <Button icon={<AppstoreAddOutlined />} type={interactiveMode ? "primary" : "default"} style={{marginLeft: 10, marginRight: 5}} onClick={interactiveModeHandler}>Интерактивное заселение</Button>
-                    {interactiveMode && <Button icon={<UserAddOutlined />} onClick={addGuestHandler}>Добавить</Button>}
+                    {interactiveMode && <Button icon={<UserAddOutlined />} onClick={addGuestHandler}>Заселить</Button>}
+                    {(interactiveMode && isFilialUEZS) && <Button icon={<TagOutlined />} style={{marginLeft: 5}} onClick={addReservationHandler}>Забронировать</Button>}
                 </Flex>
                 <Flex vertical={false}>
                     {/*//@ts-ignore*/}
                     <RangePicker style={{width: 285, marginRight: 5}} format={"DD-MM-YYYY"} value={props.chessDateRange} onChange={(e) => {
                         props.setChessDateRange(e as any)
                     }}/>
+                    <Button onClick={refreshHandler}>
+                        Обновить
+                    </Button>
                     <Search ref={searchInputRef} style={{width: 285, marginLeft: 5}} size={'middle'}
                             placeholder={'Общий поиск комнаты жильца'}
                             onSearch={searchGuestHandler}

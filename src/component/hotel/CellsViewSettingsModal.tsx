@@ -1,6 +1,8 @@
 import {Button, Checkbox, ColorPicker, Flex, Form, FormProps, Input, InputNumber, Modal} from "antd";
 import React, {useState} from "react";
 import {AggregationColor} from "antd/es/color-picker/color";
+import {RoomModel} from "../../model/RoomModel";
+import {Dayjs} from "dayjs";
 
 type ModalProps = {
     visible: boolean,

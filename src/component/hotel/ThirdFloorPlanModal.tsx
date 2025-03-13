@@ -14,6 +14,7 @@ type ModalProps = {
     setFlatModalVisible: Function,
     setSelectedFlatId: Function,
     selectedFlatId: number,
+    hotelId: string
 }
 
 export const ThirdFloorPlanModal = (props: ModalProps) => {
@@ -26,6 +27,7 @@ export const ThirdFloorPlanModal = (props: ModalProps) => {
                }}
         >
             <CustomPaintScreen
+                hotelId={props.hotelId}
                 setSelectedFlatId={props.setSelectedFlatId}
                 flats={props.flatsData}
                 date={props.date}

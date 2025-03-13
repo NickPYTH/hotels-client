@@ -10,8 +10,6 @@ import {ReservationModal} from "../../component/dict/ReservationModal";
 import {UserAddOutlined, UsergroupAddOutlined} from "@ant-design/icons";
 import {GroupReservationModal} from "../../component/hotel/GroupReservationModal";
 import {TableTitleRender} from "../../component/TableTitleRender";
-import {GuestModel} from "../../model/GuestModel";
-import * as events from "events";
 
 const ReservationScreen: React.FC = () => {
 

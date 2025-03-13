@@ -6,9 +6,4 @@ export type EventModel = {
     name: string;
     description: string;
     type: EventTypeModel;
-    dateStart: string;
-    dateFinish: string;
-    hotel: HotelModel;
-    manCount: number;
-    womenCount: number;
 }

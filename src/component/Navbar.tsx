@@ -84,6 +84,10 @@ export const Navbar = (props: propsType) => {
                                 label: 'Доп. услуги',
                                 key: 'extras',
                             },
+                            {
+                                label: 'Виды мероприятий',
+                                key: 'events',
+                            },
                         ]
                     },
                     {
@@ -125,10 +129,6 @@ export const Navbar = (props: propsType) => {
                                 key: 'logs',
                             },
                         ]
-                    },
-                    {
-                        label: 'Мероприятия',
-                        key: 'events',
                     },
                     {
                         label: 'Справка',
@@ -177,6 +177,10 @@ export const Navbar = (props: propsType) => {
                                 label: 'Доп. услуги',
                                 key: 'extras',
                             },
+                            {
+                                label: 'Виды мероприятий',
+                                key: 'events',
+                            },
                         ]
                     },
                     {
@@ -204,10 +208,6 @@ export const Navbar = (props: propsType) => {
                                 key: 'loadStatsReport',
                             },
                         ]
-                    },
-                    {
-                        label: 'Мероприятия',
-                        key: 'events',
                     },
                     {
                         label: 'Справка',

@@ -15,7 +15,7 @@ import LogScreen from "../screen/admin/LogScreen";
 import MVZScreen from "../screen/dict/MVZScreen";
 import {Result} from "antd";
 import AboutScreen from "../screen/AboutScreen";
-import EventScreen from "../screen/EventScreen";
+import EventScreen from "../screen/dict/EventScreen";
 import ExtraScreen from "../screen/dict/ExtraScreen";
 import ReservationScreen from "../screen/dict/ReservationScreen";
 

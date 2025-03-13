@@ -5,8 +5,10 @@ import {UserModel} from "../../model/UserModel";
 import {reservationAPI} from "../../service/ReservationService";
 
 type CardProps = {
-    guest: GuestModel,
-    getFlat: Function
+    reservation: GuestModel,
+    getFlat: Function,
+    setSelectedReservation: Function,
+    setVisibleReservationModal: Function
 }
 export const ReservationCard = (props:CardProps) => {
 
@@ -15,36 +17,54 @@ export const ReservationCard = (props:CardProps) => {
         data: response,
         isLoading: isConfirmLoading
     }] = reservationAPI.useConfirmMutation();
+    const [deleteReservation, {
+        data: deletedReservation,
+        isLoading: isDeleteLoading
+    }] = reservationAPI.useDeleteMutation();
     // -----
 
     // Effects
     useEffect(() => {
         if (response) props.getFlat();
     }, [response]);
+    useEffect(() => {
+        if (deletedReservation) props.getFlat();
+    }, [deletedReservation]);
     // -----
 
     // Handlers
     const confirmHandler = () =>  {
-        confirm(props.guest.id);
+        confirm(props.reservation.id);
+    }
+    const deleteHandler = () => {
+        deleteReservation(props.reservation.id);
+    }
+    const openHandler = () => {
+        props.setVisibleReservationModal(true);
+        props.setSelectedReservation(props.reservation);
     }
     // -----
 
     return(
-        <Card title={`${props.guest.lastname ?? ""} ${props.guest.firstname ? props.guest.firstname[0]+"." : ""} ${props.guest.secondName ? props.guest.secondName[0]+".":""}`}
+        <Card title={`${props.reservation.lastname ?? ""} ${props.reservation.firstname ? props.reservation.firstname[0]+"." : ""} ${props.reservation.secondName ? props.reservation.secondName[0]+".":""}`}
               bordered={true}
               style={{width: 340}}>
-            <Tag style={{position: 'absolute', top: 8, right: 5}} color={'blue'}>Бронь #{props.guest.id}</Tag>
+            <Tag style={{position: 'absolute', top: 8, right: 5}} color={'blue'}>Бронь #{props.reservation.id}</Tag>
             <div>
-                Дата заселения: {props.guest?.dateStart}
+                Дата заселения: {props.reservation?.dateStart}
             </div>
             <div>
-                Дата выселения: {props.guest?.dateFinish}
+                Дата выселения: {props.reservation?.dateFinish}
             </div>
             <div>
-                Место: {props.guest?.bedName}
+                Место: {props.reservation?.bedName}
             </div>
+            <Button disabled={isConfirmLoading} style={{marginTop: 5, width: 300}} onClick={openHandler}>Открыть карточку брони</Button>
             <Popconfirm title={"Вы точно хотите подтвердить бронь?"} onConfirm={confirmHandler}>
-                <Button disabled={isConfirmLoading} style={{marginTop: 5}} type={'primary'}>Подтвердить бронь и добавить жильца</Button>
+                <Button disabled={isConfirmLoading} style={{marginTop: 5, width: 300}}>Подтвердить бронь и добавить жильца</Button>
+            </Popconfirm>
+            <Popconfirm title={"Вы точно хотите удалить бронь?"} onConfirm={deleteHandler}>
+                <Button danger disabled={isDeleteLoading} style={{marginTop: 5, width: 300}}>Удалить запись о бронировании</Button>
             </Popconfirm>
         </Card>
     )

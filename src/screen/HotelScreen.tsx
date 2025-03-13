@@ -208,6 +208,7 @@ const HotelScreen: React.FC = () => {
                         date={selectedDate}
                         visibleFlatModal={flatModalVisible}
                         setFlatModalVisible={setFlatModalVisible}
+                        hotelId={id}
                     />
                 }
                 {(notCheckoutedModalVisible && id) && <NotCheckoutedModal hotelId={id} visible={notCheckoutedModalVisible} setVisible={setNotCheckoutedModalVisible} selectedDate={selectedDate}/>}
@@ -240,7 +241,7 @@ const HotelScreen: React.FC = () => {
                             if (id) getAllFlatsSilent({hotelId: id, date: selectedDate.format('DD-MM-YYYY HH:mm')});
                         }}/>}
                 {selectedFlatId &&
-                    <FlatModal date={selectedDate} flatId={selectedFlatId} visible={flatModalVisible} setVisible={setFlatModalVisible}/>
+                    <FlatModal hotelId={id} date={selectedDate} flatId={selectedFlatId} visible={flatModalVisible} setVisible={setFlatModalVisible}/>
                 }
                 <Flex style={{marginTop: 15, marginLeft: 15}} gap={'small'} align={'center'}>
                     <Flex>
@@ -387,6 +388,7 @@ const HotelScreen: React.FC = () => {
                 {(selectedView === '0') &&
                 <Flex>
                     <TableView
+                        hotelId={id}
                         flatsData={flats}
                         selectedDate={selectedDate}
                         setVisibleGuestModal={setVisibleGuestModal}

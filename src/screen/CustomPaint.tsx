@@ -10,6 +10,7 @@ import {FlatModal} from "../component/hotel/FlatModal";
 import React, {useState} from "react";
 
 type ModalProps = {
+    hotelId: string,
     flats: FlatModel[],
     visibleFlatModal: boolean,
     setFlatModalVisible: Function,
@@ -24,7 +25,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
     return (
         <div style={{height: 820, width: window.innerWidth}}>
             {props.selectedFlatId &&
-                <FlatModal date={props.date} flatId={props.selectedFlatId} visible={props.visibleFlatModal} setVisible={props.setFlatModalVisible}/>
+                <FlatModal hotelId={props.hotelId} date={props.date} flatId={props.selectedFlatId} visible={props.visibleFlatModal} setVisible={props.setFlatModalVisible}/>
             }
             <Flex align="start" justify="start">
                 <div style={{height: 330, width: 1200, marginTop: 250}}>

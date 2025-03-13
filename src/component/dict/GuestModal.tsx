@@ -258,7 +258,6 @@ export const GuestModal = (props: ModalProps) => {
             setMale(props.selectedGuest.male);
             if (props.selectedGuest.contractId)
                 setSelectedContractId(props.selectedGuest.contractId);
-            console.log(props.selectedGuest);
             if (props.selectedGuest.familyMemberOfEmployee) {
                 setIsFamilyMemberOfEmployee(true);
                 setFamilyTabnum(props.selectedGuest.familyMemberOfEmployee);

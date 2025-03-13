@@ -23,6 +23,16 @@ import {EventModel} from "../../model/EventModel";
 import {GuestModel} from "../../model/GuestModel";
 
 type ModalProps = {
+    // Параметры для вызова из шахматки
+    filialId?: number,
+    hotelId?: number,
+    flatId?: number,
+    roomId?: number,
+    bedId?: number;
+    room?: RoomModel;
+    dateStart?: Dayjs,
+    dateFinish?: Dayjs,
+    // -----
     semiAutoParams?: ReservationModel,
     selectedReservation: ReservationModel | null,
     setSelectedReservation?: Function,
@@ -119,6 +129,20 @@ export const ReservationModal = (props: ModalProps) => {
     useEffect(() => {
         getAllFilials();
         getAllEvents();
+
+        // Заполнение параметрами переданным из шахматки
+        if (props.filialId && props.hotelId && props.flatId && props.roomId && props.bedId) {
+            setSelectedFilialId(parseInt(props.filialId.toString()));
+            setSelectedHotelId(parseInt(props.hotelId.toString()));
+            setSelectedFlatId(parseInt(props.flatId.toString()));
+            setSelectedRoomId(parseInt(props.roomId.toString()));
+            setSelectedBedId(parseInt(props.bedId.toString()));
+            setDateStart(props?.dateStart);
+            setDateFinish(props?.dateFinish);
+        }
+        // -----
+
+        // Заполнение парамаетрами из массового заполнения
         if (props.semiAutoParams){
             if (props.semiAutoParams.tabnum) {
                 setTabnum(props.semiAutoParams.tabnum);
@@ -143,7 +167,17 @@ export const ReservationModal = (props: ModalProps) => {
             setSelectedBedId(tmp.bedId);
             // -----
         }
+        // -----
     }, []);
+    useEffect(() => {
+        if (props.room) {
+            setSelectedFilialId(props.room.filialId);
+            setSelectedHotelId(props.room.hotelId);
+            setSelectedFlatId(props.room.flatId);
+            setSelectedRoomId(props.room.id);
+            setSelectedBedId(props.bedId);
+        }
+    }, [props.room]);
     useEffect(() => {
         if (fioByTabnum) {
             setFirstname(fioByTabnum.firstname);
@@ -168,7 +202,7 @@ export const ReservationModal = (props: ModalProps) => {
             setLastname(props.selectedReservation.lastname);
             setFirstname(props.selectedReservation.firstname);
             setSecondname(props.selectedReservation.secondname);
-            setMale(props.selectedReservation.male)
+            setMale(props.selectedReservation.male);
             setSelectedFilialId(props.selectedReservation.bed.room.flat.hotel.filial.id);
             setSelectedHotelId(props.selectedReservation.bed.room.flat.hotel.id);
             setSelectedFlatId(props.selectedReservation.bed.room.flat.id);
