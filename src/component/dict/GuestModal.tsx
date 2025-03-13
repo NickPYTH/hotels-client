@@ -103,6 +103,7 @@ export const GuestModal = (props: ModalProps) => {
     const [visibleHistoryModal, setVisibleHistoryModal] = useState(false); // Видимость модального окна и историей изменений карточки
     const [visibleExtrasModal, setVisibleExtrasModal] = useState(false); // Видимость модального окна с доп. услугами (только для Ермака)
     const [errorType, setErrorType] = useState<number|null>(null);
+    const [isExtra, setIsExtra] = useState(false); // Параметр отвечающий за заселение жильца на доп. место, место с свойством isExtra=true
     // -----
 
     // Web requests
@@ -273,6 +274,7 @@ export const GuestModal = (props: ModalProps) => {
             setSelectedFlatId(props.room.flatId);
             setSelectedRoomId(props.room.id);
             setSelectedBedId(props.bedId);
+            if (!props.bedId) setIsExtra(true);
         }
     }, [props.room]);
     useEffect(() => {
@@ -572,12 +574,12 @@ export const GuestModal = (props: ModalProps) => {
                 flatName: "",
                 hotelName: "",
                 hotelId: 0,
-                bedId: selectedBedId, // По этому полю происходит заселение по цепочке тянутся остальные
+                bedId: isExtra ? null : selectedBedId, // По этому полю происходит заселение по цепочке тянутся остальные
                 id: null,
                 lastname: lastname ? lastname.trim() : null,
                 note,
                 secondName: secondName ? secondName.trim() : null,
-                roomId: selectedRoomId,
+                roomId: selectedRoomId, // Нужное свойство для создания доп. места
                 roomName: "",
                 tabnum: isEmployee ? tabnum : null,
                 organization: customOrgName ? customOrgName.trim() : null,
@@ -600,7 +602,7 @@ export const GuestModal = (props: ModalProps) => {
     // ------
 
     return (
-        <Modal title={props.selectedGuest ? "Редактирование" : "Создание"}
+        <Modal title={props.selectedGuest ? "Редактирование" : isExtra ? "Создание доп. места" : "Создание"}
                open={props.visible}
                onCancel={closeModalHandler}
                loading={(isFilialsLoading || isOrganizationsLoading)}
@@ -915,7 +917,7 @@ export const GuestModal = (props: ModalProps) => {
                         value={selectedBedId}
                         loading={isBedsLoading}
                         placeholder={"Выберите койко-место"}
-                        disabled={isBedsLoading}
+                        disabled={isBedsLoading || isExtra}
                         style={{width: '100%'}}
                         onChange={(e) => selectBedHandler(e)}
                         onClear={() => selectBedHandler()}

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Flex, message, Modal, Popconfirm, Switch, Tabs, Tag} from 'antd';
+import {Button, Flex, message, Modal, Popconfirm, Switch, Tabs, Tag} from 'antd';
 import {flatAPI} from "../../service/FlatService";
 import {GuestModel} from "../../model/GuestModel";
 import {guestAPI} from "../../service/GuestService";
@@ -15,7 +15,7 @@ import {FlatLockModal} from "./FlatLockModal";
 import {FlatLocksTimeLineModal} from "./FlatLocksTimeLineModal";
 import {RoomLocksTimeLineModal} from './RoomLocksTimeLineModal';
 import {GuestCard} from "./GuestCard";
-import { ReservationCard } from './ReservationCard';
+import {ReservationCard} from './ReservationCard';
 import {ReservationModal} from "../dict/ReservationModal";
 import {ReservationModel} from "../../model/ReservationModel";
 
@@ -242,7 +242,8 @@ export const FlatModal = (props: ModalProps) => {
                                         />
                                     )
                                 })}
-                                {(room.guests.length < room.bedsCount) && room.statusId == 1 && flat.statusId == 1 &&
+                                {room.statusId == 1 && flat.statusId == 1 &&
+                                    (room.guests.length < room.bedsCount) ?
                                     <Flex vertical={true} justify={'center'} align={'center'}>
                                         <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3} type={'primary'} style={{height: 50, width: 330}} onClick={() => {
                                             setSelectedRoom(room);
@@ -257,23 +258,16 @@ export const FlatModal = (props: ModalProps) => {
                                             });
                                             setBedId(availableBedNumber);
                                         }}>Добавить жильца</Button>
-                                        {isFilialUEZS && <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3}
-                                                 type={'primary'}
-                                                 color={'lime'}
-                                                 style={{height: 50, width: 330, marginTop: 5}} onClick={() => {
-                                            setSelectedRoom(room);
-                                            setVisibleReservationModal(true);
-                                            let availableBedNumber = null;
-                                            room?.beds.forEach((bed: { id: number }) => {
-                                                let exist = false;
-                                                room.guests.forEach((guest: GuestModel) => {
-                                                    if (guest.bedId === bed.id) exist = true;
-                                                });
-                                                if (!exist) availableBedNumber = bed.id;
-                                            });
-                                            setBedId(availableBedNumber);
-                                        }}>Добавить бронь</Button>}
+
                                     </Flex>
+                                    : isFilialUEZS ? <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3}
+                                                             type={'primary'}
+                                                             style={{height: 50, width: 330, marginTop: 5}} onClick={() => {
+                                            setSelectedRoom(room);
+                                            setVisibleGuestModal(true);
+                                    }}>Заселить на дополнительное место</Button>
+                                        :
+                                        <></>
                                 }
                             </Flex>
                         </Flex>,
