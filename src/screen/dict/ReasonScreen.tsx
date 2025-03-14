@@ -1,24 +1,33 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Flex, Spin, Table, TableProps} from 'antd';
+import {Button, Flex, Table, TableProps} from 'antd';
 import {ReasonModel} from "../../model/ReasonModel";
 import {reasonAPI} from "../../service/ReasonService";
 import {ReasonModal} from "../../component/dict/ReasonModal";
 
 const ReasonScreen: React.FC = () => {
-    const [visible, setVisible] = useState(false);
+
+    // States
+    const [isVisibleReasonModal, setIsVisibleReasonModal] = useState(false);
     const [selectedReason, setSelectedReason] = useState<ReasonModel | null>(null);
+    // -----
+
+    // Web requests
     const [getAll, {
         data: reasons,
-        isLoading: isOrganizationsLoading
+        isLoading: isReasonsLoading
     }] = reasonAPI.useGetAllMutation();
+    // -----
 
+    // Effects
     useEffect(() => {
         getAll();
     }, []);
     useEffect(() => {
-        if (!visible) setSelectedReason(null);
-    }, [visible]);
+        if (!isVisibleReasonModal) setSelectedReason(null);
+    }, [isVisibleReasonModal]);
+    // -----
 
+    // Useful utils
     const columns: TableProps<ReasonModel>['columns'] = [
         {
             title: 'ИД',
@@ -48,28 +57,25 @@ const ReasonScreen: React.FC = () => {
             key: 'isDefault',
             render: (e) => e ? <div>Да</div> : <div>Нет</div>,
         },
-    ]
+    ];
+    // -----
 
-    if (isOrganizationsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex vertical={true}>
-            {visible && <ReasonModal selectedReason={selectedReason} visible={visible} setVisible={setVisible} refresh={getAll}/>}
-            <Button type={'primary'} onClick={() => setVisible(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+            {isVisibleReasonModal && <ReasonModal selectedReason={selectedReason} visible={isVisibleReasonModal} setVisible={setIsVisibleReasonModal} refresh={getAll}/>}
+            <Button type={'primary'} onClick={() => setIsVisibleReasonModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={reasons}
+                loading={isReasonsLoading}
                 pagination={{
                     defaultPageSize: 100,
                 }}
                 onRow={(record, rowIndex) => {
                     return {
                         onDoubleClick: (e) => {
-                            setVisible(true);
+                            setIsVisibleReasonModal(true);
                             setSelectedReason(record);
                         },
                     };

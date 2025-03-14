@@ -7,7 +7,8 @@ import {
     Modal,
     Select,
     Table,
-    TableProps, Tag,
+    TableProps,
+    Tag,
     TimePicker,
     Upload,
     UploadProps
@@ -40,7 +41,8 @@ export const GroupReservationModal = (props: ModalProps) => {
     // States
     const [mode, setMode] = useState<boolean>(false); // 0 - by tab, 1 - by fio
     const [data, setData] = useState<ReservationModel[] | null>(null); // Данные в таблице
-    const [visibleReservationModal, setVisibleReservationModal] = useState(false);
+    const [isVisibleReservationModal, setIsVisibleReservationModal] = useState(false);
+    const [selectedReservation, setSelectedReservation] = useState<ReservationModel | null>(null);
     const [selectedFromFilialId, setSelectedFromFilialId] = useState<number | null>(null); // ИД филиала заказчика
     const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null); // ИД филиала
     const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null); // ИД общежития
@@ -49,7 +51,6 @@ export const GroupReservationModal = (props: ModalProps) => {
     const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время заселения
     const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
     const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время выселения
-    const [selectedRecord, setSelectedRecord] = useState<ReservationModel | null>(null);
     // -----
 
     // Useful utils
@@ -103,13 +104,12 @@ export const GroupReservationModal = (props: ModalProps) => {
             key: 'action',
             render: (val, record:any) => (<Button style={{marginLeft: 15}} disabled={record?.statusGrid === "Забронирован"}
                                                   onClick={() => {
-                setSelectedRecord(record);
-                setVisibleReservationModal(true);
+                setSelectedReservation(record);
+                setIsVisibleReservationModal(true);
             }}>Забронировать</Button>)
         },
     ]
-
-    const uploadProps: UploadProps = {
+    const uploadFileProps: UploadProps = {
         name: 'file',
         multiple: false,
         action: `${host}/hotels/api/guest/manyGuestUpload?mode=${mode}`,
@@ -202,12 +202,12 @@ export const GroupReservationModal = (props: ModalProps) => {
                width={window.innerWidth - 10}
                maskClosable={false}
         >
-            {visibleReservationModal &&
+            {isVisibleReservationModal &&
                 <ReservationModal
-                    semiAutoParams={selectedRecord}
+                    semiAutoParams={selectedReservation}
                     selectedReservation={null}
-                    visible={visibleReservationModal}
-                    setVisible={setVisibleReservationModal}
+                    visible={isVisibleReservationModal}
+                    setVisible={setIsVisibleReservationModal}
                     refresh={(reservation:ReservationModel) => {
                         if (reservation) {
                             setData((prev: ReservationModel[]) => {
@@ -226,7 +226,7 @@ export const GroupReservationModal = (props: ModalProps) => {
                         <div style={{width: 300}}>Загрузить список табельный номеров</div>
                         <Checkbox checked={mode} onChange={(e) => setMode(e.target.checked)}/>
                     </Flex>
-                    <Dragger {...uploadProps}>
+                    <Dragger {...uploadFileProps}>
                         <p className="ant-upload-drag-icon">
                             <InboxOutlined/>
                         </p>

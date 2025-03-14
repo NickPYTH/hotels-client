@@ -1,30 +1,33 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Flex, Spin, Table, TableProps} from 'antd';
+import {Button, Flex, Table, TableProps} from 'antd';
 import {userAPI} from "../../service/UserService";
 import {UserModel} from "../../model/UserModel";
 import {UserModal} from "../../component/dict/UserModal";
-import {RootStateType} from "../../store/store";
-import {useNavigate} from 'react-router-dom';
-import {useSelector} from 'react-redux';
 
 const UserScreen: React.FC = () => {
-    const navigate = useNavigate();
-    const currentUser = useSelector((state: RootStateType) => state.currentUser.user);
-    if (currentUser.roleId !== 1 && currentUser.roleId !== 999) navigate(`../hotels/`);
-    const [visible, setVisible] = useState(false);
+
+    // States
+    const [isVisibleUserModal, setIsVisibleUserModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
+    // -----
+
+    // Web requests
     const [getAll, {
         data: users,
         isLoading: isUsersLoading
     }] = userAPI.useGetAllMutation();
+    // -----
 
+    // Effects
     useEffect(() => {
         getAll();
     }, []);
     useEffect(() => {
-        if (!visible) setSelectedUser(null);
-    }, [visible]);
+        if (!isVisibleUserModal) setSelectedUser(null);
+    }, [isVisibleUserModal]);
+    // -----
 
+    // Useful utils
     const columns: TableProps<UserModel>['columns'] = [
         {
             title: 'ИД',
@@ -111,24 +114,21 @@ const UserScreen: React.FC = () => {
             filterSearch: true,
         },
     ]
+    // -----
 
-    if (isUsersLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex vertical={true}>
-            {visible && <UserModal selectedUser={selectedUser} visible={visible} setVisible={setVisible} refresh={getAll}/>}
-            <Button type={'primary'} onClick={() => setVisible(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+            {isVisibleUserModal && <UserModal selectedUser={selectedUser} visible={isVisibleUserModal} setVisible={setIsVisibleUserModal} refresh={getAll}/>}
+            <Button type={'primary'} onClick={() => setIsVisibleUserModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={users}
+                loading={isUsersLoading}
                 onRow={(record, rowIndex) => {
                     return {
                         onDoubleClick: (e) => {
-                            setVisible(true);
+                            setIsVisibleUserModal(true);
                             setSelectedUser(record);
                         },
                     };

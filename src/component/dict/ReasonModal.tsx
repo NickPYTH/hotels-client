@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Flex, Input, Modal, Switch} from 'antd';
 import {ReasonModel} from "../../model/ReasonModel";
-import {organizationAPI} from "../../service/OrganizationService";
 import {reasonAPI} from "../../service/ReasonService";
 
 type ModalProps = {
@@ -11,16 +10,24 @@ type ModalProps = {
     refresh: Function
 }
 export const ReasonModal = (props: ModalProps) => {
+
+    // States
     const [name, setName] = useState<string>("");
     const [isDefault, setIsDefault] = useState<boolean>(false);
+    // -----
+
+    // Web requests
     const [createReason, {
-        data: createdOrganization,
-        isLoading: isCreateOrganizationLoading
+        data: createdReason,
+        isLoading: isCreateReasonLoading
     }] = reasonAPI.useCreateMutation();
     const [updateReason, {
-        data: updatedOrganization,
-        isLoading: isUpdateOrganizationLoading
+        data: updatedReason,
+        isLoading: isUpdateReasonLoading
     }] = reasonAPI.useUpdateMutation();
+    // -----
+
+    // Effects
     useEffect(() => {
         if (props.selectedReason) {
             setName(props.selectedReason.name);
@@ -28,11 +35,14 @@ export const ReasonModal = (props: ModalProps) => {
         }
     }, [props.selectedReason]);
     useEffect(() => {
-        if (createdOrganization || updatedOrganization) {
+        if (createdReason || updatedReason) {
             props.setVisible(false);
             props.refresh();
         }
-    }, [createdOrganization, updatedOrganization]);
+    }, [createdReason, updatedReason]);
+    // -----
+
+    // Handlers
     const confirmHandler = () => {
         if (name) {
             let reasonModel: ReasonModel = {
@@ -44,10 +54,12 @@ export const ReasonModal = (props: ModalProps) => {
             else createReason(reasonModel);
         }
     }
+    // -----
+
     return (
         <Modal title={props.selectedReason ? "Редактирование основания" : "Создание основания"}
                open={props.visible}
-               loading={(isCreateOrganizationLoading || isUpdateOrganizationLoading)}
+               loading={(isCreateReasonLoading || isUpdateReasonLoading)}
                onOk={confirmHandler}
                onCancel={() => props.setVisible(false)}
                okText={props.selectedReason ? "Сохранить" : "Создать"}
@@ -59,7 +71,7 @@ export const ReasonModal = (props: ModalProps) => {
                     <Input value={name} onChange={(e) => setName(e.target.value)}/>
                 </Flex>
                 <Flex align={"center"}>
-                    <div style={{width: 122}}>По умолчанию</div>
+                    <div style={{width: 122}}>По-умолчанию</div>
                     <Switch checked={isDefault} onChange={(e) => setIsDefault(e)}/>
                 </Flex>
             </Flex>

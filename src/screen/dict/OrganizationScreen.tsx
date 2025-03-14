@@ -3,23 +3,31 @@ import {Button, Flex, Spin, Table, TableProps} from 'antd';
 import {organizationAPI} from "../../service/OrganizationService";
 import {OrganizationModel} from "../../model/OrganizationModel";
 import {OrganizationModal} from "../../component/dict/OrganizationModal";
-import {ContractModel} from "../../model/ContractModel";
 
 const OrganizationScreen: React.FC = () => {
-    const [visible, setVisible] = useState(false);
+
+    // States
+    const [isVisibleOrganizationModal, setIsVisibleOrganizationModal] = useState(false);
     const [selectedOrganization, setSelectedOrganization] = useState<OrganizationModel | null>(null);
+    // -----
+
+    // Web requests
     const [getAll, {
         data: organizations,
         isLoading: isOrganizationsLoading
     }] = organizationAPI.useGetAllMutation();
+    // -----
 
+    // Effects
     useEffect(() => {
         getAll();
     }, []);
     useEffect(() => {
-        if (!visible) setSelectedOrganization(null);
-    }, [visible]);
+        if (!isVisibleOrganizationModal) setSelectedOrganization(null);
+    }, [isVisibleOrganizationModal]);
+    // -----
 
+    // Useful utils
     const columns: TableProps<OrganizationModel>['columns'] = [
         {
             title: 'ИД',
@@ -44,27 +52,24 @@ const OrganizationScreen: React.FC = () => {
             },
         },
     ]
+    // -----
 
-    if (isOrganizationsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex vertical={true}>
-            {visible && <OrganizationModal selectedOrganization={selectedOrganization} visible={visible} setVisible={setVisible} refresh={getAll}/>}
-            <Button type={'primary'} onClick={() => setVisible(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+            {isVisibleOrganizationModal && <OrganizationModal selectedOrganization={selectedOrganization} visible={isVisibleOrganizationModal} setVisible={setIsVisibleOrganizationModal} refresh={getAll}/>}
+            <Button type={'primary'} onClick={() => setIsVisibleOrganizationModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={organizations}
+                loading={isOrganizationsLoading}
                 pagination={{
                     defaultPageSize: 100,
                 }}
                 onRow={(record, rowIndex) => {
                     return {
                         onDoubleClick: (e) => {
-                            setVisible(true);
+                            setIsVisibleOrganizationModal(true);
                             setSelectedOrganization(record);
                         },
                     };

@@ -18,6 +18,7 @@ import AboutScreen from "../screen/AboutScreen";
 import EventScreen from "../screen/dict/EventScreen";
 import ExtraScreen from "../screen/dict/ExtraScreen";
 import ReservationScreen from "../screen/dict/ReservationScreen";
+import EventTypeScreen from "../screen/dict/EventTypeScreen";
 
 
 export const Router: React.FC = () => {
@@ -80,6 +81,10 @@ export const Router: React.FC = () => {
                 <Route
                     path='hotels/events'
                     element={<EventScreen/>}
+                />
+                <Route
+                    path='hotels/eventTypes'
+                    element={<EventTypeScreen/>}
                 />
                 <Route
                     path='hotels/extras'

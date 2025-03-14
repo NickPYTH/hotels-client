@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Divider, Flex, message, Spin, Switch, Table, TableProps} from 'antd';
+import {Button, Divider, Flex, message, Switch, Table, TableProps} from 'antd';
 import {useNavigate, useParams} from "react-router-dom";
 import {hotelAPI} from "../service/HotelService";
 import {HotelModel} from "../model/HotelModel";
@@ -8,12 +8,14 @@ import {LeftOutlined} from "@ant-design/icons";
 import dayjs from 'dayjs';
 
 const FilialScreen: React.FC = () => {
-    const [messageApi, messageContextHolder] = message.useMessage();
+
+    // States
     const [hotels, setHotels] = useState<HotelModel[] | null>(null);
     const [tableMode, setTableMode] = useState<boolean>(false);
     const [bedsCountSort, setBedsCountSort] = useState<boolean>(false);
-    const navigate = useNavigate();
-    let {id} = useParams();
+    // -----
+
+    // Web requests
     const [getAllHotelsWithStats, {
         data: hotelsDataWithStats,
     }] = hotelAPI.useGetAllByFilialIdWithStatsMutation();
@@ -21,6 +23,12 @@ const FilialScreen: React.FC = () => {
         data: hotelsData,
         isLoading: isHotelsLoading
     }] = hotelAPI.useGetAllByFilialIdMutation();
+    // -----
+
+    // Useful utils
+    const navigate = useNavigate();
+    let {id} = useParams();
+    const [messageApi, messageContextHolder] = message.useMessage();
     const showWarningMsg = (msg: string) => {
         messageApi.warning(msg);
     };
@@ -78,7 +86,10 @@ const FilialScreen: React.FC = () => {
                 navigate(`../hotels/hotels/${record.id}`)
             }}>Открыть</Button>)
         }
-    ]
+    ];
+    // -----
+
+    // Effects
     useEffect(() => {
         if (id) {
             getAllHotelsWithStats({filialId: id, date: dayjs().format('DD-MM-YYYY HH:mm')});
@@ -111,12 +122,9 @@ const FilialScreen: React.FC = () => {
                 else setHotels(hotelsDataWithStats.filter((f: HotelModel) => f.bedsCount > 0));
             }
         }
-    }, [bedsCountSort])
-    if (isHotelsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
+    }, [bedsCountSort]);
+    // -----
+
     return (
         <Flex gap="middle" align="start" vertical={true} wrap={'wrap'}>
             {messageContextHolder}
@@ -131,13 +139,6 @@ const FilialScreen: React.FC = () => {
                     </div>
                 </Flex>
                 <Divider style={{height: 44}} type={'vertical'}/>
-                {/*<Flex align={'center'}>*/}
-                {/*    <div style={{width: 240, height: 44, wordBreak: 'break-word', whiteSpace: 'normal'}}>Остортировать по убыванию общего колличества мест</div>*/}
-                {/*    <div>*/}
-                {/*        <Switch value={bedsCountSort} onChange={(e) => setBedsCountSort(e)} style={{marginLeft: 5}}/>*/}
-                {/*    </div>*/}
-                {/*</Flex>*/}
-                {/*<Divider style={{height: 44}} type={'vertical'}/>*/}
             </Flex>
             <Divider style={{marginTop: 5, marginBottom: 0}}/>
             {tableMode ?

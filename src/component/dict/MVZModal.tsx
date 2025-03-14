@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {Flex, Input, Modal, Select} from 'antd';
 import {FilialModel} from "../../model/FilialModel";
 import {filialAPI} from "../../service/FilialService";
-import {MVZAPI} from "../../service/MVZService";
 import {MVZModel} from "../../model/MVZModel";
 
 type ModalProps = {
@@ -12,24 +11,24 @@ type ModalProps = {
     refresh: Function
 }
 export const MVZModal = (props: ModalProps) => {
+
+    // States
     const [employeeTab, setEmployeeTab] = useState<string>("");
     const [employeeFio, setEmployeeFio] = useState<string>("");
     const [mvz, setMvz] = useState<string>("");
     const [mvzName, setMvzName] = useState<string>("");
     const [organization, setOrganization] = useState<string>("");
     const [selectedFilialId, setSelectedFilialId] = useState<string | null>(null);
+    // -----
+
+    // Web requests
     const [getAllFilials, {
         data: filials,
         isLoading: isFilialsLoading
     }] = filialAPI.useGetAllMutation();
-    const [createMVZ, {
-        data: createdMVZ,
-        isLoading: isCreateMVZLoading
-    }] = MVZAPI.useCreateMutation();
-    const [updateMVZ, {
-        data: updatedMVZ,
-        isLoading: isUpdateMVZLoading
-    }] = MVZAPI.useUpdateMutation();
+    // -----
+
+    // Effects
     useEffect(() => {
         getAllFilials();
     }, []);
@@ -43,32 +42,12 @@ export const MVZModal = (props: ModalProps) => {
             setSelectedFilialId(props.selectedMVZ.filial);
         }
     }, [props.selectedMVZ])
-    useEffect(() => {
-        if (createdMVZ || updatedMVZ) {
-            props.setVisible(false);
-            props.refresh();
-        }
-    }, [createdMVZ, updatedMVZ]);
-    const confirmHandler = () => {
-        // let filial: FilialModel | undefined = filials?.find((f: FilialModel) => f.id === selectedFilialId);
-        // if (filials && employeeFio && employeeTab && organization && filial && mvz && mvzName) {
-        //     let mvzModel: MVZModel = {
-        //         employeeFio,
-        //         employeeTab,
-        //         filial,
-        //         mvz,
-        //         mvzName,
-        //         organization
-        //     }
-        //     if (!props.selectedMVZ) createMVZ(mvzModel);
-        //     else updateMVZ({...mvzModel, id: props.selectedMVZ.mvzName});
-        // }
-    }
+    // -----
+
     return (
         <Modal title={props.selectedMVZ ? "Редактирование МВЗ" : "Создание МВЗ"}
                open={props.visible}
-               loading={(isCreateMVZLoading || isUpdateMVZLoading)}
-               onOk={confirmHandler}
+               footer={() => (<></>)}
                onCancel={() => props.setVisible(false)}
                okText={props.selectedMVZ ? "Сохранить" : "Создать"}
                width={'670px'}

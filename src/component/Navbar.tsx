@@ -12,18 +12,43 @@ import {HotelReportModal} from "./report/HotelReportModal";
 import {ReportMVZModal} from "./report/ReportMVZModal";
 import {LoadStatsReportModal} from "./report/LoadStatsReportModal";
 
-type propsType = {}
+export const Navbar = () => {
 
-export const Navbar = (props: propsType) => {
-    const [items, setItems] = useState<MenuProps['items']>([]);
-    const dispatch = useDispatch();
+    // Useful utils
     const currentUser = useSelector((state: RootStateType) => state.currentUser.user);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+    // -----
+
+    // States
+    const [items, setItems] = useState<MenuProps['items']>([]);
+    const [current, setCurrent] = useState(() => {
+        if (location.pathname === "/hotels/reasons") return 'reasons';
+        if (location.pathname === "/hotels/responsibilities") return 'responsibilities';
+        if (location.pathname === "/hotels/organizations") return 'organizations';
+        if (location.pathname === "/hotels/MVZ") return 'MVZ';
+        if (location.pathname === "/hotels/contracts") return 'contracts';
+        if (location.pathname === "/hotels/users") return 'users';
+        if (location.pathname === "/hotels/hotels") return 'hotels';
+        if (location.pathname.includes('guests')) return 'guests';
+        if (location.pathname.includes('reservations')) return 'reservations';
+        if (location.pathname.includes('filials')) return 'filials';
+        if (location.pathname.includes('eventTypes')) return 'eventTypes';
+        if (location.pathname.includes('events')) return 'events';
+        if (location.pathname.includes('extras')) return 'extras';
+        if (location.pathname.includes('about')) return 'about';
+        if (location.pathname.includes('hotels')) return 'filials';
+        return "";
+    });
     const [guestModalReport, setGuestModalReport] = useState(false);
     const [hotelModalReport, setHotelModalReport] = useState(false);
     const [mvzModalReport, setMvzModalReport] = useState(false);
     const [loadStatsModalReport, setVisibleLoadStatsModalReport] = useState(false);
+    const [visibleMonthReport, setVisibleMonthReport] = useState(false);
+    // -----
+
+    // Web requests
     const [getCurrentUser, {
         data: currentUserData,
         isLoading: isCurrentUserLoading
@@ -32,14 +57,17 @@ export const Navbar = (props: propsType) => {
         data: updatedRole,
         isLoading: isUpdateRoleLoading
     }] = userAPI.useUpdateRoleMutation();
+    // -----
+
+    // Effects
+    useEffect(() => {
+        getCurrentUser();
+    }, []);
     useEffect(() => {
         if (updatedRole) {
             window.location.reload();
         }
     }, [updatedRole]);
-    useEffect(() => {
-        getCurrentUser();
-    }, []);
     useEffect(() => {
         if (currentUserData) {
             if (currentUserData.roleId === 1) { // Админ
@@ -87,6 +115,10 @@ export const Navbar = (props: propsType) => {
                             {
                                 label: 'Виды мероприятий',
                                 key: 'events',
+                            },
+                            {
+                                label: 'Типы мероприятий',
+                                key: 'eventTypes',
                             },
                         ]
                     },
@@ -180,6 +212,10 @@ export const Navbar = (props: propsType) => {
                             {
                                 label: 'Виды мероприятий',
                                 key: 'events',
+                            },
+                            {
+                                label: 'Типы мероприятий',
+                                key: 'eventTypes',
                             },
                         ]
                     },
@@ -303,23 +339,6 @@ export const Navbar = (props: propsType) => {
             dispatch(setCurrentUser(currentUserData))
         }
     }, [currentUserData]);
-    const [current, setCurrent] = useState(() => {
-        if (location.pathname === "/hotels/reasons") return 'reasons';
-        if (location.pathname === "/hotels/responsibilities") return 'responsibilities';
-        if (location.pathname === "/hotels/organizations") return 'organizations';
-        if (location.pathname === "/hotels/MVZ") return 'MVZ';
-        if (location.pathname === "/hotels/contracts") return 'contracts';
-        if (location.pathname === "/hotels/users") return 'users';
-        if (location.pathname === "/hotels/hotels") return 'hotels';
-        if (location.pathname.includes('guests')) return 'guests';
-        if (location.pathname.includes('reservations')) return 'reservations';
-        if (location.pathname.includes('filials')) return 'filials';
-        if (location.pathname.includes('hotels')) return 'filials';
-        if (location.pathname.includes('events')) return 'events';
-        if (location.pathname.includes('extras')) return 'extras';
-        if (location.pathname.includes('about')) return 'about';
-        return "";
-    });
     useEffect(() => {
         setCurrent(() => {
             if (location.pathname === "/hotels/reasons") return 'reasons';
@@ -331,16 +350,17 @@ export const Navbar = (props: propsType) => {
             if (location.pathname.includes('guests')) return 'guests';
             if (location.pathname.includes('reservations')) return 'reservations';
             if (location.pathname.includes('filials')) return 'filials';
-            if (location.pathname.includes('hotels')) return 'filials';
+            if (location.pathname.includes('eventTypes')) return 'eventTypes';
             if (location.pathname.includes('events')) return 'events';
             if (location.pathname.includes('extras')) return 'extras';
             if (location.pathname.includes('about')) return 'about';
+            if (location.pathname.includes('hotels')) return 'filials';
             return "";
         });
     }, [location]);
+    // -----
 
-    const [visibleMonthReport, setVisibleMonthReport] = useState(false);
-
+    // Handlers
     const onClick: MenuProps['onClick'] = (e) => {
         setCurrent(e.key);
         if (e.key === 'monthReport') {
@@ -361,6 +381,7 @@ export const Navbar = (props: propsType) => {
         if (e.key === 'reasons') navigate(`hotels/reasons`)
         if (e.key === 'contracts') navigate(`hotels/contracts`)
         if (e.key === 'filials') navigate(`hotels/filials`)
+        if (e.key === 'eventTypes') navigate(`hotels/eventTypes`)
         if (e.key === 'events') navigate(`hotels/events`)
         if (e.key === 'extras') navigate(`hotels/extras`)
         if (e.key === 'hotels') navigate(`hotels/hotels`)
@@ -373,6 +394,7 @@ export const Navbar = (props: propsType) => {
         if (e.key === 'MVZ') navigate(`hotels/MVZ`)
         if (e.key === 'responsibilities') navigate(`hotels/responsibilities`)
     };
+    // -----
 
     return (<>
             <div style={{position: 'absolute', top: 10, right: 10}}>
@@ -403,6 +425,5 @@ export const Navbar = (props: propsType) => {
             {hotelModalReport && <HotelReportModal visible={hotelModalReport} setVisible={setHotelModalReport}/>}
             {loadStatsModalReport && <LoadStatsReportModal visible={loadStatsModalReport} setVisible={setVisibleLoadStatsModalReport}/>}
         </>
-
     );
 };

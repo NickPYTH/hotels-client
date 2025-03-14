@@ -19,6 +19,7 @@ import {eventAPI} from "../service/EventService";
 import {MVZAPI} from "../service/MVZService";
 import {extraAPI} from "../service/ExtraService";
 import {reservationAPI} from "../service/ReservationService";
+import {eventTypeAPI} from "../service/EventTypeService";
 
 export type RootStateType = {
     filialList: FilialModelStateType,
@@ -46,6 +47,7 @@ const rootReducer = combineReducers({
     [MVZAPI.reducerPath]: MVZAPI.reducer,
     [eventAPI.reducerPath]: eventAPI.reducer,
     [extraAPI.reducerPath]: extraAPI.reducer,
+    [eventTypeAPI.reducerPath]: eventTypeAPI.reducer,
 })
 
 export const setupStore = () => {
@@ -71,6 +73,7 @@ export const setupStore = () => {
                 .concat(eventAPI.middleware)
                 .concat(extraAPI.middleware)
                 .concat(reservationAPI.middleware)
+                .concat(eventTypeAPI.middleware)
     })
 }
 

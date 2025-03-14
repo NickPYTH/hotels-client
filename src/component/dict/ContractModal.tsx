@@ -18,6 +18,8 @@ type ModalProps = {
 
 }
 export const ContractModal = (props: ModalProps) => {
+
+    // States
     const [filial, setFilial] = useState<number | null>(null);
     const [hotel, setHotel] = useState<number | null>(null);
     const [organization, setOrganization] = useState<number | null>(null);
@@ -27,6 +29,9 @@ export const ContractModal = (props: ModalProps) => {
     const [cost, setCost] = useState<number>(0);
     const [note, setNote] = useState<string>("");
     const [year, setYear] = useState<number>(2025);
+    // -----
+
+    // Web requests
     const [createContract, {
         data: createdContract,
         isLoading: isCreateContractLoading
@@ -51,6 +56,9 @@ export const ContractModal = (props: ModalProps) => {
         isLoading: isGetAllReasonsLoading,
         data: reasons
     }] = reasonAPI.useGetAllMutation();
+    // -----
+
+    // Effects
     useEffect(() => {
         getAllFilials();
         getAllOrganization();
@@ -80,8 +88,10 @@ export const ContractModal = (props: ModalProps) => {
         }
 
     }, [createdContract, updatedContract]);
+    // -----
+
+    // Handlers
     const confirmHandler = () => {
-        console.log(filial && hotel && cost !== null && docnum && billing && reason)
         if (filial && hotel && cost !== null && docnum && billing && reason) {
             let contract: ContractModel = {
                 cost,
@@ -103,6 +113,8 @@ export const ContractModal = (props: ModalProps) => {
             else createContract(contract);
         }
     }
+    // -----
+
     return (
         <Modal title={props.selectedContract ? "Редактирование договора" : "Создание договора"}
                open={props.visible}

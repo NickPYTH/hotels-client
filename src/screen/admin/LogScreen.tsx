@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Flex, Spin, Table, TableProps, Tag} from 'antd';
+import {Flex, Table, TableProps, Tag} from 'antd';
 import {RootStateType} from "../../store/store";
 import {useNavigate} from 'react-router-dom';
 import {useSelector} from 'react-redux';
@@ -7,18 +7,24 @@ import {logAPI} from "../../service/LogService";
 import {LogModel} from "../../model/LogModel";
 
 const LogScreen: React.FC = () => {
-    const navigate = useNavigate();
-    const currentUser = useSelector((state: RootStateType) => state.currentUser.user);
-    if (currentUser.roleId !== 1 && currentUser.roleId !== 999) navigate(`../hotels/`);
+
+    // Web requests
     const [getAll, {
         data: logs,
         isLoading: isLogsLoading
     }] = logAPI.useGetAllMutation();
+    // -----
 
+    // Effects
     useEffect(() => {
         getAll();
     }, []);
+    // -----
 
+    // Useful utils
+    const navigate = useNavigate();
+    const currentUser = useSelector((state: RootStateType) => state.currentUser.user);
+    if (currentUser.roleId !== 1 && currentUser.roleId !== 999) navigate(`../hotels/`);
     const columns: TableProps<LogModel>['columns'] = [
         {
             title: 'ИД',
@@ -89,18 +95,15 @@ const LogScreen: React.FC = () => {
             key: 'message',
         },
     ]
+    // -----
 
-    if (isLogsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex vertical={true}>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={logs}
+                loading={isLogsLoading}
                 pagination={{
                     defaultPageSize: 100,
                 }}

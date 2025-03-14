@@ -44,7 +44,6 @@ type ModalProps = {
 export const ReservationModal = (props: ModalProps) => {
 
     // States
-    const [messageApi, messageContextHolder] = message.useMessage(); // Контекст для всплывающих уведомлений
     const [findByFioMode, setFindByFioMode] = useState(false); // Поиск данных через ФИО
     const [fio, setFio] = useState<string | null>(null);  // ФИО для поиска данных
     const [tabnum, setTabnum] = useState<number | null>(null);  // Табельный номер
@@ -80,7 +79,7 @@ export const ReservationModal = (props: ModalProps) => {
     const [rooms, setRooms] = useState<RoomModel[]>([]); // Перечень доступных для выбора комнат
     const [selectedBedId, setSelectedBedId] = useState<number | null>(null); // ИД выбранного места (койко-места)
     const [beds, setBeds] = useState<BedModel[]>([]); // Перечень доступных для выбора мест
-    const [note, setNote] = useState("");
+    const [note, setNote] = useState(""); // Примечание
     const [visibleHistoryModal, setVisibleHistoryModal] = useState(false); // Видимость модального окна и историей изменений карточки
     // -----
 
@@ -116,13 +115,13 @@ export const ReservationModal = (props: ModalProps) => {
     const [updateReservation, {
         data: updatedReservation,
         isLoading: isUpdateReservationLoading
-    }] = reservationAPI.useUpdateMutation(); // Запрос на обновление записи о проживании
+    }] = reservationAPI.useUpdateMutation(); // Запрос на обновление брони
     const [getGuestHistory, {
         data: history,
-    }] = historyAPI.useGetGuestHistoryMutation(); // Запрос на получение истории изменения карточки проживания по ИД гостя
+    }] = historyAPI.useGetGuestHistoryMutation(); // Запрос на получение истории изменения брони по ИД гостя
     const [getAllEvents, {
         data: events,
-    }] = eventAPI.useGetAllMutation(); // Получение списка мероприятий
+    }] = eventAPI.useGetAllMutation(); // Получение списка видов мероприятий
     // -----
 
     // Effects
@@ -288,6 +287,7 @@ export const ReservationModal = (props: ModalProps) => {
     // -----
 
     // Useful utils
+    const [messageApi, messageContextHolder] = message.useMessage(); // Контекст для всплывающих уведомлений
     const showWarningMsg = (msg: string) => {
         messageApi.warning(msg);
     };
@@ -322,7 +322,6 @@ export const ReservationModal = (props: ModalProps) => {
         if (id !== undefined) setSelectedBedId(id);
         else setSelectedBedId(null);
     };
-
     const confirmHandler = () => {
         if (dateStart && dateFinish && selectedFlatId && selectedRoomId && male !== null && selectedEventId && selectedFromFilialId) {
             if (dateStart.isAfter(dateFinish)) return;
@@ -367,16 +366,16 @@ export const ReservationModal = (props: ModalProps) => {
     };
     const selectStartDateHandler = (date: Dayjs) => {
         setDateStart(date);
-    }
+    };
     const selectStartTimeHandler = (time: Dayjs) => {
         setTimeStart(time);
-    }
+    };
     const selectFinishDateHandler = (date: Dayjs) => {
         setDateFinish(date);
-    }
+    };
     const selectFinishTimeHandler = (time: Dayjs) => {
         setTimeFinish(time);
-    }
+    };
     // ------
 
     return (

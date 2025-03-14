@@ -21,7 +21,6 @@ type ModalProps = {
 
 export const CustomPaintScreen = (props: ModalProps) => {
 
-
     return (
         <div style={{height: 820, width: window.innerWidth}}>
             {props.selectedFlatId &&

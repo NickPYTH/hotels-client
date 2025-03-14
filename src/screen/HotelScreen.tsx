@@ -11,15 +11,14 @@ import {
     Slider,
     SliderSingleProps,
     Spin,
-    Switch,
-    Table
+    Switch
 } from 'antd';
 import {useNavigate, useParams} from "react-router-dom";
 import {flatAPI} from "../service/FlatService";
 import {FlatModel} from "../model/FlatModel";
 import {FlatCard} from "../component/hotel/FlatCard";
 import {FlatModal} from "../component/hotel/FlatModal";
-import {LeftOutlined, UserAddOutlined, UsergroupAddOutlined} from "@ant-design/icons";
+import {LeftOutlined, UsergroupAddOutlined} from "@ant-design/icons";
 import Search from 'antd/lib/input/Search';
 import {RoomModel} from "../model/RoomModel";
 import {GuestModel} from "../model/GuestModel";
@@ -42,14 +41,12 @@ const HotelScreen: React.FC = () => {
     const [flats, setFlats] = useState<FlatModel[] | null>(null);
     const [hideBusy, setHideBusy] = useState<boolean>(false);
     const [hideTech, setHideTech] = useState<boolean>(true);
-    const navigate = useNavigate();
     const [flatModalVisible, setFlatModalVisible] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [selectedFlatId, setSelectedFlatId] = useState<number | null>(null);
     const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
-    const [notCheckoutedModalVisible, setNotCheckoutedModalVisible] = useState(false);
+    const [notCheckoutModalVisible, setNotCheckoutModalVisible] = useState(false);
     const [dateMarks, setDateMarks] = useState<SliderSingleProps['marks']>({});
-    let {id} = useParams();
     const [dividerHeight, setDividerHeight] = useState(110);  // Высота меню в зависимости от режима отображения
     const [chessDateRange, setChessDateRange] = useState<Dayjs[]>([dayjs(), dayjs().add(14, 'days')]);
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
@@ -61,6 +58,8 @@ const HotelScreen: React.FC = () => {
     // -----
 
     // Useful utils
+    let {id} = useParams();
+    const navigate = useNavigate();
     const showWarningMsg = (msg: string) => {
         messageApi.warning(msg);
     };
@@ -211,7 +210,7 @@ const HotelScreen: React.FC = () => {
                         hotelId={id}
                     />
                 }
-                {(notCheckoutedModalVisible && id) && <NotCheckoutedModal hotelId={id} visible={notCheckoutedModalVisible} setVisible={setNotCheckoutedModalVisible} selectedDate={selectedDate}/>}
+                {(notCheckoutModalVisible && id) && <NotCheckoutedModal hotelId={id} visible={notCheckoutModalVisible} setVisible={setNotCheckoutModalVisible} selectedDate={selectedDate}/>}
                 {messageContextHolder}
                 {(visibleManyGuestModal && filialId) &&
                     <GroupGuestModal
@@ -247,7 +246,7 @@ const HotelScreen: React.FC = () => {
                     <Flex>
                         <Button style={{marginRight: 10, height: dividerHeight}} icon={<LeftOutlined/>} type={'primary'} onClick={() => navigate(-1)}></Button>
                         <Flex vertical style={{width: 260}}>
-                            <Button style={{marginBottom: 5}} onClick={() => setNotCheckoutedModalVisible(true)}>Список не выселенных</Button>
+                            <Button style={{marginBottom: 5}} onClick={() => setNotCheckoutModalVisible(true)}>Список не выселенных</Button>
                             <Dropdown.Button menu={{ items: viewItemsButton, onClick: onViewButtonClick }}>
                                 <div style={{width: 197}}>
                                     Выбран режим:

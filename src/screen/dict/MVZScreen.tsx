@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Button, Flex, Input, InputRef, Space, Spin, Table, TableProps} from 'antd';
+import {Button, Flex, Input, InputRef, Space, Table, TableProps} from 'antd';
 import {MVZAPI} from "../../service/MVZService";
 import {MVZModel} from "../../model/MVZModel";
 import {MVZModal} from "../../component/dict/MVZModal";
@@ -17,8 +17,7 @@ type DataIndex = keyof DataType;
 const MVZScreen: React.FC = () => {
 
     // States
-    const searchInput = useRef<InputRef>(null);
-    const [mvzModalVisible, setMvzModalVisible] = useState<boolean>(false);
+    const [isVisibleMvzModal, setIsVisibleMvzModal] = useState<boolean>(false);
     const [selectedMVZ, setSelectedMVZ] = useState<MVZModel | null>(null);
     // -----
 
@@ -38,8 +37,8 @@ const MVZScreen: React.FC = () => {
     };
     // -----
 
-
     // Useful utils
+    const searchInput = useRef<InputRef>(null);
     const getColumnSearchProps = (dataIndex: any): ColumnType<any> => ({
         filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters, close}) => (
             <div style={{padding: 8}} onKeyDown={(e) => e.stopPropagation()}>
@@ -105,15 +104,6 @@ const MVZScreen: React.FC = () => {
         render: (text) => (<div>{text}</div>)
     });
     const columns: TableProps<MVZModel>['columns'] = [
-        // {
-        //     title: 'ИД',
-        //     dataIndex: 'id',
-        //     key: 'id',
-        //     sorter: (a, b) => a.id - b.id,
-        //     sortDirections: ['descend', 'ascend'],
-        //     defaultSortOrder: 'descend',
-        //     ...getColumnSearchProps('id'),
-        // },
         {
             title: 'Таб.№ проживающего',
             dataIndex: 'employeeTab',
@@ -168,31 +158,25 @@ const MVZScreen: React.FC = () => {
         getAll();
     }, []);
     useEffect(() => {
-        if (!mvzModalVisible) setSelectedMVZ(null);
-    }, [mvzModalVisible]);
+        if (!isVisibleMvzModal) setSelectedMVZ(null);
+    }, [isVisibleMvzModal]);
     // -----
 
-    if (isMVZsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex style={{marginTop: 5}} vertical={true}>
-            {mvzModalVisible && <MVZModal selectedMVZ={selectedMVZ} visible={mvzModalVisible} setVisible={setMvzModalVisible} refresh={getAll}/>}
-            <Button type={'primary'} onClick={() => setMvzModalVisible(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+            {isVisibleMvzModal && <MVZModal selectedMVZ={selectedMVZ} visible={isVisibleMvzModal} setVisible={setIsVisibleMvzModal} refresh={getAll}/>}
+            <Button type={'primary'} onClick={() => setIsVisibleMvzModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={MVZs}
-                virtual={true}
-                pagination={false}
+                loading={isMVZsLoading}
                 rowKey={'id'}
                 scroll={{x: window.innerWidth, y: window.innerHeight - 160}}
                 onRow={(record, rowIndex) => {
                     return {
                         onDoubleClick: (e) => {
-                            setMvzModalVisible(true);
+                            setIsVisibleMvzModal(true);
                             setSelectedMVZ(record);
                         },
                     };

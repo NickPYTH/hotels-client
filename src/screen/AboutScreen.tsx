@@ -37,7 +37,12 @@ import Report2 from "../assets/about/Report2.png";
 import Report3 from "../assets/about/Report3.png";
 
 const AboutScreen: React.FC = () => {
+
+    // States
     const [selected, setSelected] = useState<Key[]>(['0-0-0']);
+    // -----
+
+    // Useful utils
     const treeData: DataNode[] = [
         {
             title: 'Оглавление',
@@ -60,7 +65,9 @@ const AboutScreen: React.FC = () => {
                 },
             ]
         }
-    ]
+    ];
+    // -----
+
     return (
         <div style={{height: window.innerHeight - 140, paddingTop: '10px'}}>
             <div style={{display: 'flex', justifyContent: 'start'}}>

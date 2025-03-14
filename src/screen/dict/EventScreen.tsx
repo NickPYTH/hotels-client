@@ -1,8 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Button, ConfigProvider, Flex, Input, InputRef, Space, Spin, Table, TableProps} from 'antd';
-import {FilterConfirmProps} from "antd/es/table/interface";
-import {ColumnType} from "antd/es/table";
-import {SearchOutlined} from "@ant-design/icons";
+import React, {useEffect, useState} from 'react';
+import {Button, ConfigProvider, Flex, Table, TableProps} from 'antd';
 import {EventModel} from "../../model/EventModel";
 import {eventAPI} from "../../service/EventService";
 import {EventModal} from "../../component/event/EventModal";
@@ -18,8 +15,7 @@ type DataIndex = keyof DataType;
 const EventScreen: React.FC = () => {
 
     // States
-    const searchInput = useRef<InputRef>(null);
-    const [eventModalVisible, setEventModalVisible] = useState<boolean>(false);
+    const [isVisibleEventModal, setIsVisibleEventModal] = useState<boolean>(false);
     const [selectedEvent, setSelectedEvent] = useState<EventModel | null>(null);
     // -----
 
@@ -28,15 +24,6 @@ const EventScreen: React.FC = () => {
         data: events,
         isLoading: isEventsLoading
     }] = eventAPI.useGetAllMutation();
-    // -----
-
-    // Handlers
-    const handleSearch = (selectedKeys: string[], confirm: (param?: FilterConfirmProps) => void, dataIndex: DataIndex) => {
-        confirm();
-    };
-    const handleReset = (clearFilters: () => void) => {
-        clearFilters();
-    };
     // -----
 
     // Useful utils
@@ -101,19 +88,14 @@ const EventScreen: React.FC = () => {
         getAll();
     }, []);
     useEffect(() => {
-        if (!eventModalVisible) setSelectedEvent(null);
-    }, [eventModalVisible]);
+        if (!isVisibleEventModal) setSelectedEvent(null);
+    }, [isVisibleEventModal]);
     // -----
 
-    if (isEventsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex style={{marginTop: 5}} vertical={true}>
-            {eventModalVisible && <EventModal selectedEvent={selectedEvent} visible={eventModalVisible} setVisible={setEventModalVisible} refresh={getAll}/>}
-            <Button type={'primary'} onClick={() => setEventModalVisible(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+            {isVisibleEventModal && <EventModal selectedEvent={selectedEvent} visible={isVisibleEventModal} setVisible={setIsVisibleEventModal} refresh={getAll}/>}
+            <Button type={'primary'} onClick={() => setIsVisibleEventModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
             <ConfigProvider
                 theme={{
                     components: {
@@ -129,10 +111,11 @@ const EventScreen: React.FC = () => {
                     style={{width: '100vw'}}
                     columns={columns}
                     dataSource={events}
+                    loading={isEventsLoading}
                     onRow={(record, rowIndex) => {
                         return {
                             onDoubleClick: (e) => {
-                                setEventModalVisible(true);
+                                setIsVisibleEventModal(true);
                                 setSelectedEvent(record);
                             },
                         };

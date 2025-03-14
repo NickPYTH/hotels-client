@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Flex, message, Popconfirm, Spin, Table, TableProps} from 'antd';
+import {Button, Flex, message, Popconfirm, Table, TableProps} from 'antd';
 import {ReservationModel} from "../../model/ReservationModel";
 import {reservationAPI} from "../../service/ReservationService";
 import dayjs from "dayjs";
@@ -14,8 +14,7 @@ import {TableTitleRender} from "../../component/TableTitleRender";
 const ReservationScreen: React.FC = () => {
 
     // States
-    const [messageApi, messageContextHolder] = message.useMessage();
-    const [visibleSingleReservationModal, setVisibleSingleReservationModal] = useState(false);
+    const [isVisibleReservationModal, setIsVisibleReservationModal] = useState(false);
     const [selectedReservation, setSelectedReservation] = useState<ReservationModel | null>(null);
     const [visibleGroupReservationModal, setVisibleGroupReservationModal] = useState(false);
     // -----
@@ -31,6 +30,7 @@ const ReservationScreen: React.FC = () => {
     // -----
 
     // Useful utils
+    const [messageApi, messageContextHolder] = message.useMessage();
     const showWarningMsg = (msg: string) => {
         messageApi.warning(msg);
     };
@@ -41,8 +41,8 @@ const ReservationScreen: React.FC = () => {
         getAll();
     }, []);
     useEffect(() => {
-        if (!visibleSingleReservationModal) setSelectedReservation(null);
-    }, [visibleSingleReservationModal]);
+        if (!isVisibleReservationModal) setSelectedReservation(null);
+    }, [isVisibleReservationModal]);
     useEffect(() => {
         if (deletedReservation) getAll();
     }, [deletedReservation]);
@@ -182,35 +182,27 @@ const ReservationScreen: React.FC = () => {
     ]
     // -----
 
-    // Handlers
-
-    // -----
-
-    if (isReservationsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex vertical={true}>
             {messageContextHolder}
-            {visibleSingleReservationModal && <ReservationModal selectedReservation={selectedReservation} visible={visibleSingleReservationModal} setVisible={setVisibleSingleReservationModal} refresh={getAll}/>}
+            {isVisibleReservationModal && <ReservationModal selectedReservation={selectedReservation} visible={isVisibleReservationModal} setVisible={setIsVisibleReservationModal} refresh={getAll}/>}
             {visibleGroupReservationModal && <GroupReservationModal visible={visibleGroupReservationModal} setVisible={setVisibleGroupReservationModal} refresh={getAll} showWarningMsg={showWarningMsg}/>}
             <Flex>
-                <Button icon={<UserAddOutlined />} type={'primary'} onClick={() => setVisibleSingleReservationModal(true)} style={{width: 180, margin: 10}}>Добавить бронь</Button>
+                <Button icon={<UserAddOutlined />} type={'primary'} onClick={() => setIsVisibleReservationModal(true)} style={{width: 180, margin: 10}}>Добавить бронь</Button>
                 <Button icon={<UsergroupAddOutlined />} type={'primary'} onClick={() => setVisibleGroupReservationModal(true)} style={{width: 210, margin: 10}}>Групповое бронирование</Button>
             </Flex>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={reservations}
+                loading={isReservationsLoading}
                 pagination={{
                     defaultPageSize: 100,
                 }}
                 onRow={(record, rowIndex) => {
                     return {
                         onDoubleClick: (e) => {
-                            setVisibleSingleReservationModal(true);
+                            setIsVisibleReservationModal(true);
                             setSelectedReservation(record);
                         },
                     };

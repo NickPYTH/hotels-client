@@ -10,9 +10,14 @@ type ModalProps = {
     refresh: Function
 }
 export const ExtraModal = (props: ModalProps) => {
+
+        // States
         const [name, setName] = useState<string>("");
         const [description, setDescription] = useState<string>("");
         const [cost, setCost] = useState<number>(0);
+        // -----
+
+        // Web requests
         const [createExtra, {
             data: createdExtra,
             isLoading: isCreateExtraLoading
@@ -21,6 +26,9 @@ export const ExtraModal = (props: ModalProps) => {
             data: updatedExtra,
             isLoading: isUpdateExtraLoading
         }] = extraAPI.useUpdateMutation();
+        // -----
+
+        // Effects
         useEffect(() => {
             if (props.selectedExtra) {
                 setName(props.selectedExtra.name);
@@ -34,6 +42,9 @@ export const ExtraModal = (props: ModalProps) => {
                 props.refresh();
             }
         }, [createdExtra, updatedExtra]);
+        // -----
+
+        // Handlers
         const confirmHandler = () => {
             if (name && cost) {
                 let ExtraModel: ExtraModel = {
@@ -46,6 +57,8 @@ export const ExtraModal = (props: ModalProps) => {
                 else createExtra(ExtraModel);
             }
         }
+        // -----
+
         return (
             <Modal title={props.selectedExtra ? "Редактирование дополнительной услуги" : "Создание новой услуги"}
                    open={props.visible}

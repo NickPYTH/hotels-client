@@ -1,24 +1,33 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Flex, Spin, Table, TableProps} from 'antd';
+import {Button, Flex, Table, TableProps} from 'antd';
 import {responsibilityAPI} from "../../service/ResponsibilityService";
 import {ResponsibilityModel} from "../../model/ResponsibilityModel";
 import {ResponsibilityModal} from "../../component/dict/ResponsibilityModal";
 
 const ResponsibilityScreen: React.FC = () => {
-    const [visible, setVisible] = useState(false);
-    const [selectedResponsibilities, setSelectedResponsibilities] = useState<ResponsibilityModel | null>(null);
+
+    // States
+    const [isVisibleResponsibilityModal, setIsVisibleResponsibilityModal] = useState(false);
+    const [selectedResponsibility, setSelectedResponsibility] = useState<ResponsibilityModel | null>(null);
+    // -----
+
+    // Web requests
     const [getAll, {
         data: responsibilities,
         isLoading: isResponsibilitiesLoading
     }] = responsibilityAPI.useGetAllMutation();
+    // -----
 
+    // Effects
     useEffect(() => {
         getAll();
     }, []);
     useEffect(() => {
-        if (!visible) setSelectedResponsibilities(null);
-    }, [visible]);
+        if (!isVisibleResponsibilityModal) setSelectedResponsibility(null);
+    }, [isVisibleResponsibilityModal]);
+    // -----
 
+    // Useful utils
     const columns: TableProps<ResponsibilityModel>['columns'] = [
         {
             title: 'ИД',
@@ -86,28 +95,25 @@ const ResponsibilityScreen: React.FC = () => {
             },
         },
     ]
+    // -----
 
-    if (isResponsibilitiesLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex vertical={true}>
-            {visible && <ResponsibilityModal selected={selectedResponsibilities} visible={visible} setVisible={setVisible} refresh={getAll}/>}
-            <Button type={'primary'} onClick={() => setVisible(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+            {isVisibleResponsibilityModal && <ResponsibilityModal selected={selectedResponsibility} visible={isVisibleResponsibilityModal} setVisible={setIsVisibleResponsibilityModal} refresh={getAll}/>}
+            <Button type={'primary'} onClick={() => setIsVisibleResponsibilityModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={responsibilities}
+                loading={isResponsibilitiesLoading}
                 pagination={{
                     defaultPageSize: 100,
                 }}
                 onRow={(record, rowIndex) => {
                     return {
                         onDoubleClick: (e) => {
-                            setVisible(true);
-                            setSelectedResponsibilities(record);
+                            setIsVisibleResponsibilityModal(true);
+                            setSelectedResponsibility(record);
                         },
                     };
                 }}

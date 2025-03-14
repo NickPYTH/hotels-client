@@ -1,35 +1,44 @@
 import React, {useEffect, useState} from 'react';
-import {Divider, Flex, message, Spin, Switch} from 'antd';
+import {Divider, Flex, message, Switch} from 'antd';
 import {useNavigate} from "react-router-dom";
 import {hotelAPI} from "../service/HotelService";
 import {HotelModel} from "../model/HotelModel";
 import {RootStateType} from "../store/store";
 import {useSelector} from 'react-redux';
 import {HotelCard} from "../component/filial/HotelCard";
-import dayjs from 'dayjs';
 
 const CommendantScreen: React.FC = () => {
-    const navigate = useNavigate();
-    const currentUser = useSelector((state: RootStateType) => state.currentUser.user);
-    if (currentUser.roleId !== 2 && currentUser.roleId !== 3) navigate(`../hotels/`);
+
+    // States
     const [messageApi, messageContextHolder] = message.useMessage();
     const [hotels, setHotels] = useState<HotelModel[] | null>(null);
     const [includeEmpty, setIncludeEmpty] = useState<boolean>(false);
     const [bedsCountSort, setBedsCountSort] = useState<boolean>(false);
+    // -----
+
+    // Web requests
     const [getAllHotelsByCommendant, {
         data: hotelsData,
-        isLoading: isHotelsLoading
     }] = hotelAPI.useGetAllHotelsByCommendantMutation();
     const [getAllHotelsByCommendantWithStats, {
         data: hotelsDataWithStats,
     }] = hotelAPI.useGetAllHotelsByCommendantWithStatsMutation();
+    // -----
+
+    // Useful utils
+    const navigate = useNavigate();
+    const currentUser = useSelector((state: RootStateType) => state.currentUser.user);
+    if (currentUser.roleId !== 2 && currentUser.roleId !== 3) navigate(`../hotels/`);
+    const showWarningMsg = (msg: string) => {
+        messageApi.warning(msg);
+    };
+    // -----
+
+    // Effects
     useEffect(() => {
         getAllHotelsByCommendant();
         getAllHotelsByCommendantWithStats();
     }, []);
-    const showWarningMsg = (msg: string) => {
-        messageApi.warning(msg);
-    };
     useEffect(() => {
         if (hotelsDataWithStats) setHotels(hotelsDataWithStats);
     }, [hotelsDataWithStats]);
@@ -55,12 +64,9 @@ const CommendantScreen: React.FC = () => {
                 else setHotels(hotelsData.filter((f: HotelModel) => f.bedsCount > 0));
             }
         }
-    }, [bedsCountSort])
-    if (isHotelsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
+    }, [bedsCountSort]);
+    // -----
+
     return (
         <Flex gap="middle" align="start" vertical={true} wrap={'wrap'}>
             {messageContextHolder}

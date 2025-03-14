@@ -1,24 +1,33 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Flex, Spin, Table, TableProps} from 'antd';
+import {Button, Flex, Table, TableProps} from 'antd';
 import {ExtraModel} from "../../model/ExtraModel";
 import {extraAPI} from "../../service/ExtraService";
 import {ExtraModal} from "../../component/dict/ExtraModal";
 
 const ExtraScreen: React.FC = () => {
-    const [visible, setVisible] = useState(false);
+
+    // States
+    const [isVisibleExtraModal, setIsVisibleExtraModal] = useState(false);
     const [selectedExtra, setSelectedExtra] = useState<ExtraModel | null>(null);
+    // -----
+
+    // Web requests
     const [getAll, {
         data: extras,
         isLoading: isExtrasLoading
     }] = extraAPI.useGetAllMutation();
+    // -----
 
+    // Effects
     useEffect(() => {
         getAll();
     }, []);
     useEffect(() => {
-        if (!visible) setSelectedExtra(null);
-    }, [visible]);
+        if (!isVisibleExtraModal) setSelectedExtra(null);
+    }, [isVisibleExtraModal]);
+    // -----
 
+    // Useful utils
     const columns: TableProps<ExtraModel>['columns'] = [
         {
             title: 'ИД',
@@ -63,28 +72,25 @@ const ExtraScreen: React.FC = () => {
             sorter: (a, b) => a.cost - b.cost,
             sortDirections: ['descend', 'ascend'],
         },
-    ]
+    ];
+    // -----
 
-    if (isExtrasLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex vertical={true}>
-            {visible && <ExtraModal selectedExtra={selectedExtra} visible={visible} setVisible={setVisible} refresh={getAll}/>}
-            <Button type={'primary'} onClick={() => setVisible(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+            {isVisibleExtraModal && <ExtraModal selectedExtra={selectedExtra} visible={isVisibleExtraModal} setVisible={setIsVisibleExtraModal} refresh={getAll}/>}
+            <Button type={'primary'} onClick={() => setIsVisibleExtraModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={extras}
+                loading={isExtrasLoading}
                 pagination={{
                     defaultPageSize: 100,
                 }}
                 onRow={(record, rowIndex) => {
                     return {
                         onDoubleClick: (e) => {
-                            setVisible(true);
+                            setIsVisibleExtraModal(true);
                             setSelectedExtra(record);
                         },
                     };

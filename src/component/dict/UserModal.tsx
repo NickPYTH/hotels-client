@@ -15,13 +15,17 @@ type ModalProps = {
     refresh: Function
 }
 export const UserModal = (props: ModalProps) => {
-    const [messageApi, messageContextHolder] = message.useMessage();
+
+    // States
     const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null);
     const [selectedHotelIdList, setSelectedHotelIdList] = useState<number[] | null>(null);
     const [tabnum, setTabnum] = useState<number | null>(null);
     const [fio, setFio] = useState("");
     const [username, setUsername] = useState("");
     const [role, setRole] = useState<number | null>(null);
+    // -----
+
+    // Web requests
     const [createUser, {
         data: createdUser,
         isLoading: isCreateUserLoading
@@ -42,6 +46,9 @@ export const UserModal = (props: ModalProps) => {
         data: hotels,
         isLoading: isHotelsLoading
     }] = hotelAPI.useGetAllByFilialIdMutation();
+    // -----
+
+    // Effects
     useEffect(() => {
         getAllFilials();
     }, []);
@@ -75,9 +82,16 @@ export const UserModal = (props: ModalProps) => {
             props.refresh();
         }
     }, [createdUser, updatedUser]);
+    // -----
+
+    // Useful utils
+    const [messageApi, messageContextHolder] = message.useMessage();
     const showWarningMsg = (msg: string) => {
         messageApi.warning(msg);
     };
+    // -----
+
+    // Handlers
     const confirmHandler = () => {
         if (role === 2 && selectedHotelIdList !== null) {
             if (selectedHotelIdList.length === 0) {
@@ -112,7 +126,9 @@ export const UserModal = (props: ModalProps) => {
                 createUser(user);
             }
         } else showWarningMsg("Некторрые поля остались пустыми")
-    }
+    };
+    // -----
+
     return (
         <Modal title={props.selectedUser ? "Редактирование пользователя" : "Создание пользователя"}
                open={props.visible}

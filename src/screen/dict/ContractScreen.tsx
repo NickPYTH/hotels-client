@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Flex, Spin, Table, TableProps} from 'antd';
+import {Button, Flex, Table, TableProps} from 'antd';
 import {ContractModel} from "../../model/ContractModel";
 import {contractAPI} from "../../service/ContractService";
 import {ContractModal} from "../../component/dict/ContractModal";
@@ -8,7 +8,7 @@ import {host} from "../../config/constants";
 const ContractScreen: React.FC = () => {
 
     // States
-    const [visible, setVisible] = useState(false);
+    const [isVisibleContractModal, setIsVisibleContractModal] = useState(false);
     const [selectedContract, setSelectedContract] = useState<ContractModel | null>(null);
     const [contracts, setContracts] = useState<ContractModel[]>([]);
     // -----
@@ -31,13 +31,14 @@ const ContractScreen: React.FC = () => {
         if (contractsData) setContracts(contractsData);
     }, [contractsData]);
     useEffect(() => {
-        if (!visible) setSelectedContract(null);
-    }, [visible]);
-    useEffect(() => {
         if (contractsDataSilent) setContracts(contractsDataSilent);
     }, [contractsDataSilent]);
+    useEffect(() => {
+        if (!isVisibleContractModal) setSelectedContract(null);
+    }, [isVisibleContractModal]);
     // -----
 
+    // Useful utils
     const columns: TableProps<ContractModel>['columns'] = [
         {
             title: 'ИД',
@@ -191,17 +192,13 @@ const ContractScreen: React.FC = () => {
             },
         },
     ]
+    // -----
 
-    if (isContractsLoading)
-        return <div
-            style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh', width: '100vw'}}>
-            <Spin size={'large'}/>
-        </div>
     return (
         <Flex vertical={true}>
-            {visible && <ContractModal selectedContract={selectedContract} visible={visible} setVisible={setVisible} refresh={getAllSilent}/>}
+            {isVisibleContractModal && <ContractModal selectedContract={selectedContract} visible={isVisibleContractModal} setVisible={setIsVisibleContractModal} refresh={getAllSilent}/>}
             <Flex justify={'space-between'}>
-                <Button type={'primary'} onClick={() => setVisible(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+                <Button type={'primary'} onClick={() => setIsVisibleContractModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
                 <Button type={'primary'} onClick={() => {
                     let tmpButton = document.createElement('a');
                     tmpButton.href = `${host}/hotels/api/contract/getAllReport`
@@ -212,13 +209,14 @@ const ContractScreen: React.FC = () => {
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={contracts}
+                loading={isContractsLoading}
                 pagination={{
                     defaultPageSize: 100,
                 }}
                 onRow={(record, rowIndex) => {
                     return {
                         onDoubleClick: (e) => {
-                            setVisible(true);
+                            setIsVisibleContractModal(true);
                             setSelectedContract(record);
                         },
                     };

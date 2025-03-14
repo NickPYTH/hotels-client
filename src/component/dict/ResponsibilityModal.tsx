@@ -7,7 +7,6 @@ import {HotelModel} from "../../model/HotelModel";
 import {ResponsibilityModel} from "../../model/ResponsibilityModel";
 import {responsibilityAPI} from "../../service/ResponsibilityService";
 import {guestAPI} from "../../service/GuestService";
-import dayjs from 'dayjs';
 
 type ModalProps = {
     selected: ResponsibilityModel | null,
@@ -16,12 +15,17 @@ type ModalProps = {
     refresh: Function
 }
 export const ResponsibilityModal = (props: ModalProps) => {
-    const [tabnum, setTabnum] = useState<number>(0);
+
+    // States
+    const [tabnum, setTabnum] = useState<number | null>(null);
     const [firstname, setFirstname] = useState("");
     const [lastname, setLastname] = useState("");
     const [secondName, setSecondName] = useState("");
     const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null);
     const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
+    // -----
+
+    // Web requests
     const [create, {
         data: created,
         isLoading: isCreateLoading
@@ -42,6 +46,9 @@ export const ResponsibilityModal = (props: ModalProps) => {
         data: hotels,
         isLoading: isHotelsLoading
     }] = hotelAPI.useGetAllByFilialIdMutation();
+    // -----
+
+    // Effects
     useEffect(() => {
         if (props.selected) {
             setTabnum(props.selected.tabnum);
@@ -71,6 +78,9 @@ export const ResponsibilityModal = (props: ModalProps) => {
         if (selectedFilialId)
             getAllHotels({filialId: selectedFilialId.toString()});
     }, [selectedFilialId]);
+    // -----
+
+    // Handlers
     const confirmHandler = () => {
         if (tabnum && selectedHotelId) {
             let responsibilityModel: ResponsibilityModel = {
@@ -86,7 +96,9 @@ export const ResponsibilityModal = (props: ModalProps) => {
             if (props.selected) update({...responsibilityModel, id: props.selected.id});
             else create(responsibilityModel);
         }
-    }
+    };
+    // -----
+
     return (
         <Modal title={props.selected ? "Редактирование" : "Создание"}
                open={props.visible}

@@ -1,5 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Badge, Button, Checkbox, DatePicker, Flex, Input, InputNumber, message, Modal, Select, TimePicker} from 'antd';
+import {
+    Alert,
+    Badge,
+    Button,
+    Checkbox,
+    DatePicker,
+    Flex,
+    Input,
+    InputNumber,
+    message,
+    Modal,
+    Select,
+    TimePicker
+} from 'antd';
 import dayjs, {Dayjs} from "dayjs";
 import {filialAPI} from "../../service/FilialService";
 import {FilialModel} from "../../model/FilialModel";
@@ -51,8 +64,6 @@ type ModalProps = {
 export const GuestModal = (props: ModalProps) => {
 
     // States
-    const currentUser = useSelector((state: RootStateType) => state.currentUser.user); // Текущий пользователь системы
-    const [messageApi, messageContextHolder] = message.useMessage(); // Контекст для всплывающих уведомлений
     const [isEmployee, setIsEmployee] = useState(true); // Является ли жилец работник Газпрома
     const [isFamilyMemberOfEmployee, setIsFamilyMemberOfEmployee] = useState(false); // Является ли жилец членом семьи работника
     const [findByFioMode, setFindByFioMode] = useState(false); // Поиск данных через ФИО
@@ -66,7 +77,7 @@ export const GuestModal = (props: ModalProps) => {
     const [male, setMale] = useState<boolean | null>(null); // Пол ДА - мужской, НЕТ - женский
     const [memo, setMemo] = useState(""); // Номер маршрутного листа или служебного задания
     const [reason, setReason] = useState(""); // Основание
-    const [reasons, setReasons] = useState<ReasonModel[]>([]);
+    const [reasons, setReasons] = useState<ReasonModel[]>([]); // Список оснований
     const [billing, setBilling] = useState(""); // Вид оплаты
     const [selectedContractId, setSelectedContractId] = useState<number | null>(null); // ИД выбранного договора
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
@@ -98,11 +109,11 @@ export const GuestModal = (props: ModalProps) => {
     const [rooms, setRooms] = useState<RoomModel[]>([]); // Перечень доступных для выбора комнат
     const [selectedBedId, setSelectedBedId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.bedId : null); // ИД выбранного места (койко-места)
     const [beds, setBeds] = useState<BedModel[]>([]); // Перечень доступных для выбора мест
-    const [note, setNote] = useState("");
+    const [note, setNote] = useState(""); // Примечание
     const [visibleSelectGuestModal, setVisibleSelectGuestModal] = useState(false);  // Окно выбора проживающего из ранее заселенных жильцов для авто аполнения данных
     const [visibleHistoryModal, setVisibleHistoryModal] = useState(false); // Видимость модального окна и историей изменений карточки
     const [visibleExtrasModal, setVisibleExtrasModal] = useState(false); // Видимость модального окна с доп. услугами (только для Ермака)
-    const [errorType, setErrorType] = useState<number|null>(null);
+    const [errorCode, setErrorCode] = useState<number|null>(null); // Код ошибки с сервера, для вывода нужного сообщения
     const [isExtra, setIsExtra] = useState(false); // Параметр отвечающий за заселение жильца на доп. место, место с свойством isExtra=true
     // -----
 
@@ -165,10 +176,13 @@ export const GuestModal = (props: ModalProps) => {
 
     // Effects
     useEffect(() => {
+        // Получаем справочники
         getAllOrganizations();
         getAllFilials();
         getContracts();
+        // -----
 
+        // Параметры для частичного пред-заполнения карточки, если нужно заполнить куда селить и даты проживания
         if (props.filialId && props.hotelId && props.flatId && props.roomId && props.bedId) {
             setSelectedFilialId(parseInt(props.filialId.toString()));
             setSelectedHotelId(parseInt(props.hotelId.toString()));
@@ -178,7 +192,9 @@ export const GuestModal = (props: ModalProps) => {
             setDateStart(props?.dateStart);
             setDateFinish(props?.dateFinish);
         }
+        // -----
 
+        // Так передаются параметры из модалок массового создания, передаю так т.к. через selectedGuest срабатывает эффект на редактирование существующей записи
         if (props.semiAutoParams) {
             setTabnum(props.semiAutoParams.tabnum);
             setReason(props.semiAutoParams.reason);
@@ -201,6 +217,8 @@ export const GuestModal = (props: ModalProps) => {
             setSelectedRoomId(props.semiAutoParams.roomId);
             setSelectedBedId(props.semiAutoParams.bedId);
         }
+        // -----
+
     }, []);
     useEffect(() => {
         if (contractsFromRequest && selectedHotelId) {
@@ -377,11 +395,11 @@ export const GuestModal = (props: ModalProps) => {
                         : p));
                 }
             } else {
-                if (updatedGuest.error == 'datesError') setErrorType(1);
-                if (updatedGuest.error == 'roomLock') setErrorType(2);
-                if (updatedGuest.error == 'flatLock') setErrorType(3);
-                if (updatedGuest.error == 'roomOrg') setErrorType(4);
-                if (updatedGuest.error == 'flatOrg') setErrorType(5);
+                if (updatedGuest.error == 'datesError') setErrorCode(1);
+                if (updatedGuest.error == 'roomLock') setErrorCode(2);
+                if (updatedGuest.error == 'flatLock') setErrorCode(3);
+                if (updatedGuest.error == 'roomOrg') setErrorCode(4);
+                if (updatedGuest.error == 'flatOrg') setErrorCode(5);
             }
         }
     }, [updatedGuest]);
@@ -417,11 +435,11 @@ export const GuestModal = (props: ModalProps) => {
                 }
             }
             else {
-                if (createdGuest.error == 'datesError') setErrorType(1);
-                if (createdGuest.error == 'roomLock') setErrorType(2);
-                if (createdGuest.error == 'flatLock') setErrorType(3);
-                if (createdGuest.error == 'roomOrg') setErrorType(4);
-                if (createdGuest.error == 'flatOrg') setErrorType(5);
+                if (createdGuest.error == 'datesError') setErrorCode(1);
+                if (createdGuest.error == 'roomLock') setErrorCode(2);
+                if (createdGuest.error == 'flatLock') setErrorCode(3);
+                if (createdGuest.error == 'roomOrg') setErrorCode(4);
+                if (createdGuest.error == 'flatOrg') setErrorCode(5);
             }
         }
     }, [createdGuest]);
@@ -438,6 +456,8 @@ export const GuestModal = (props: ModalProps) => {
     // -----
 
     // Useful utils
+    const currentUser = useSelector((state: RootStateType) => state.currentUser.user); // Текущий пользователь системы
+    const [messageApi, messageContextHolder] = message.useMessage(); // Контекст для всплывающих уведомлений
     const showWarningMsg = (msg: string) => {
         messageApi.warning(msg);
     };
@@ -807,34 +827,34 @@ export const GuestModal = (props: ModalProps) => {
                     <TimePicker needConfirm={false} value={timeFinish} style={{width: 170}} onChange={selectFinishTimeHandler} minuteStep={15} showSecond={false} hourStep={1} allowClear={false}/>
                 </Flex>
                 <Flex vertical={true} align={"center"}>
-                    {(errorType == 1 && updatedGuest) &&
+                    {(errorCode == 1 && updatedGuest) &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`Указанные даты пересекают существующий период проживания работника ${updatedGuest?.lastname} ${updatedGuest?.firstname} ${updatedGuest?.secondName} (с ${updatedGuest?.dateStart} по ${updatedGuest?.dateFinish}) 
                         в филиале: "${updatedGuest?.filialName}", общежитии: "${updatedGuest?.hotelName}", секции: "${updatedGuest?.flatName}", комнате  "${updatedGuest?.roomName}", месте  "${updatedGuest?.bedName}"`}
                                showIcon/>
                     }
-                    {(errorType == 1 && createdGuest) &&
+                    {(errorCode == 1 && createdGuest) &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`Указанные даты пересекают существующий период проживания работника ${createdGuest?.lastname} ${createdGuest?.firstname} ${createdGuest.secondName} (с ${createdGuest?.dateStart} по ${createdGuest?.dateFinish}) 
                         в филиале: "${createdGuest?.filialName}", общежитии: "${createdGuest?.hotelName}", секции: "${createdGuest?.flatName}", комнате  "${createdGuest?.roomName}", месте  "${createdGuest?.bedName}"`}
                                showIcon/>
                     }
-                    {errorType == 2 &&
+                    {errorCode == 2 &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`На указанный период комната отмечена статусом "Занято", проверьте тайм-лайн статусов в карточке секции.`}
                                showIcon/>
                     }
-                    {errorType == 3 &&
+                    {errorCode == 3 &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`На указанный период секция отмечена статусом "Занято", проверьте тайм-лайн статусов в карточке секции.`}
                                showIcon/>
                     }
-                    {errorType == 4 &&
+                    {errorCode == 4 &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`На указанный период комната отмечена статусом "Выкуплено организацией", проверьте тайм-лайн статусов в карточке секции.`}
                                showIcon/>
                     }
-                    {errorType == 5 &&
+                    {errorCode == 5 &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`На указанный период секция отмечена статусом "Выкуплено организацией", проверьте тайм-лайн статусов в карточке секции.`}
                                showIcon/>
