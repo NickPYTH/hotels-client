@@ -258,14 +258,34 @@ export const FlatModal = (props: ModalProps) => {
                                             });
                                             setBedId(availableBedNumber);
                                         }}>Добавить жильца</Button>
-
+                                        {isFilialUEZS &&
+                                        <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3}
+                                                type={'primary'}
+                                                color={'lime'}
+                                                style={{height: 50, width: 330, marginTop: 5}} onClick={() => {
+                                            setSelectedRoom(room);
+                                            setVisibleReservationModal(true);
+                                            let availableBedNumber = null;
+                                            room?.beds.forEach((bed: { id: number }) => {
+                                                let exist = false;
+                                                room.guests.forEach((guest: GuestModel) => {
+                                                    if (guest.bedId === bed.id) exist = true;
+                                                });
+                                                if (!exist) availableBedNumber = bed.id;
+                                            });
+                                            setBedId(availableBedNumber);
+                                        }}>Добавить бронь</Button>
+                                        }
                                     </Flex>
-                                    : isFilialUEZS ? <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3}
+                                    : isFilialUEZS ?
+                                        <Flex vertical={true} justify={'center'} align={'center'}>
+                                        <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3}
                                                              type={'primary'}
                                                              style={{height: 50, width: 330, marginTop: 5}} onClick={() => {
                                             setSelectedRoom(room);
                                             setVisibleGuestModal(true);
                                     }}>Заселить на дополнительное место</Button>
+                                        </Flex>
                                         :
                                         <></>
                                 }
