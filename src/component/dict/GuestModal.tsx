@@ -222,18 +222,24 @@ export const GuestModal = (props: ModalProps) => {
     }, []);
     useEffect(() => {
         if (contractsFromRequest && selectedHotelId) {
-            if (isEmployee) setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === selectedHotelId && c.year == 2025));
-            else {
-                setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId !== 11 && c.hotelId === selectedHotelId && c.year == 2025));
+            if (isEmployee) {
+                let filteredContracts:ContractModel[] = contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === selectedHotelId && c.year == 2025);
+                setContracts(filteredContracts);
+                setReasons(filteredContracts.reduce((acc: ReasonModel[], contract: ContractModel) => {
+                    if (!acc.find((reason: ReasonModel) => reason.id == contract.reasonId))
+                        return acc.concat([{id: contract.reasonId, name: contract.reason, isDefault: true}]);
+                    return acc;
+                }, []));
             }
-        }
-        if (contractsFromRequest) {
-            // Заполняем список доступных оснований из договоров, чтобы уменьшить кол-во эл-тов в выпад. списке
-            setReasons(contractsFromRequest.reduce((acc: ReasonModel[], contract: ContractModel) => {
-                if (!acc.find((reason: ReasonModel) => reason.id == contract.reasonId))
-                    return acc.concat([{id: contract.reasonId, name: contract.reason, isDefault: true}]);
-                return acc;
-            }, []));
+            else {
+                let filteredContracts:ContractModel[] = contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId !== 11 && c.hotelId === selectedHotelId && c.year == 2025);
+                setContracts(filteredContracts);
+                setReasons(filteredContracts.reduce((acc: ReasonModel[], contract: ContractModel) => {
+                    if (!acc.find((reason: ReasonModel) => reason.id == contract.reasonId))
+                        return acc.concat([{id: contract.reasonId, name: contract.reason, isDefault: true}]);
+                    return acc;
+                }, []));
+            }
         }
     }, [contractsFromRequest, selectedHotelId, isEmployee]);
     useEffect(() => {
@@ -555,12 +561,12 @@ export const GuestModal = (props: ModalProps) => {
     }
     const selectReasonHandler = (reason: string) => {
         setReason(reason);
-        setContractsStep2(() => contracts.filter((c: ContractModel) => (billing ? c.billing == billing : true) && c.reason == reason));
+        setContractsStep2(() => contracts.filter((c: ContractModel) => (billing ? c.billing == billing : true) && (reason ? c.reason == reason : true)));
         setSelectedContractId(null);
     }
     const selectBillingHandler = (billing: string) => {
         setBilling(billing);
-        setContractsStep2(() => contracts.filter((c: ContractModel) => (reason ? c.reason == reason : true) && c.billing == billing));
+        setContractsStep2(() => contracts.filter((c: ContractModel) => (reason ? c.reason == reason : true) && (billing ? c.billing == billing : true)));
         setSelectedContractId(null);
     }
     const selectContractHandler = (id: number) => {
