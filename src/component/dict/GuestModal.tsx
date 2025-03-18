@@ -538,7 +538,7 @@ export const GuestModal = (props: ModalProps) => {
             // -----
 
             // Устанавливаем договор
-            let familyContract = contractsFromRequest?.find((c: ContractModel) => c.reason.toLowerCase().indexOf("семьи") !== -1);
+            let familyContract = contracts?.find((c: ContractModel) => c.reason.toLowerCase().indexOf("семьи") !== -1);
             setSelectedContractId(familyContract ? familyContract.id : null);
             if (familyContract) {
                 setSelectedContractId(familyContract.id);
