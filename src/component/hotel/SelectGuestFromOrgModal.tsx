@@ -9,7 +9,7 @@ type ModalProps = {
     visible: boolean,
     setVisible: Function,
     showSuccessMsg: Function,
-    orgName: string,
+    selectedOrganizationId: number,
     organizations: OrganizationModel[],
     setFirstname: Function,
     setLastname: Function,
@@ -107,8 +107,7 @@ export const SelectGuestFromOrgModal = (props: ModalProps) => {
         },
     ]
     useEffect(() => {
-        let id = props.organizations.find((o:OrganizationModel) => o.name == props.orgName)?.id;
-        if (id) getGuests(id);
+        getGuests(props.selectedOrganizationId);
     }, []);
     return (
         <Modal title={"Перечень жильцов"}

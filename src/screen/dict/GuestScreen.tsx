@@ -9,6 +9,8 @@ import {ColumnType} from 'antd/es/table';
 import {SearchOutlined} from '@ant-design/icons';
 import {FilterConfirmProps} from 'antd/es/table/interface';
 import {TableTitleRender} from "../../component/TableTitleRender";
+import {filialAPI} from "../../service/FilialService";
+import {FilialModel} from "../../model/FilialModel";
 
 export interface DataType extends GuestModel {
     key: React.Key;
@@ -33,6 +35,9 @@ const GuestScreen: React.FC = () => {
     const [deleteGuest, {
         data: deletedGuest,
     }] = guestAPI.useDeleteMutation();
+    const [getAllFilials, {
+        data: filials
+    }] = filialAPI.useGetAllMutation();
     // -----
 
     // Handlers
@@ -234,17 +239,41 @@ const GuestScreen: React.FC = () => {
         },
         {
             title: <TableTitleRender title={'Организация'} />,
-            dataIndex: 'organization',
-            key: 'organization',
+            dataIndex: 'organizationName',
+            key: 'organizationName',
             filters: guestsData?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (guest.organization) {
-                    if (acc.find((g: { text: string, value: string }) => g.text === guest.organization.toString()) === undefined)
-                        return acc.concat({text: guest.organization.toString(), value: guest.organization.toString()});
+                if (guest.organizationName) {
+                    if (acc.find((g: { text: string, value: string }) => g.text === guest.organizationName) === undefined)
+                        return acc.concat({text: guest.organizationName, value: guest.organizationName});
                 }
                 return acc;
             }, []),
             onFilter: (value: any, record: GuestModel) => {
-                return record.organization?.toString().indexOf(value) === 0
+                return record.organizationName.indexOf(value) === 0
+            },
+            filterSearch: true,
+        },
+        {
+            title: <TableTitleRender title={'Филиал работника'} />,
+            dataIndex: 'filialEmployee',
+            key: 'filialEmployee',
+            render: (value: any, record: GuestModel) => {
+                if (filials) {
+                    let filialName = filials.find((f: FilialModel) => f.code.toString() == record.filialEmployee)?.name;
+                    return (<>{filialName}</>);
+                }
+                return (<></>);
+            },
+            filters: guestsData?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
+                if (guest.filialEmployee && filials) {
+                    let filialName = filials.find((f:FilialModel) => f.code.toString() == guest.filialEmployee)?.name;
+                    if (acc.find((g: { text: string, value: string }) => g.text === filialName) === undefined)
+                        return acc.concat({text: filialName, value: guest.filialEmployee});
+                }
+                return acc;
+            }, []),
+            onFilter: (value: any, record: GuestModel) => {
+                return record.filialEmployee?.indexOf(value) === 0
             },
             filterSearch: true,
         },
@@ -269,6 +298,7 @@ const GuestScreen: React.FC = () => {
     // Effects
     useEffect(() => {
         getAllGuests();
+        getAllFilials();
     }, []);
     useEffect(() => {
         if (guestsData) setGuests(guestsData);

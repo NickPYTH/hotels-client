@@ -70,7 +70,7 @@ export const GuestModal = (props: ModalProps) => {
     const [fio, setFio] = useState<string | null>(null);  // ФИО для поиска данных
     const [tabnum, setTabnum] = useState<number | null>(null);  // Табельный номер
     const [familyTabnum, setFamilyTabnum] = useState<number | null>(null);  // Табельный номер члена семьи
-    const [customOrgName, setCustomOrgName] = useState<string | null>("ООО \"Газпром трансгаз Сургут\""); // Выбранная организация или Новое название иной организации (если нет в списке можно создать)
+    const [selectedOrganizationId, setSelectedOrganizationId] = useState<number | null>(11); // Выбранная организация или Новое название иной организации (если нет в списке можно создать)
     const [lastname, setLastname] = useState(""); // Фамилия
     const [firstname, setFirstname] = useState(""); // Имя
     const [secondName, setSecondName] = useState(""); // Отчество
@@ -208,7 +208,7 @@ export const GuestModal = (props: ModalProps) => {
                 setDateFinish(dayjs(props.semiAutoParams.dateFinish, 'DD-MM-YYYY'));
                 setTimeFinish(dayjs(props.semiAutoParams.dateFinish.split(" ")[1], 'HH:mm'));
             }
-            setCustomOrgName("ООО \"Газпром трансгаз Сургут\"");
+            setSelectedOrganizationId(11);
             getFioByTabnum(props.semiAutoParams.tabnum);
             setMemo("-");
             setSelectedFilialId(props.semiAutoParams.filialId);
@@ -278,7 +278,7 @@ export const GuestModal = (props: ModalProps) => {
             getAllBeds({roomId: props.selectedGuest.roomId, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
             setIsEmployee(!!props.selectedGuest.tabnum);
             setTabnum(props.selectedGuest.tabnum);
-            setCustomOrgName(!!props.selectedGuest.tabnum ? "ООО \"Газпром трансгаз Сургут\"" : props.selectedGuest.organization);
+            setSelectedOrganizationId(!!props.selectedGuest.tabnum ? 11 : props.selectedGuest.organizationId);
             setRegPoMestu(props.selectedGuest.regPoMestu);
             setMale(props.selectedGuest.male);
             if (props.selectedGuest.contractId)
@@ -383,7 +383,8 @@ export const GuestModal = (props: ModalProps) => {
                         {
                             ...p,
                             tabnum: updatedGuest.tabnum,
-                            organization: updatedGuest.organization,
+                            organizationId: updatedGuest.organizationId,
+                            organizationName: updatedGuest.organizationName,
                             lastname: updatedGuest.lastname,
                             firstname: updatedGuest.firstname,
                             secondName: updatedGuest.secondName,
@@ -423,7 +424,8 @@ export const GuestModal = (props: ModalProps) => {
                         {
                             ...p,
                             tabnum: createdGuest.tabnum,
-                            organization: createdGuest.organization,
+                            organizationId: createdGuest.organizationId,
+                            organizationName: createdGuest.organizationName,
                             lastname: createdGuest.lastname,
                             firstname: createdGuest.firstname,
                             secondName: createdGuest.secondName,
@@ -520,12 +522,12 @@ export const GuestModal = (props: ModalProps) => {
         setBilling(null);
         setSelectedContractId(null);
         if (!e.target.checked) {
-            setCustomOrgName("");
+            setSelectedOrganizationId(null);
             setLastname("");
             setFirstname("");
             setSecondName("");
         } else {
-            setCustomOrgName("ООО \"Газпром трансгаз Сургут\"");
+            setSelectedOrganizationId(11);
         }
     }
     const switchIsFamilyMemberOfEmployeeHandler = (e) => {
@@ -534,7 +536,7 @@ export const GuestModal = (props: ModalProps) => {
         if (e.target.checked) {
             // Устанавливаем организацию
             let familyOrg = organizations?.find((org: OrganizationModel) => org.name.toLowerCase().indexOf("семьи") !== -1);
-            setCustomOrgName(familyOrg !== undefined ? familyOrg.name : "");
+            setSelectedOrganizationId(familyOrg !== undefined ? familyOrg.id : null);
             // -----
 
             // Устанавливаем договор
@@ -551,7 +553,7 @@ export const GuestModal = (props: ModalProps) => {
 
             setMemo("-");
         } else {
-            setCustomOrgName("");
+            setSelectedOrganizationId(null);
             setFamilyTabnum(null);
             setIsFamilyMemberOfEmployee(false);
         }
@@ -577,7 +579,7 @@ export const GuestModal = (props: ModalProps) => {
             showWarningMsg("Вы находитесь в режиме просмотра");
             return;
         }
-        if (firstname && lastname && secondName && dateStart && dateFinish && selectedFlatId && selectedRoomId && memo && male !== null) {
+        if (firstname && lastname && secondName && dateStart && dateFinish && selectedFlatId && selectedRoomId && memo && male !== null && selectedOrganizationId) {
             let ds = `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`;
             let df = `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`;
             if (dayjs(ds, 'DD-MM-YYYY HH:mm').isAfter(dayjs(df, 'DD-MM-YYYY HH:mm'))) {
@@ -608,7 +610,8 @@ export const GuestModal = (props: ModalProps) => {
                 roomId: selectedRoomId, // Нужное свойство для создания доп. места
                 roomName: "",
                 tabnum: isEmployee ? tabnum : null,
-                organization: customOrgName ? customOrgName.trim() : null,
+                organizationId: selectedOrganizationId,
+                organizationName: "",
                 regPoMestu,
                 memo,
                 billing,
@@ -651,8 +654,8 @@ export const GuestModal = (props: ModalProps) => {
         >
             <Button onClick={() => setVisibleHistoryModal(true)} type={'text'} style={{fontSize: 16, position: 'absolute', top: 13, right: 47}} icon={<HistoryOutlined/>}></Button>
             {messageContextHolder}
-            {(visibleSelectGuestModal && customOrgName && organizations) &&
-                <SelectGuestFromOrgModal organizations={organizations} setMale={setMale} setLastname={setLastname} setFirstname={setFirstname} setSecondName={setSecondName} orgName={customOrgName}
+            {(visibleSelectGuestModal && selectedOrganizationId && organizations) &&
+                <SelectGuestFromOrgModal organizations={organizations} setMale={setMale} setLastname={setLastname} setFirstname={setFirstname} setSecondName={setSecondName} selectedOrganizationId={selectedOrganizationId}
                                          visible={visibleSelectGuestModal}
                                          setVisible={setVisibleSelectGuestModal} showSuccessMsg={showWarningMsg}/>}
             {(visibleHistoryModal && history) && <HistoryModal visible={visibleHistoryModal} setVisible={setVisibleHistoryModal} history={history}/>}
@@ -719,16 +722,21 @@ export const GuestModal = (props: ModalProps) => {
                     <Flex vertical={true}>
                         <Select
                             disabled={isEmployee}
-                            value={customOrgName}
+                            value={selectedOrganizationId}
                             placeholder={"Выберите организацию"}
                             style={{width: 397}}
                             onChange={(e) => {
                                 setFamilyTabnum(null);
-                                setCustomOrgName(e);
-                                setContracts(contractsFromRequest.filter((c: ContractModel) => c.organization == e && c.hotelId === selectedHotelId && c.year == 2025));
+                                setSelectedOrganizationId(e);
+                                setContracts(contractsFromRequest.filter((c: ContractModel) => c.organizationId == e && c.hotelId === selectedHotelId && c.year == 2025));
                             }}
-                            options={organizations?.filter((org: OrganizationModel) => org.id !== 11).map((o: OrganizationModel) => ({
-                                value: o.name,
+                            options={organizations?.filter((org: OrganizationModel) => {
+                                if (isEmployee) return true;
+                                else {
+                                    return org.id !== 11;
+                                }
+                            }).map((o: OrganizationModel) => ({
+                                value: o.id,
                                 label: o.name
                             }))}
                             allowClear={true}
@@ -738,7 +746,7 @@ export const GuestModal = (props: ModalProps) => {
                         />
                     </Flex>
                 </Flex>
-                {(!isEmployee && customOrgName) &&
+                {(!isEmployee && selectedOrganizationId) &&
                     <Flex align={"center"} justify={'space-between'}>
                         <div style={{width: 420}}>Вы можете выбрать жильца из таблицы, если он заселялся ранее</div>
                         <Button onClick={() => setVisibleSelectGuestModal(true)}>Выбрать</Button>

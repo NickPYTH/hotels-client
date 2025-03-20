@@ -15,7 +15,8 @@ export type GuestModel = {
     filialId: number;
     roomId: number;
     roomName: string;
-    organization: string;
+    organizationId: number;
+    organizationName: string;
     regPoMestu: boolean;
     memo: string;
     billing: string;

@@ -261,7 +261,7 @@ export const CellsView = (props: ModalPros) => {
                                 marginBottom: 3,
                                 cursor: 'pointer',
                                 background: isReservation == 'true' ? reservationCellsColor: male ? cellsMaleColor: cellsFemaleColor,
-                                width: coloredWidth,
+                                width: percent == 100 ? '100%' : coloredWidth,
                                 height: 25,
                                 color: fontColor,
                                 fontSize,
@@ -360,7 +360,7 @@ export const CellsView = (props: ModalPros) => {
                             <>
                                 <div onClick={() => {
                                     setSelectedFlatId(record.sectionId);
-                                    setSelectedDate(dayjs(personLeftDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
+                                    setSelectedDate(dayjs(personLeftDates.split(" :: ")[1].replace("12:00", "11:59"), "DD-MM-YYYY HH:mm"));
                                 }}
                                     style={{
                                     marginTop: 3,
@@ -389,7 +389,7 @@ export const CellsView = (props: ModalPros) => {
                                 <div
                                     onClick={() => {
                                         setSelectedFlatId(record.sectionId);
-                                        setSelectedDate(dayjs(personRightDates.split(" - ")[0], "DD-MM-YYYY HH:mm"));
+                                        setSelectedDate(dayjs(personRightDates.split(" :: ")[0].replace("12:00", "12:01"), "DD-MM-YYYY HH:mm"));
                                     }}
                                     style={{
                                     marginTop: 3,
