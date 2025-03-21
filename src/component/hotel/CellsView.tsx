@@ -106,10 +106,6 @@ export const CellsView = (props: ModalPros) => {
     const [visibleReservationModal, setVisibleReservationModal] = useState(false);
     const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(false);
     const [currentMonth, setCurrentMonth] = useState<string>(() => selectMonthByDate(props.selectedDate));
-    const [reservationCellsColor] = useState(() => {
-        if (localStorage.getItem("reservationCellsColor")) return localStorage.getItem('reservationCellsColor');
-        return "#B9848C";
-    });
     const [cellsMaleColor] = useState(() => {
         if (localStorage.getItem("cellsMaleColor")) return localStorage.getItem('cellsMaleColor');
         return "#75a5f2";
@@ -260,8 +256,11 @@ export const CellsView = (props: ModalPros) => {
                                 marginTop: 3,
                                 marginBottom: 3,
                                 cursor: 'pointer',
-                                background: isReservation == 'true' ? reservationCellsColor: male ? cellsMaleColor: cellsFemaleColor,
+                                background: male ? cellsMaleColor: cellsFemaleColor,
                                 width: percent == 100 ? '100%' : coloredWidth,
+                                backgroundImage: isReservation == 'true' ? "radial-gradient(white 1px, transparent 0)" : "inherit",
+                                backgroundSize: isReservation == 'true' ? "8px 8px" : 'inherit',
+                                fontWeight: isReservation == 'true' ? 600 : 'inherit',
                                 height: 25,
                                 color: fontColor,
                                 fontSize,
@@ -287,7 +286,7 @@ export const CellsView = (props: ModalPros) => {
                                                 <div style={{position: 'absolute', width: columnWidth, top: 7, left: 0, height: 25}}>
                                                     <Flex vertical={false}>
                                                         {startCell && <div style={{position: "absolute", width: 100, zIndex: 100, height: 25}}>
-                                                            <div>{fio}</div>
+                                                            <div style={{zIndex: 1000}}>{fio}</div>
                                                         </div>}
                                                     </Flex>
                                                 </div>
@@ -330,6 +329,7 @@ export const CellsView = (props: ModalPros) => {
                         let personLeftNote = personLeft.split('#')[0].split('&')[3] == 'null' ? "" : personLeft.split('#')[0].split('&')[3];
                         let personLeftPost = personLeft.split('#')[0].split('&')[4];
                         let personLeftFilial = personLeft.split('#')[0].split('&')[5] == 'emptyF' ? "" : personLeft.split('#')[0].split('&')[5];
+                        let personLeftIsReservation = personLeft.split('#')[0].split('&')[6];
                         let personLeftPercent = Math.abs(personLeft.split('#')[1]);
                         let coloredLeftWidth = columnWidth * (personLeftPercent/100);
                         // -----
@@ -352,6 +352,7 @@ export const CellsView = (props: ModalPros) => {
                         let personRightNote = personRight.split('#')[0].split('&')[3] == 'null' ? "" : personRight.split('#')[0].split('&')[3];
                         let personRightPost = personRight.split('#')[0].split('&')[4];
                         let personRightFilial = personRight.split('#')[0].split('&')[5] == 'emptyF' ? "" : personRight.split('#')[0].split('&')[5];
+                        let personRightIsReservation = personRight.split('#')[0].split('&')[6];
                         let personRightPercent = Math.abs(personRight.split('#')[1]);
                         let coloredRightWidth = columnWidth * (personRightPercent/100);
                         // -----
@@ -367,6 +368,9 @@ export const CellsView = (props: ModalPros) => {
                                     marginBottom: 3,
                                     cursor: 'pointer',
                                     background: personLeftMale ? cellsMaleColor: cellsFemaleColor,
+                                    backgroundImage: personLeftIsReservation == 'true' ? "radial-gradient(white 1px, transparent 0)" : "inherit",
+                                    backgroundSize: personLeftIsReservation == 'true' ? "8px 8px" : 'inherit',
+                                    fontWeight: personLeftIsReservation == 'true' ? 600 : 'inherit',
                                     height: 25,
                                     color: fontColor,
                                     fontSize,
@@ -396,6 +400,9 @@ export const CellsView = (props: ModalPros) => {
                                     marginBottom: 3,
                                     cursor: 'pointer',
                                     background: personRightMale ? cellsMaleColor: cellsFemaleColor, height: 25, color: fontColor, fontSize,
+                                    backgroundImage: personRightIsReservation == 'true' ? "radial-gradient(white 1px, transparent 0)" : "inherit",
+                                    backgroundSize: personRightIsReservation == 'true' ? "8px 8px" : 'inherit',
+                                    fontWeight: personRightIsReservation == 'true' ? 600 : 'inherit',
                                     borderBottomLeftRadius: 8,
                                     borderTopLeftRadius: 8,
                                     width: coloredRightWidth,

@@ -20,10 +20,6 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
         if (localStorage.getItem("cellsFemaleColor")) return localStorage.getItem('cellsFemaleColor');
         return "#f1259b";
     });
-    const [reservationCellsColor, setReservationCellsColor] = useState(() => {
-        if (localStorage.getItem("reservationCellsColor")) return localStorage.getItem('reservationCellsColor');
-        return "#B9848C";
-    });
     const [fontColor, setFontColor] = useState(() => {
         if (localStorage.getItem("fontColor")) return localStorage.getItem('fontColor');
         return "#fff";
@@ -44,10 +40,9 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
 
     // Handlers
     const saveHandler = () => {
-        if (cellsMaleColor != null && cellsFemaleColor && fontColor != null && columnWidth != null && fontSize != null && cellBackgroundColor != null && reservationCellsColor != null) {
+        if (cellsMaleColor != null && cellsFemaleColor && fontColor != null && columnWidth != null && fontSize != null && cellBackgroundColor != null) {
             localStorage.setItem("cellsMaleColor", cellsMaleColor);
             localStorage.setItem("cellsFemaleColor", cellsFemaleColor);
-            localStorage.setItem("reservationCellsColor", reservationCellsColor);
             localStorage.setItem("fontColor", fontColor);
             localStorage.setItem("cellBackgroundColor", cellBackgroundColor);
             localStorage.setItem("columnWidth", columnWidth.toString());
@@ -60,9 +55,6 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
     }
     const updateFemaleCellsColor = (_, css:string) => {
         setCellsFemaleColor(css);
-    }
-    const updateReservationCellsColor = (_, css:string) => {
-        setReservationCellsColor(css);
     }
     const updateCellBackgroundColor = (_, css:string) => {
         setCellBackgroundColor(css);
@@ -86,10 +78,6 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
                     <div style={{width: 200, marginRight: 15}}>Цвет записей женщин</div>
                     <ColorPicker value={cellsFemaleColor} onChange={updateFemaleCellsColor} defaultValue={cellsFemaleColor}/>
-                </Flex>
-                <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
-                    <div style={{width: 200, marginRight: 15}}>Цвет броней</div>
-                    <ColorPicker value={reservationCellsColor} onChange={updateReservationCellsColor} defaultValue={reservationCellsColor}/>
                 </Flex>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
                     <div style={{width: 200, marginRight: 15}}>Цвет выходных дней</div>
