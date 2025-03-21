@@ -74,7 +74,7 @@ export const NotCheckoutedModal = (props: ModalProps) => {
                         if (props.guest) {
                             let periodStart = props.guest.dateStart;
                             let periodEnd = props.guest.dateFinish;
-                            tmpButton.href = `${host}/hotels/api/user/getCheckoutReport?id=${props.guest.id}&roomNumber=${props.guest.roomName}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
+                            tmpButton.href = `${host}/hotels/api/report/getCheckoutReport?id=${props.guest.id}&roomNumber=${props.guest.roomName}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
                             tmpButton.click();
                         }
                     }}>Отчетный документ</Button>

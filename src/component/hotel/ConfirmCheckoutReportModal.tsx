@@ -41,7 +41,7 @@ export const ConfirmCheckoutReport = (props: ModalProps) => {
                     if (dateRange) {
                         let periodStart = dateRange[0].format("DD-MM-YYYY HH:mm");
                         let periodEnd = dateRange[1].format("DD-MM-YYYY HH:mm");
-                        tmpButton.href = `${host}/hotels/api/user/getCheckoutReport?id=${props.guest.id}&roomNumber=${props.roomName}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
+                        tmpButton.href = `${host}/hotels/api/report/getCheckoutReport?id=${props.guest.id}&roomNumber=${props.roomName}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
                         tmpButton.click();
                     }
                 }}>Сформировать отчетный документ</Button>

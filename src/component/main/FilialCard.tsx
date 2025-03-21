@@ -19,7 +19,7 @@ export const FilialCard = ({filial, showWarningMsg, date}: CardProps) => {
         if (e.key === '1') {
             showWarningMsg("Отчет начал формироваться.")
             let tmpButton = document.createElement('a')
-            tmpButton.href = `${host}/hotels/api/filial/getShortReport?filialId=${filial.id}`
+            tmpButton.href = `${host}/hotels/api/report/getShortReport?filialId=${filial.id}`
             tmpButton.click();
         }
     };

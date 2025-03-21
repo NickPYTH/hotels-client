@@ -14,6 +14,7 @@ import {RootStateType} from "../../store/store";
 import {host, uttistCehs} from "../../config/constants";
 import {contractAPI} from "../../service/ContractService";
 import {OrganizationModel} from "../../model/OrganizationModel";
+import {organizationAPI} from "../../service/OrganizationService";
 
 const {RangePicker} = DatePicker;
 
@@ -45,7 +46,7 @@ export const ReportMonthModal = (props: ModalProps) => {
     const [getAllOrganizations, {
         data: organizations,
         isLoading: isOrganizationsLoading
-    }] = contractAPI.useGetAllOrganizationMutation();
+    }] = organizationAPI.useGetAllMutation();
     const [getAllFilials, {
         data: filials,
         isLoading: isFilialsLoading
@@ -87,15 +88,15 @@ export const ReportMonthModal = (props: ModalProps) => {
                    if (orgMode) {
                        let tmpButton = document.createElement('a');
                        if (dateRange && selectedOrganizationsId && responsibilityId && reasonId)
-                           tmpButton.href = `${host}/hotels/api/contract/getMonthReportByOrganization?organizationId=${selectedOrganizationsId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}`
+                           tmpButton.href = `${host}/hotels/api/report/getMonthReportByOrganization?organizationId=${selectedOrganizationsId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}`
                        tmpButton.click();
                    } else {
                        let tmpButton = document.createElement('a');
                        if (dateRange && selectedEmpFilialId && responsibilityId && reasonId) {
                            if (selectedCehId != null)
-                               tmpButton.href = `${host}/hotels/api/contract/getMonthReportByUttist?empFilialId=${selectedEmpFilialId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}&ceh=${uttistCehs.find((ceh: any) => ceh.id === selectedCehId).name}`
+                               tmpButton.href = `${host}/hotels/api/report/getMonthReportByUttist?empFilialId=${selectedEmpFilialId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}&ceh=${uttistCehs.find((ceh: any) => ceh.id === selectedCehId).name}`
                            else
-                               tmpButton.href = `${host}/hotels/api/contract/getMonthReportByFilial?empFilialId=${selectedEmpFilialId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}`
+                               tmpButton.href = `${host}/hotels/api/report/getMonthReportByFilial?empFilialId=${selectedEmpFilialId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}`
                        }
                        tmpButton.click();
 

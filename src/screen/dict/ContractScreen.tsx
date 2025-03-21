@@ -177,20 +177,6 @@ const ContractScreen: React.FC = () => {
                 return record.year.toString().indexOf(value) === 0
             },
         },
-        {
-            title: 'Комната',
-            dataIndex: 'roomNumber',
-            key: 'roomNumber',
-            filters: contracts?.reduce((acc: { text: string, value: string }[], contract: ContractModel) => {
-                if (contract.roomNumber)
-                    if (acc.find((g: { text: string, value: string }) => g.text === contract.roomNumber?.toString()) === undefined)
-                        return acc.concat({text: contract.roomNumber?.toString(), value: contract.roomNumber?.toString()});
-                return acc;
-            }, []),
-            onFilter: (value: any, record: ContractModel) => {
-                return record.roomNumber?.toString().indexOf(value) === 0
-            },
-        },
     ]
     // -----
 
@@ -201,7 +187,7 @@ const ContractScreen: React.FC = () => {
                 <Button type={'primary'} onClick={() => setIsVisibleContractModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
                 <Button type={'primary'} onClick={() => {
                     let tmpButton = document.createElement('a');
-                    tmpButton.href = `${host}/hotels/api/contract/getAllReport`
+                    tmpButton.href = `${host}/hotels/api/report/getAllContractReport`
                     tmpButton.click();
                 }} style={{width: 100, margin: 10}}>Отчет</Button>
             </Flex>

@@ -325,7 +325,7 @@ const GuestScreen: React.FC = () => {
                 <Button type={'primary'} onClick={() => setIsVisibleGuestModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
                 <Button type={'primary'} onClick={() => {
                     let tmpButton = document.createElement('a');
-                    tmpButton.href = `${host}/hotels/api/guest/getGuestReport`
+                    tmpButton.href = `${host}/hotels/api/report/getGuestReport`
                     tmpButton.click();
                 }} style={{width: 100, margin: 10}}>Отчет</Button>
             </Flex>

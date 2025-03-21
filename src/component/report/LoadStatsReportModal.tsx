@@ -58,7 +58,7 @@ export const LoadStatsReportModal = (props: ModalProps) => {
         if (dateRange && selectedHotelId) {
             let dateStart = dateRange[0].format('DD-MM-YYYY');
             let dateFinish = dateRange[1].format('DD-MM-YYYY');
-            tmpButton.href = `${host}/hotels/api/filial/getLoadStatsReport?hotelId=${selectedHotelId}&dateStart=${dateStart}&dateFinish=${dateFinish}`
+            tmpButton.href = `${host}/hotels/api/report/getLoadStatsReport?hotelId=${selectedHotelId}&dateStart=${dateStart}&dateFinish=${dateFinish}`
             tmpButton.click();
         } else {
             showWarningMsg("Не все поля заполнены");

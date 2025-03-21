@@ -24,7 +24,7 @@ export const FilialGuestReportModal = (props: ModalProps) => {
         if (dateRange) {
             let dateStart = dateRange[0].format('DD-MM-YYYY');
             let dateFinish = dateRange[1].format('DD-MM-YYYY');
-            tmpButton.href = `${host}/hotels/api/filial/getFilialReport?id=${props.filial.id}&checkouted=${isDefault}&dateStart=${dateStart}&dateFinish=${dateFinish}`
+            tmpButton.href = `${host}/hotels/api/report/getFilialReport?id=${props.filial.id}&checkouted=${isDefault}&dateStart=${dateStart}&dateFinish=${dateFinish}`
             tmpButton.click();
         } else {
             showWarningMsg("Не все поля заполнены");

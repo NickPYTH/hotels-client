@@ -39,6 +39,7 @@ import {BedModel} from "../../model/BedModel";
 import {SelectGuestFromOrgModal} from "../hotel/SelectGuestFromOrgModal";
 import {LabelOptionRender} from "../LabelOptionRender";
 import {SelectOptionRender} from "../SelectOptionRender";
+import {organizationAPI} from "../../service/OrganizationService";
 
 type ModalProps = {
     semiAutoParams?: GuestModel, // Перечень параметров для полу автоматичского заполнения
@@ -145,7 +146,7 @@ export const GuestModal = (props: ModalProps) => {
     const [getAllOrganizations, {
         data: organizations,
         isLoading: isOrganizationsLoading
-    }] = contractAPI.useGetAllOrganizationMutation(); // Получение всех организаций
+    }] = organizationAPI.useGetAllMutation(); // Получение всех организаций
     const [getFioByTabnum, {
         data: fioByTabnum,
         isLoading: isGetFioByTabnumLoading

@@ -341,7 +341,7 @@ const HotelScreen: React.FC = () => {
                                             if (flats) {
                                                 showWarningMsg("Отчет начал формироваться.")
                                                 let tmpButton = document.createElement('a')
-                                                tmpButton.href = `${host}/hotels/api/hotel/getFloorReport?hotelId=${flats[0].hotelId}&floor=${floorNumber}&date=${selectedDate.format('DD-MM-YYYY HH:mm')}`;
+                                                tmpButton.href = `${host}/hotels/api/report/getFloorReport?hotelId=${flats[0].hotelId}&floor=${floorNumber}&date=${selectedDate.format('DD-MM-YYYY HH:mm')}`;
                                                 tmpButton.click();
                                             }
                                         }} style={{marginTop: 36, marginBottom: 5, width: 180}}>Скачать отчет по этажу</Button>

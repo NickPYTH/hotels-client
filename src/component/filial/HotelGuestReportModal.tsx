@@ -24,7 +24,7 @@ export const HotelGuestReportModal = (props: ModalProps) => {
         if (dateRange) {
             let dateStart = dateRange[0].format('DD-MM-YYYY');
             let dateFinish = dateRange[1].format('DD-MM-YYYY');
-            tmpButton.href = `${host}/hotels/api/hotel/getHotelReport?id=${props.hotel.id}&checkouted=${isDefault}&dateStart=${dateStart}&dateFinish=${dateFinish}`
+            tmpButton.href = `${host}/hotels/api/report/getHotelReport?id=${props.hotel.id}&checkouted=${isDefault}&dateStart=${dateStart}&dateFinish=${dateFinish}`
             tmpButton.click();
         } else {
             showWarningMsg("Не все поля заполнены");

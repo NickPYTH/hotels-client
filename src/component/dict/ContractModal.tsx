@@ -9,6 +9,7 @@ import {HotelModel} from "../../model/HotelModel";
 import {OrganizationModel} from "../../model/OrganizationModel";
 import {reasonAPI} from "../../service/ReasonService";
 import {ReasonModel} from "../../model/ReasonModel";
+import {organizationAPI} from "../../service/OrganizationService";
 
 type ModalProps = {
     selectedContract: ContractModel | null,
@@ -51,7 +52,7 @@ export const ContractModal = (props: ModalProps) => {
     const [getAllOrganization, {
         isLoading: isGetAllOrganizationsLoading,
         data: organizations
-    }] = contractAPI.useGetAllOrganizationMutation();
+    }] = organizationAPI.useGetAllMutation();
     const [getAllReasons, {
         isLoading: isGetAllReasonsLoading,
         data: reasons

@@ -40,13 +40,6 @@ export const contractAPI = createApi({
             }),
             invalidatesTags: ['contract']
         }),
-        getAllOrganization: build.mutation<OrganizationModel[], void>({
-            query: () => ({
-                url: `/getAllOrganizations`,
-                method: 'GET',
-            }),
-            invalidatesTags: ['contract']
-        }),
         getAllByFilialAndHotelAndReason: build.mutation<ContractModel[], { filial: number, hotel: number, reason: number, org: string, billing: string }>({
             query: ({filial, hotel, reason, org, billing}) => ({
                 url: `/getAllByFilialAndHotel?filialId=${filial}&hotelId=${hotel}&reasonId=${reason}&org=${org}&billing=${billing}`,

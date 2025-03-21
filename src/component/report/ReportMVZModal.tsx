@@ -60,13 +60,13 @@ export const ReportMVZModal = (props: ModalProps) => {
                    if (dateRange) {
                        if (onlyLpu){
                            showWarningMsg("Отчет начал формироваться");
-                           tmpButton.href = `${host}/hotels/api/contract/getMVZReportOnlyLPU?lpu=ЛПУ&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}`
+                           tmpButton.href = `${host}/hotels/api/report/getMVZReportOnlyLPU?lpu=ЛПУ&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}`
                        } else {
                            if (selectedFilialId) {
                                showWarningMsg("Отчет начал формироваться");
                                if (shortMode) {
-                                   if (selectedEmployeeFilialId) tmpButton.href = `${host}/hotels/api/MVZ/getMVZReportShort?empFilialId=${selectedEmployeeFilialId}&filialId=${selectedFilialId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}`
-                               } else tmpButton.href = `${host}/hotels/api/contract/getMVZReport?filialId=${selectedFilialId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}`
+                                   if (selectedEmployeeFilialId) tmpButton.href = `${host}/hotels/api/report/getMVZReportShort?empFilialId=${selectedEmployeeFilialId}&filialId=${selectedFilialId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}`
+                               } else tmpButton.href = `${host}/hotels/api/report/getMVZReport?filialId=${selectedFilialId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}`
                            } else showWarningMsg("Вы не выбрали филиал");
                        }
                    } else showWarningMsg("Вы не выбрали период");

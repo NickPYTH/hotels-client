@@ -1,7 +1,6 @@
 import React from 'react';
 import {Modal, Table, TableProps} from 'antd';
 import {HistoryModel} from "../../model/HistoryModel";
-import {GuestModel} from "../../model/GuestModel";
 
 type ModalProps = {
     visible: boolean,

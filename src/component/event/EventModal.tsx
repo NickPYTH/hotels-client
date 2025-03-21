@@ -3,6 +3,7 @@ import {Flex, Input, Modal, Select} from 'antd';
 import {EventModel} from "../../model/EventModel";
 import {eventAPI} from "../../service/EventService";
 import {EventTypeModel} from "../../model/EventTypeModel";
+import {eventTypeAPI} from "../../service/EventTypeService";
 
 
 type ModalProps = {
@@ -24,7 +25,7 @@ export const EventModal = (props: ModalProps) => {
     const [getTypes, {
         data: types,
         isLoading: isTypesLoading
-    }] = eventAPI.useGetAllTypesMutation();
+    }] = eventTypeAPI.useGetAllMutation();
     const [createEvent, {
         data: createdEvent,
         isLoading: isCreateEventLoading

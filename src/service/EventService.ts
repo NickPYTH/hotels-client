@@ -17,13 +17,6 @@ export const eventAPI = createApi({
             }),
             invalidatesTags: ['event']
         }),
-        getAllTypes: build.mutation<EventTypeModel[], void>({
-            query: () => ({
-                url: `/getAllTypes`,
-                method: 'GET',
-            }),
-            invalidatesTags: ['event']
-        }),
         get: build.mutation<EventModel, number>({
             query: (id) => ({
                 url: `/get?id=${id}`,
