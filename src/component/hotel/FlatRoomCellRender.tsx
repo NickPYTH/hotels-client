@@ -10,6 +10,7 @@ import {GuestModel} from "../../model/GuestModel";
 import {flatAPI} from "../../service/FlatService";
 
 type FlatRoomCellRendererProps = {
+    s: boolean,
     tabnum: number,
     showWarningMsg: Function,
     dateStart: string,
@@ -65,6 +66,9 @@ export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
             setSelectedBedId(availableBedFromRequest.id);
         }
     }, [availableBedFromRequest]);
+    useEffect(() => {
+        getAllFlats({hotelId: props.hotelId.toString(), dateStart: props.dateStart, dateFinish: props.dateFinish});
+    }, [props.s]);
     useEffect(() => {
         if (props.dateStart && props.dateFinish && props.hotelId){
             getAllFlats({hotelId: props.hotelId.toString(), dateStart: props.dateStart, dateFinish: props.dateFinish});

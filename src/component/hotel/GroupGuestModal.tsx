@@ -8,7 +8,8 @@ import {
     Modal,
     Select,
     Table,
-    TableProps, Tag,
+    TableProps,
+    Tag,
     TimePicker,
     Upload,
     UploadProps
@@ -25,7 +26,6 @@ import {GuestModal} from "../dict/GuestModal";
 import {ContractCellRender} from './ContractCellRender';
 import {DatesCellRender} from "./DatesCellRender";
 import {FlatRoomCellRenderer} from "./FlatRoomCellRender";
-import {flatAPI} from "../../service/FlatService";
 
 const {Dragger} = Upload;
 
@@ -54,6 +54,7 @@ export const GroupGuestModal = (props: ModalProps) => {
     const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
     const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время выселения
     const [selectedRecord, setSelectedRecord] = useState<GuestModel | null>(null);
+    const [s, ss] = useState(true);
     // -----
 
     // Useful utils
@@ -97,7 +98,7 @@ export const GroupGuestModal = (props: ModalProps) => {
             title: 'Секция и комната',
             dataIndex: 'flatName',
             key: 'flatName',
-            render: (val, record: GuestModel) => (<FlatRoomCellRenderer tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.flatId} roomId={record.roomId} setGridData={setData} filialId={props.filialId} hotelId={props.hotelId} bedId={record.bedId} />)
+            render: (val, record: GuestModel) => (<FlatRoomCellRenderer s={s} tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.flatId} roomId={record.roomId} setGridData={setData} filialId={props.filialId} hotelId={props.hotelId} bedId={record.bedId} />)
         },
         {
             title: 'Статус',
@@ -245,6 +246,7 @@ export const GroupGuestModal = (props: ModalProps) => {
                                     else return g;
                                 })
                             });
+                            ss(p=>!p);
                         }
                     }}/>}
             {data == null &&

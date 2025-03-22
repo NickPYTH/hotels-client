@@ -51,6 +51,7 @@ export const GroupReservationModal = (props: ModalProps) => {
     const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время заселения
     const [dateFinish, setDateFinish] = useState<Dayjs | null>(null); // Дата выселения
     const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время выселения
+    const [s, ss] = useState(true);
     // -----
 
     // Useful utils
@@ -88,7 +89,7 @@ export const GroupReservationModal = (props: ModalProps) => {
             title: 'Секция и комната',
             dataIndex: 'bed',
             key: 'bed',
-            render: (val, record: ReservationModel) => (<FlatRoomCellRenderer tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.bed?.room.flat.id} roomId={record.bed?.room.id} setGridData={setData} filialId={selectedFilialId} hotelId={selectedHotelId} bedId={record.bed?.id} />)
+            render: (val, record: ReservationModel) => (<FlatRoomCellRenderer s={s} tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.bed?.room.flat.id} roomId={record.bed?.room.id} setGridData={setData} filialId={selectedFilialId} hotelId={selectedHotelId} bedId={record.bed?.id} />)
         },
         {
             title: 'Статус',
