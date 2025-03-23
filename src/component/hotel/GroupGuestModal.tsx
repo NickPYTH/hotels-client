@@ -98,7 +98,7 @@ export const GroupGuestModal = (props: ModalProps) => {
             title: 'Секция и комната',
             dataIndex: 'flatName',
             key: 'flatName',
-            render: (val, record: GuestModel) => (<FlatRoomCellRenderer s={s} tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.flatId} roomId={record.roomId} setGridData={setData} filialId={props.filialId} hotelId={props.hotelId} bedId={record.bedId} />)
+            render: (val, record: GuestModel) => (<FlatRoomCellRenderer s={s} tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} setGridData={setData} bed={record.bed} hotelId={props.hotelId}/>)
         },
         {
             title: 'Статус',
@@ -242,7 +242,8 @@ export const GroupGuestModal = (props: ModalProps) => {
                         if (guest) {
                             setData((prev: GuestModel[]) => {
                                 return prev.map((g: GuestModel) => {
-                                    if (g.tabnum == guest.tabnum) return {...g, flatName: guest.flatName, roomName: guest.roomName, bedName: guest.bedName, status: "Заселен"};
+                                    if (g.tabnum == guest.tabnum)
+                                        return {...g, status: "Заселен"}; // Todo
                                     else return g;
                                 })
                             });

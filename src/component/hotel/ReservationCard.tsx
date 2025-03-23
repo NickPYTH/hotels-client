@@ -57,7 +57,7 @@ export const ReservationCard = (props:CardProps) => {
                 Дата выселения: {props.reservation?.dateFinish}
             </div>
             <div>
-                Место: {props.reservation?.bedName}
+                Место: {props.reservation?.bed.name}
             </div>
             <Button disabled={isConfirmLoading} style={{marginTop: 5, width: 300}} onClick={openHandler}>Открыть карточку брони</Button>
             <Popconfirm title={"Вы точно хотите подтвердить бронь?"} onConfirm={confirmHandler}>

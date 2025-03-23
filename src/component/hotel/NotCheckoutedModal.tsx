@@ -19,15 +19,23 @@ type GuestCardProps = {
 }
 
 export const NotCheckoutedModal = (props: ModalProps) => {
-    const [checkout, {
-        data: checkoutData,
-    }] = guestAPI.useCheckoutMutation();
-    const [selectedGuest, setSelectedGuest] = useState<GuestModel | null>(null);
+
+    // States
     const [data, setData] = useState<GuestModel[]>([]);
+    const [selectedGuest, setSelectedGuest] = useState<GuestModel | null>(null);
+    // -----
+
+    // Web requests
     const [getGuests, {
         data: guests,
         isLoading,
     }] = flatAPI.useGetAllNotCheckotedBeforeTodayByHotelIdMutation();
+    const [checkout, {
+        data: checkoutData,
+    }] = guestAPI.useCheckoutMutation();
+    // -----
+
+    // Effects
     useEffect(() => {
         getGuests({hotelId: props.hotelId, date: props.selectedDate.format("DD-MM-YYYY HH:mm")})
     }, []);
@@ -40,9 +48,12 @@ export const NotCheckoutedModal = (props: ModalProps) => {
             setSelectedGuest(null);
         }
     }, [checkoutData]);
+    // -----
+
+    // Useful utils
     const GuestCard = (props: GuestCardProps) => {
         return (
-            <Modal onCancel={() => props.setSelectedGuest(null)} visible={true} footer={<></>} title={`${props.guest.lastname} ${props.guest.firstname[0]}. ${props.guest.secondName[0]}.`}
+            <Modal onCancel={() => props.setSelectedGuest(null)} visible={true} footer={<></>} title={`${props.guest.lastname} ${props.guest.firstname ? props.guest.firstname[0]+"." : ""} ${props.guest.secondName ? props.guest.secondName[0]+"." : ""}`}
                    width={450}>
                 <div>
                     Филиал: {props.guest?.filialEmployee}
@@ -74,7 +85,7 @@ export const NotCheckoutedModal = (props: ModalProps) => {
                         if (props.guest) {
                             let periodStart = props.guest.dateStart;
                             let periodEnd = props.guest.dateFinish;
-                            tmpButton.href = `${host}/hotels/api/report/getCheckoutReport?id=${props.guest.id}&roomNumber=${props.guest.roomName}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
+                            tmpButton.href = `${host}/hotels/api/report/getCheckoutReport?id=${props.guest.id}&periodStart=${periodStart}&periodEnd=${periodEnd}`;
                             tmpButton.click();
                         }
                     }}>Отчетный документ</Button>
@@ -87,7 +98,7 @@ export const NotCheckoutedModal = (props: ModalProps) => {
                 </Flex>
             </Modal>
         )
-    }
+    };
     const columns: TableProps<GuestModel>['columns'] = [
         {
             title: 'ИД',
@@ -189,62 +200,69 @@ export const NotCheckoutedModal = (props: ModalProps) => {
         },
         {
             title: 'Филиал',
-            dataIndex: 'filialName',
-            key: 'filialName',
-            sorter: (a, b) => a.filialName.length - b.filialName.length,
+            dataIndex: 'bed',
+            key: 'filial',
+            sorter: (a, b) => a.bed.room.flat.hotel.filial.name.length - b.bed.room.flat.hotel.filial.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === guest.filialName) === undefined)
-                    return acc.concat({text: guest.filialName, value: guest.filialName});
+            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+                let filial = guest.bed.room.flat.hotel.filial;
+                if (acc.find((g: { text: string, value: number }) => g.value == filial.id) === undefined)
+                    return acc.concat({text: filial.name, value: filial.id});
                 else return acc;
             }, []),
+            onFilter: (value: string, record: GuestModel) => {
+                return record.bed.room.flat.hotel.filial.name.indexOf(value) === 0
+            },
             filterSearch: true,
         },
         {
             title: 'Общежитие',
-            dataIndex: 'hotelName',
-            key: 'hotelName',
-            sorter: (a, b) => a.hotelName.length - b.hotelName.length,
+            dataIndex: 'bed',
+            key: 'hotel',
+            sorter: (a, b) => a.bed.room.flat.hotel.name.length - b.bed.room.flat.hotel.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === guest.hotelName) === undefined)
-                    return acc.concat({text: guest.hotelName, value: guest.hotelName});
+            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+                let hotel = guest.bed.room.flat.hotel;
+                if (acc.find((g: { text: string, value: number }) => g.value == hotel.id) === undefined)
+                    return acc.concat({text: hotel.name, value: hotel.id});
                 else return acc;
             }, []),
-            onFilter: (value: any, record: GuestModel) => {
-                return record.hotelName.indexOf(value) === 0
+            onFilter: (value: string, record: GuestModel) => {
+                return record.bed.room.flat.hotel.name.indexOf(value) === 0
             },
             filterSearch: true,
         },
         {
             title: 'Квартира',
-            dataIndex: 'flatName',
-            key: 'flatName',
-            sorter: (a, b) => a.flatName.length - b.flatName.length,
+            dataIndex: 'bed',
+            key: 'flat',
+            sorter: (a, b) => a.bed.room.flat.name.length - b.bed.room.flat.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === guest.flatName) === undefined)
-                    return acc.concat({text: guest.flatName, value: guest.flatName});
+            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+                let flat = guest.bed.room.flat;
+                if (acc.find((g: { text: string, value: number }) => g.value == flat.id) === undefined)
+                    return acc.concat({text: flat.name, value: flat.id});
                 else return acc;
             }, []),
-            onFilter: (value: any, record: GuestModel) => {
-                return record.flatName.indexOf(value) === 0
+            onFilter: (value: string, record: GuestModel) => {
+                return record.bed.room.flat.name.indexOf(value) === 0
             },
             filterSearch: true,
         },
         {
             title: 'Комната',
-            dataIndex: 'roomId',
-            key: 'roomId',
-            sorter: (a, b) => a.roomId - b.roomId,
+            dataIndex: 'bed',
+            key: 'room',
+            sorter: (a, b) => a.bed.room.name.length - b.bed.room.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === guest.roomId.toString()) === undefined)
-                    return acc.concat({text: guest.roomId.toString(), value: guest.roomId.toString()});
+            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+                let room = guest.bed.room;
+                if (acc.find((g: { text: string, value: number }) => g.value == room.id) === undefined)
+                    return acc.concat({text: room.name, value: room.id});
                 else return acc;
             }, []),
-            onFilter: (value: any, record: GuestModel) => {
-                return record.roomId?.toString().indexOf(value) === 0
+            onFilter: (value: string, record: GuestModel) => {
+                return record.bed.room.name.indexOf(value) === 0
             },
             filterSearch: true,
         },
@@ -259,7 +277,9 @@ export const NotCheckoutedModal = (props: ModalProps) => {
             key: 'regPoMestu',
             render: (value) => value ? "Да" : "Нет"
         },
-    ]
+    ];
+    // -----
+
     return (
         <Modal title={`Список не выселенных жильцов на ${props.selectedDate.format('DD-MM-YYYY HH:mm')}`}
                open={props.visible}

@@ -41,7 +41,7 @@ export const GuestCard = (props:CardProps) => {
                 Дата выселения: {props.guest?.dateFinish}
             </div>
             <div>
-                Место: {props.guest?.bedName}
+                Место: {props.guest?.bed.name}
             </div>
             <Button style={{marginTop: 5, width: 280}} onClick={() => {
                 props.setVisibleGuestModal(true);

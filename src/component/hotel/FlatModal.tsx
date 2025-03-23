@@ -252,7 +252,7 @@ export const FlatModal = (props: ModalProps) => {
                                             room?.beds.forEach((bed:{id:number}) => {
                                                 let exist = false;
                                                 room.guests.forEach((guest: GuestModel) => {
-                                                    if (guest.bedId === bed.id) exist = true;
+                                                    if (guest.bed.id == bed.id) exist = true;
                                                 });
                                                 if (!exist) availableBedNumber = bed.id;
                                             });
@@ -269,7 +269,7 @@ export const FlatModal = (props: ModalProps) => {
                                             room?.beds.forEach((bed: { id: number }) => {
                                                 let exist = false;
                                                 room.guests.forEach((guest: GuestModel) => {
-                                                    if (guest.bedId === bed.id) exist = true;
+                                                    if (guest.bed.id == bed.id) exist = true;
                                                 });
                                                 if (!exist) availableBedNumber = bed.id;
                                             });

@@ -159,11 +159,11 @@ export const ReservationModal = (props: ModalProps) => {
             setSelectedFromFilialId(props.semiAutoParams.fromFilial?.id);
             // Поля совпадают, но мне лень переделывать их под ReservationModel
             let tmp: GuestModel = props.semiAutoParams as unknown as GuestModel;
-            setSelectedFilialId(tmp.filialId);
-            setSelectedHotelId(tmp.hotelId);
-            setSelectedFlatId(tmp.flatId);
-            setSelectedRoomId(tmp.roomId);
-            setSelectedBedId(tmp.bedId);
+            setSelectedFilialId(tmp.bed.room.flat.hotel.filial.id);
+            setSelectedHotelId(tmp.bed.room.flat.hotel.id);
+            setSelectedFlatId(tmp.bed.room.flat.id);
+            setSelectedRoomId(tmp.bed.room.id);
+            setSelectedBedId(tmp.bed.id);
             // -----
         }
         // -----

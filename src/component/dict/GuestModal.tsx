@@ -100,15 +100,15 @@ export const GuestModal = (props: ModalProps) => {
         if (props.selectedGuest?.dateFinish) return dayjs(props.selectedGuest.dateFinish.split(" ")[1], 'HH:mm');
         else return dayjs('12:00', 'HH:mm');
     }); // Время выселения
-    const [selectedFilialId, setSelectedFilialId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.filialId : null); // ИД выбранного филиала
+    const [selectedFilialId, setSelectedFilialId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.bed.room.flat.hotel.filial.id : null); // ИД выбранного филиала
     const [filials, setFilials] = useState<FilialModel[]>([]); // Перечень доступных для выбора филиалов
-    const [selectedHotelId, setSelectedHotelId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.hotelId : null); // ИД выбранного общежития
+    const [selectedHotelId, setSelectedHotelId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.bed.room.flat.hotel.id : null); // ИД выбранного общежития
     const [hotels, setHotels] = useState<HotelModel[]>([]); // Перечень достпных для выбора отелей
-    const [selectedFlatId, setSelectedFlatId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.flatId : null); // ИД выбранной секции
+    const [selectedFlatId, setSelectedFlatId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.bed.room.flat.id : null); // ИД выбранной секции
     const [flats, setFlats] = useState<FlatModel[]>([]); // Перечень доступных для выбора секций
-    const [selectedRoomId, setSelectedRoomId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.roomId : null); // ИД выбранной комнаты
+    const [selectedRoomId, setSelectedRoomId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.bed.room.id : null); // ИД выбранной комнаты
     const [rooms, setRooms] = useState<RoomModel[]>([]); // Перечень доступных для выбора комнат
-    const [selectedBedId, setSelectedBedId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.bedId : null); // ИД выбранного места (койко-места)
+    const [selectedBedId, setSelectedBedId] = useState<number | null>(props.selectedGuest ? props.selectedGuest.bed.id : null); // ИД выбранного места (койко-места)
     const [beds, setBeds] = useState<BedModel[]>([]); // Перечень доступных для выбора мест
     const [note, setNote] = useState(""); // Примечание
     const [visibleSelectGuestModal, setVisibleSelectGuestModal] = useState(false);  // Окно выбора проживающего из ранее заселенных жильцов для авто аполнения данных
@@ -197,6 +197,7 @@ export const GuestModal = (props: ModalProps) => {
 
         // Так передаются параметры из модалок массового создания, передаю так т.к. через selectedGuest срабатывает эффект на редактирование существующей записи
         if (props.semiAutoParams) {
+            console.log(props.semiAutoParams)
             setTabnum(props.semiAutoParams.tabnum);
             setReason(props.semiAutoParams.reason);
             setBilling(props.semiAutoParams.billing);
@@ -212,11 +213,11 @@ export const GuestModal = (props: ModalProps) => {
             setSelectedOrganizationId(11);
             getFioByTabnum(props.semiAutoParams.tabnum);
             setMemo("-");
-            setSelectedFilialId(props.semiAutoParams.filialId);
-            setSelectedHotelId(props.semiAutoParams.hotelId);
-            setSelectedFlatId(props.semiAutoParams.flatId);
-            setSelectedRoomId(props.semiAutoParams.roomId);
-            setSelectedBedId(props.semiAutoParams.bedId);
+            setSelectedFilialId(props.semiAutoParams.bed.room.flat.hotel.filial.id);
+            setSelectedHotelId(props.semiAutoParams.bed.room.flat.hotel.id);
+            setSelectedFlatId(props.semiAutoParams.bed.room.flat.id);
+            setSelectedRoomId(props.semiAutoParams.bed.room.id);
+            setSelectedBedId(props.semiAutoParams.bed.id);
         }
         // -----
 
@@ -273,10 +274,10 @@ export const GuestModal = (props: ModalProps) => {
             setFirstname(props.selectedGuest.firstname);
             setLastname(props.selectedGuest.lastname);
             setSecondName(props.selectedGuest.secondName);
-            getAllHotels({filialId: props.selectedGuest.filialId.toString()});
-            getAllFlats({hotelId: props.selectedGuest.hotelId.toString(), dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
-            getAllRooms({flatId: props.selectedGuest.flatId, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
-            getAllBeds({roomId: props.selectedGuest.roomId, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
+            getAllHotels({filialId: props.selectedGuest.bed.room.flat.hotel.filial.id.toString()});
+            getAllFlats({hotelId: props.selectedGuest.bed.room.flat.hotel.id.toString(), dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
+            getAllRooms({flatId: props.selectedGuest.bed.room.flat.id, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
+            getAllBeds({roomId: props.selectedGuest.bed.room.id, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
             setIsEmployee(!!props.selectedGuest.tabnum);
             setTabnum(props.selectedGuest.tabnum);
             setSelectedOrganizationId(!!props.selectedGuest.tabnum ? 11 : props.selectedGuest.organizationId);
@@ -397,7 +398,7 @@ export const GuestModal = (props: ModalProps) => {
                             regPoMestu: updatedGuest.regPoMestu,
                             dateStart: updatedGuest.dateStart,
                             dateFinish: updatedGuest.dateFinish,
-                            bedName: updatedGuest.bedName,
+                            bed: updatedGuest.bed,
                             note: updatedGuest.note,
                         }
                         : p));
@@ -593,23 +594,19 @@ export const GuestModal = (props: ModalProps) => {
             }
             if (ds.includes("00:00")) ds = ds.replace("00:00", "12:00");
             if (df.includes("00:00")) df = df.replace("00:00", "12:00");
+            let bed:any = {
+                id: selectedBedId,
+                name:"",
+                room: {id: selectedRoomId, flat: {id: selectedFlatId, hotel: {id: selectedHotelId, filial: {id: selectedFilialId}}}}
+            }
             let guest: GuestModel = {
                 dateFinish: df,
                 dateStart: ds,
-                filialName: "",
-                filialId: 0,
                 firstname: firstname ? firstname.trim() : null,
-                flatId: 0,
-                flatName: "",
-                hotelName: "",
-                hotelId: 0,
-                bedId: isExtra ? null : selectedBedId, // По этому полю происходит заселение по цепочке тянутся остальные
                 id: null,
                 lastname: lastname ? lastname.trim() : null,
                 note,
                 secondName: secondName ? secondName.trim() : null,
-                roomId: selectedRoomId, // Нужное свойство для создания доп. места
-                roomName: "",
                 tabnum: isEmployee ? tabnum : null,
                 organizationId: selectedOrganizationId,
                 organizationName: "",
@@ -620,6 +617,7 @@ export const GuestModal = (props: ModalProps) => {
                 male,
                 contractId: selectedContractId ?? undefined,
                 familyMemberOfEmployee: familyTabnum,
+                bed
             };
             if (props.selectedGuest) {
                 guest = {...guest, id: props.selectedGuest.id}
@@ -845,13 +843,13 @@ export const GuestModal = (props: ModalProps) => {
                     {(errorCode == 1 && updatedGuest) &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`Указанные даты пересекают существующий период проживания работника ${updatedGuest?.lastname} ${updatedGuest?.firstname} ${updatedGuest?.secondName} (с ${updatedGuest?.dateStart} по ${updatedGuest?.dateFinish}) 
-                        в филиале: "${updatedGuest?.filialName}", общежитии: "${updatedGuest?.hotelName}", секции: "${updatedGuest?.flatName}", комнате  "${updatedGuest?.roomName}", месте  "${updatedGuest?.bedName}"`}
+                        в филиале: "${updatedGuest?.bed.room.flat.hotel.filial.name}", общежитии: "${updatedGuest?.bed.room.flat.hotel.name}", секции: "${updatedGuest?.bed.room.flat.name}", комнате  "${updatedGuest?.bed.room.name}", месте  "${updatedGuest?.bed.name}"`}
                                showIcon/>
                     }
                     {(errorCode == 1 && createdGuest) &&
                         <Alert style={{marginTop: 15}} type={'error'} message={"Ошибка"}
                                description={`Указанные даты пересекают существующий период проживания работника ${createdGuest?.lastname} ${createdGuest?.firstname} ${createdGuest.secondName} (с ${createdGuest?.dateStart} по ${createdGuest?.dateFinish}) 
-                        в филиале: "${createdGuest?.filialName}", общежитии: "${createdGuest?.hotelName}", секции: "${createdGuest?.flatName}", комнате  "${createdGuest?.roomName}", месте  "${createdGuest?.bedName}"`}
+                        в филиале: "${createdGuest?.bed.room.flat.hotel.filial.name}", общежитии: "${createdGuest?.bed.room.flat.hotel.name}", секции: "${createdGuest?.bed.room.flat.name}", комнате  "${createdGuest?.bed.room.name}", месте  "${createdGuest?.bed.name}"`}
                                showIcon/>
                     }
                     {errorCode == 2 &&

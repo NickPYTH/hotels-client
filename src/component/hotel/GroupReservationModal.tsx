@@ -89,7 +89,7 @@ export const GroupReservationModal = (props: ModalProps) => {
             title: 'Секция и комната',
             dataIndex: 'bed',
             key: 'bed',
-            render: (val, record: ReservationModel) => (<FlatRoomCellRenderer s={s} tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} flatId={record.bed?.room.flat.id} roomId={record.bed?.room.id} setGridData={setData} filialId={selectedFilialId} hotelId={selectedHotelId} bedId={record.bed?.id} />)
+            render: (val, record: ReservationModel) => (<FlatRoomCellRenderer hotelId={selectedHotelId} s={s} tabnum={record.tabnum} showWarningMsg={props.showWarningMsg} dateStart={record.dateStart} dateFinish={record.dateFinish} setGridData={setData} bed={record.bed} />)
         },
         {
             title: 'Статус',
@@ -217,6 +217,7 @@ export const GroupReservationModal = (props: ModalProps) => {
                                     else return r;
                                 })
                             });
+                            ss(p=>!p);
                         }
                     }}
                 />

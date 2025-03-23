@@ -79,7 +79,7 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                                                     setVisibleGuestModal(true);
                                                     setSelectedGuest(guest);
                                                 }}
-                                                title={`${guest.lastname} ${guest.firstname[0]}. ${guest.secondName[0]}. ${guest.post ?? ""} ${guest.organizationName ?? ""}`}
+                                                title={`${guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""} ${guest.post ?? ""} ${guest.organizationName ?? ""}`}
                                                 description={
                                                 guest.isReservation ?
                                                     `Бронирование с ${guest.dateStart} по ${guest.dateFinish}.`

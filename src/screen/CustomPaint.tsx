@@ -39,7 +39,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "301")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                     <div>{guest.post}</div>
                                     <div>{guest.filialEmployee}</div>
                                 </>
@@ -69,7 +69,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "302")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -97,7 +97,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "303")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -125,7 +125,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "304")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -153,7 +153,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "305")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -181,7 +181,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "313")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -215,7 +215,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "312")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -243,7 +243,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "311")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -271,7 +271,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "310")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -299,7 +299,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "309")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -327,7 +327,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "308")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -355,7 +355,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "307")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })
@@ -383,7 +383,7 @@ export const CustomPaintScreen = (props: ModalProps) => {
                         {props.flats.find((flat: FlatModel) => flat.floor === 3 && flat.name === "306")?.rooms.map((room: RoomModel) => {
                             return room.guests.map((guest: GuestModel) => (
                                 <>
-                                    <div>{guest.lastname} {guest.firstname[0]}. {guest.secondName[0]}.</div>
+                                    <div>{guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""}</div>
                                 </>
                             ))
                         })

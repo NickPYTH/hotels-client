@@ -11,6 +11,7 @@ import {FilterConfirmProps} from 'antd/es/table/interface';
 import {TableTitleRender} from "../../component/TableTitleRender";
 import {filialAPI} from "../../service/FilialService";
 import {FilialModel} from "../../model/FilialModel";
+import {BedModel} from "../../model/BedModel";
 
 export interface DataType extends GuestModel {
     key: React.Key;
@@ -184,58 +185,76 @@ const GuestScreen: React.FC = () => {
             sorter: (a, b) => dayjs(a.dateFinish, 'DD-MM-YYYY').diff(dayjs(b.dateFinish, 'DD-MM-YYYY')),
         },
         {
-            title: <TableTitleRender title={'Филиал'} />,
-            dataIndex: 'filialName',
-            key: 'filialName',
-            sorter: (a, b) => a.filialName.length - b.filialName.length,
+            title: 'Филиал',
+            dataIndex: 'bed',
+            key: 'filial',
+            render: (bed:BedModel) => (<>{bed.room.flat.hotel.filial.name}</>),
+            sorter: (a, b) => a.bed.room.flat.hotel.filial.name.length - b.bed.room.flat.hotel.filial.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guestsData?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === guest.filialName) === undefined)
-                    return acc.concat({text: guest.filialName, value: guest.filialName});
+            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+                let filial = guest.bed.room.flat.hotel.filial;
+                if (acc.find((g: { text: string, value: number }) => g.value == filial.id) === undefined)
+                    return acc.concat({text: filial.name, value: filial.id});
                 else return acc;
             }, []),
-            onFilter: (value: any, record: GuestModel) => {
-                return record.filialName.indexOf(value) === 0
+            onFilter: (value: string, record: GuestModel) => {
+                return record.bed.room.flat.hotel.filial.name.indexOf(value) === 0
             },
             filterSearch: true,
         },
         {
-            title: <TableTitleRender title={'Общежитие'} />,
-            dataIndex: 'hotelName',
-            key: 'hotelName',
-            sorter: (a, b) => a.hotelName.length - b.hotelName.length,
+            title: 'Общежитие',
+            dataIndex: 'bed',
+            key: 'hotel',
+            render: (bed:BedModel) => (<>{bed.room.flat.hotel.name}</>),
+            sorter: (a, b) => a.bed.room.flat.hotel.name.length - b.bed.room.flat.hotel.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guestsData?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === guest.hotelName) === undefined)
-                    return acc.concat({text: guest.hotelName, value: guest.hotelName});
+            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+                let hotel = guest.bed.room.flat.hotel;
+                if (acc.find((g: { text: string, value: number }) => g.value == hotel.id) === undefined)
+                    return acc.concat({text: hotel.name, value: hotel.id});
                 else return acc;
             }, []),
-            onFilter: (value: any, record: GuestModel) => {
-                return record.hotelName.indexOf(value) === 0
+            onFilter: (value: string, record: GuestModel) => {
+                return record.bed.room.flat.hotel.name.indexOf(value) === 0
             },
             filterSearch: true,
         },
         {
-            title: <TableTitleRender title={'Секция'} />,
-            dataIndex: 'flatName',
-            key: 'flatName',
-            sorter: (a, b) => a.flatName.length - b.flatName.length,
+            title: 'Квартира',
+            dataIndex: 'bed',
+            key: 'flat',
+            render: (bed:BedModel) => (<>{bed.room.flat.name}</>),
+            sorter: (a, b) => a.bed.room.flat.name.length - b.bed.room.flat.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guestsData?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === guest.flatName) === undefined)
-                    return acc.concat({text: guest.flatName, value: guest.flatName});
+            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+                let flat = guest.bed.room.flat;
+                if (acc.find((g: { text: string, value: number }) => g.value == flat.id) === undefined)
+                    return acc.concat({text: flat.name, value: flat.id});
                 else return acc;
             }, []),
-            onFilter: (value: any, record: GuestModel) => {
-                return record.flatName.indexOf(value) === 0
+            onFilter: (value: string, record: GuestModel) => {
+                return record.bed.room.flat.name.indexOf(value) === 0
             },
             filterSearch: true,
         },
         {
-            title: <TableTitleRender title={'Комната'} />,
-            dataIndex: 'roomName',
-            key: 'roomName',
+            title: 'Комната',
+            dataIndex: 'bed',
+            key: 'room',
+            render: (bed:BedModel) => (<>{bed.room.name}</>),
+            sorter: (a, b) => a.bed.room.name.length - b.bed.room.name.length,
             sortDirections: ['descend', 'ascend'],
+            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+                let room = guest.bed.room;
+                if (acc.find((g: { text: string, value: number }) => g.value == room.id) === undefined)
+                    return acc.concat({text: room.name, value: room.id});
+                else return acc;
+            }, []),
+            onFilter: (value: string, record: GuestModel) => {
+                return record.bed.room.name.indexOf(value) === 0
+            },
+            filterSearch: true,
         },
         {
             title: <TableTitleRender title={'Организация'} />,

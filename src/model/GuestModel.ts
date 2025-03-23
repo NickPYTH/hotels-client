@@ -1,3 +1,5 @@
+import {BedModel} from "./BedModel";
+
 export type GuestModel = {
     id: number;
     tabnum: number | null;
@@ -7,14 +9,6 @@ export type GuestModel = {
     note: string;
     dateStart: string;
     dateFinish: string;
-    flatId: number;
-    flatName: string;
-    hotelName: string;
-    hotelId: number;
-    filialName: string;
-    filialId: number;
-    roomId: number;
-    roomName: string;
     organizationId: number;
     organizationName: string;
     regPoMestu: boolean;
@@ -25,6 +19,7 @@ export type GuestModel = {
     error?: string;
     male: boolean;
     email?: string;
+    bed: BedModel;
     daysCount?: number;
     cost?: number;
     costByNight?: number;
@@ -32,8 +27,6 @@ export type GuestModel = {
     checkouted?: boolean;
     contractId?: number;
     contractNumber?: string;
-    bedName?: number;
-    bedId?: number;
     nights?: number;
     isReservation?: boolean;
     familyMemberOfEmployee: number | null;

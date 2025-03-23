@@ -16,19 +16,16 @@ type FlatRoomCellRendererProps = {
     dateStart: string,
     dateFinish: string,
     setGridData: Function,
-    filialId: number,
-    hotelId: number,
-    flatId: number,
-    roomId: number,
-    bedId: number,
+    bed: BedModel,
+    hotelId: number
 }
 
 export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
 
     // States
-    const [selectedFlatId, setSelectedFlatId] = useState<number | null>(props.flatId); // ИД выбранной секции
-    const [selectedRoomId, setSelectedRoomId] = useState<number | null>(props.roomId); // ИД выбранной комнаты
-    const [selectedBedId, setSelectedBedId] = useState<number | null>(props.bedId); // ИД выбранного места
+    const [selectedFlatId, setSelectedFlatId] = useState<number | null>(props.bed?.room.flat.id); // ИД выбранной секции
+    const [selectedRoomId, setSelectedRoomId] = useState<number | null>(props.bed?.room.id); // ИД выбранной комнаты
+    const [selectedBedId, setSelectedBedId] = useState<number | null>(props.bed?.id); // ИД выбранного места
     // -----
 
     // Web requests
@@ -67,10 +64,11 @@ export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
         }
     }, [availableBedFromRequest]);
     useEffect(() => {
-        getAllFlats({hotelId: props.hotelId.toString(), dateStart: props.dateStart, dateFinish: props.dateFinish});
+        if (props.hotelId)
+            getAllFlats({hotelId: props.hotelId.toString(), dateStart: props.dateStart, dateFinish: props.dateFinish});
     }, [props.s]);
     useEffect(() => {
-        if (props.dateStart && props.dateFinish && props.hotelId){
+        if (props.dateStart && props.dateFinish){
             getAllFlats({hotelId: props.hotelId.toString(), dateStart: props.dateStart, dateFinish: props.dateFinish});
         }
     }, [props.dateStart, props.dateFinish])
@@ -84,17 +82,15 @@ export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
         if (selectedBedId)
             props.setGridData((data:GuestModel[]) => {
                 let tmp = JSON.parse(JSON.stringify(data));
+                let bed = bedsFromRequest?.find((b:BedModel) => b.id == selectedBedId);
+                console.log(selectedBedId, bedsFromRequest)
                 return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ?
                     {...guest,
-                        filialId: props.filialId,
-                        hotelId: props.hotelId,
-                        flatId: selectedFlatId,
-                        roomId: selectedRoomId,
-                        bedId: selectedBedId
+                        bed
                     }
                     :guest);
             });
-    }, [selectedBedId])
+    }, [bedsFromRequest])
     // -----
 
     // Handlers
