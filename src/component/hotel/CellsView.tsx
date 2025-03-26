@@ -69,12 +69,12 @@ const selectMonthByDate = (date: Dayjs) => {
 }
 
 // Table component
-const ChessComponent = ({columns, data}) => {
+const ChessComponent = (props: {columns: any, data: any}) => {
     return (<Table<DataType>
         style={{width: window.innerWidth}}
-        loading={data == null}
-        columns={columns}
-        dataSource={data}
+        loading={props.data == null}
+        columns={props.columns}
+        dataSource={props.data}
         bordered={true}
         pagination={{
             defaultPageSize: 400//isFilialUEZS ? 100 : 20,
@@ -105,30 +105,24 @@ export const CellsView = (props: ModalPros) => {
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleReservationModal, setVisibleReservationModal] = useState(false);
     const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(false);
-    const [currentMonth, setCurrentMonth] = useState<string>(() => selectMonthByDate(props.selectedDate));
+    const [currentMonth, setCurrentMonth] = useState<string>(() => selectMonthByDate(props.selectedDate) ?? "Май");
     const [cellsMaleColor] = useState(() => {
-        if (localStorage.getItem("cellsMaleColor")) return localStorage.getItem('cellsMaleColor');
-        return "#75a5f2";
+        return localStorage.getItem('cellsMaleColor') ?? "#75a5f2";
     });
     const [cellsFemaleColor] = useState(() => {
-        if (localStorage.getItem("cellsFemaleColor")) return localStorage.getItem('cellsFemaleColor');
-        return "#f1259b";
+        return localStorage.getItem('cellsFemaleColor') ?? "#f1259b";
     });
     const [fontColor] = useState(() => {
-        if (localStorage.getItem("fontColor")) return localStorage.getItem('fontColor');
-        return "#000";
+        return localStorage.getItem('fontColor') ?? "#000";
     });
     const [columnWidth] = useState(() => {
-        if (localStorage.getItem("columnWidth")) return parseInt(localStorage.getItem('columnWidth'));
-        return 120;
+        return parseInt(localStorage.getItem('columnWidth') ?? "120");
     });
     const [fontSize] = useState(() => {
-        if (localStorage.getItem("fontSize")) return parseInt(localStorage.getItem('fontSize'));
-        return 10;
+        return parseInt(localStorage.getItem('fontSize') ?? "10");
     });
     const [cellBackgroundColor] = useState(() => {
-        if (localStorage.getItem("cellBackgroundColor")) return localStorage.getItem('cellBackgroundColor');
-        return '#e1e1e1';
+        return localStorage.getItem('cellBackgroundColor') ?? '#e1e1e1';
     });
     const [interactiveMode, setInteractiveMode] = useState(false);
     const [isFilialUEZS] = useState(() => props.hotelId === '182' || props.hotelId === '183' || props.hotelId === '184' || props.hotelId === '327');
@@ -149,17 +143,17 @@ export const CellsView = (props: ModalPros) => {
                 dataIndex: 'section',
                 width: 60,
                 onCell: (_: any, index: any) => {
-                    let uniqSectionNames = data.reduce((acc, section: DataType) => {
+                    let uniqSectionNames = data?.reduce((acc, section: DataType) => {
                         if (!acc.includes(section.section))
                             return acc.concat(section.section);
                         return acc;
                     }, [] as string[]);
                     let result;
                     uniqSectionNames.forEach((name: any) => {
-                        let section = data.find((t: DataType) => t.section === name);
+                        let section = data?.find((t: DataType) => t.section === name);
                         if (section) {
-                            let place = data.indexOf(section);
-                            let count = data.filter((t: DataType) => t.section === name).length;
+                            let place = data?.indexOf(section);
+                            let count = data?.filter((t: DataType) => t.section === name).length;
                             if (index === place) {
                                 result = {rowSpan: count};
                             }
@@ -179,17 +173,17 @@ export const CellsView = (props: ModalPros) => {
                     return <div>{record.roomName}</div>
                 },
                 onCell: (_: any, index: any) => {
-                    let uniqRoomNames = data.reduce((acc, room: DataType) => {
+                    let uniqRoomNames = data?.reduce((acc, room: DataType) => {
                         if (!acc.includes(room.room))
                             return acc.concat(room.room);
                         return acc;
                     }, [] as string[]);
                     let result;
                     uniqRoomNames.forEach((name: any) => {
-                        let room = data.find((t: DataType) => t.room === name);
+                        let room = data?.find((t: DataType) => t.room === name);
                         if (room) {
-                            let place = data.indexOf(room);
-                            let count = data.filter((t: DataType) => t.room === name).length;
+                            let place = data?.indexOf(room);
+                            let count = data?.filter((t: DataType) => t.room === name).length;
                             if (index === place) {
                                 result = {rowSpan: count};
                             }
@@ -226,7 +220,7 @@ export const CellsView = (props: ModalPros) => {
                     if (val.split('||').length === 1) { // Если ячейка с одним жильцом
                         let percent = val.split('#')[1]; // Формат строки можно подсмотреть в запросах браузера
                         let fio = val.split('#')[0].split('&')[0];
-                        let startCell = !data.find(d => {
+                        let startCell = !data?.find(d => {
                             if (d.bedId == record.bedId){
                                 let prevDay = dayjs(el, "DD-MM-YYYY").subtract(1, 'day').format("DD-MM-YYYY");
                                 if (record[prevDay]) {
@@ -336,7 +330,7 @@ export const CellsView = (props: ModalPros) => {
 
                         // Разбор данных по жильцу в левой ячейке
                         let fioPersonRight = personRight.split('#')[0].split('&')[0];
-                        let startCell = !data.find(d => {
+                        let startCell = !data?.find(d => {
                             if (d.bedId == record.bedId){
                                 let prevDay = dayjs(el, "DD-MM-YYYY").subtract(1, 'day').format("DD-MM-YYYY");
                                 if (record[prevDay]) {
@@ -493,7 +487,7 @@ export const CellsView = (props: ModalPros) => {
     const selectCellHandler = (el:string, record:any) => {
         let selectedCells = null;
         if (localStorage.getItem('selectedCells'))
-            selectedCells = JSON.parse(localStorage.getItem('selectedCells'));
+            selectedCells = JSON.parse(localStorage.getItem('selectedCells') ?? "");
         let selectedCell: SelectedCellType = {
             recordId: `$$$${record.bedId}${el}`,
             bedId: record.bedId,
@@ -505,20 +499,20 @@ export const CellsView = (props: ModalPros) => {
         };
         if (selectedCells == null) {
             localStorage.setItem('selectedCells', `[${JSON.stringify(selectedCell)}]`);
-            document.getElementById(`$$$${record.bedId}${el}`).classList.add('selectedCell');
+            document.getElementById(`$$$${record.bedId}${el}`)?.classList.add('selectedCell');
         }
         else{
             if (selectedCells.find((el:SelectedCellType) => el.recordId == selectedCell.recordId)) { // Если нажали на туже ячейку
-                document.getElementById(`$$$${record.bedId}${el}`).classList.remove('selectedCell');
+                document.getElementById(`$$$${record.bedId}${el}`)?.classList.remove('selectedCell');
                 selectedCells = selectedCells.filter((el:SelectedCellType) => el.recordId != selectedCell.recordId);
                 if (selectedCells.length == 0) localStorage.removeItem('selectedCells');
                 else localStorage.setItem('selectedCells', JSON.stringify(selectedCells));
             }
             else if (selectedCells[0].bedId != selectedCell.bedId) { // Выбрано другое место, нужно удалить предыдущие выделения
-                [1,2,3,4].forEach(() => Array.prototype.forEach.call(document.getElementsByClassName('selectedCell'), function(el) {
+                [1,2,3,4].forEach(() => Array.prototype.forEach.call(document.getElementsByClassName('selectedCell'), function(el:Element) {
                     el.classList.remove('selectedCell');
                 }));
-                document.getElementById(`$$$${record.bedId}${el}`).classList.add('selectedCell');
+                document.getElementById(`$$$${record.bedId}${el}`)?.classList.add('selectedCell');
                 localStorage.setItem('selectedCells', `[${JSON.stringify(selectedCell)}]`);
             } else {
                 if (selectedCells.length == 1){ // Проверяем возможность заполнения расстояния между ячейками, если одна уже выбрана
@@ -528,17 +522,17 @@ export const CellsView = (props: ModalPros) => {
                     let secondDate: Dayjs = dayjs(secondCell.date, 'DD-MM-YYYY');
                     if (!selectedCells.find((c:SelectedCellType) => c.date == firstCell.date)){
                         selectedCells.push(firstCell);
-                        document.getElementById(`$$$${firstCell.bedId}${firstCell.date}`).classList.add('selectedCell');
+                        document.getElementById(`$$$${firstCell.bedId}${firstCell.date}`)?.classList.add('selectedCell');
                     }
                     while (firstDate.isBefore(secondDate)) { // Проходим по диапазону дат, записываем их и выделяем
                         firstDate = firstDate.add(1, 'day');
                         selectedCells.push({...selectedCell, date: firstDate.format('DD-MM-YYYY')});
-                        document.getElementById(`$$$${record.bedId}${firstDate.format('DD-MM-YYYY')}`).classList.add('selectedCell');
+                        document.getElementById(`$$$${record.bedId}${firstDate.format('DD-MM-YYYY')}`)?.classList.add('selectedCell');
                     }
                     localStorage.setItem('selectedCells', JSON.stringify(selectedCells));
                 } else {
                     selectedCells.push(selectedCell);
-                    document.getElementById(`$$$${record.bedId}${el}`).classList.add('selectedCell');
+                    document.getElementById(`$$$${record.bedId}${el}`)?.classList.add('selectedCell');
                     localStorage.setItem('selectedCells', JSON.stringify(selectedCells));
                 }
             }
@@ -552,7 +546,7 @@ export const CellsView = (props: ModalPros) => {
             props.showWarningMsg('Вы не выбрали ни одного дня');
             return;
         }
-        let selectedCells: SelectedCellType[] = JSON.parse(localStorage.getItem('selectedCells'));
+        let selectedCells: SelectedCellType[] = JSON.parse(localStorage.getItem('selectedCells') ?? "");
         let sorted = selectedCells.sort((a,b) => dayjs(a.date, 'DD-MM-YYYY').diff(dayjs(b.date, 'DD-MM-YYYY')));
         let startCell = sorted[0];
         let finishCell = sorted[sorted.length-1];
@@ -570,7 +564,7 @@ export const CellsView = (props: ModalPros) => {
             props.showWarningMsg('Вы не выбрали ни одного дня');
             return;
         }
-        let selectedCells: SelectedCellType[] = JSON.parse(localStorage.getItem('selectedCells'));
+        let selectedCells: SelectedCellType[] = JSON.parse(localStorage.getItem('selectedCells') ?? "");
         let sorted = selectedCells.sort((a,b) => dayjs(a.date, 'DD-MM-YYYY').diff(dayjs(b.date, 'DD-MM-YYYY')));
         let startCell = sorted[0];
         let finishCell = sorted[sorted.length-1];
@@ -610,7 +604,7 @@ export const CellsView = (props: ModalPros) => {
     useEffect(() => {
         if (!interactiveMode){
             if (localStorage.getItem('selectedCells')) localStorage.removeItem('selectedCells');
-            [1,2,3,4].forEach(() => Array.prototype.forEach.call(document.getElementsByClassName('selectedCell'), function(el) {
+            [1,2,3,4].forEach(() => Array.prototype.forEach.call(document.getElementsByClassName('selectedCell'), function(el: Element) {
                 el.classList.remove('selectedCell');
             }));
         }
@@ -627,7 +621,7 @@ export const CellsView = (props: ModalPros) => {
     return (
         <>
             <CellsViewSettingsModal visible={visibleCellsViewSettings} setVisible={setVisibleCellsViewSettings}/>
-            {visibleGuestModal &&
+            {(visibleGuestModal && dateStart && dateFinish && filialId && hotelId && flatId && roomId && bedId) &&
                 <GuestModal
                     dateStart={dateStart}
                     dateFinish={dateFinish}
@@ -635,14 +629,14 @@ export const CellsView = (props: ModalPros) => {
                     hotelId={hotelId}
                     flatId={flatId}
                     roomId={roomId}
-                    room={null} bedId={bedId} setGuests={() => {
+                    bedId={bedId} setGuests={() => {
                 }} showSuccessMsg={() => {
                 }} isAddressDisabled={false} selectedGuest={null} visible={visibleGuestModal} setVisible={setVisibleGuestModal}
                     refresh={() => {
                         if (props.hotelId)
                             getAllFlats({hotelId: props.hotelId, dateStart: props.chessDateRange[0].format("DD-MM-YYYY"), dateFinish: props.chessDateRange[1].format("DD-MM-YYYY")});
                     }}/>}
-            {visibleReservationModal &&
+            {(visibleReservationModal && dateStart && dateFinish && filialId && hotelId && flatId && roomId && bedId) &&
                 <ReservationModal
                     dateStart={dateStart}
                     dateFinish={dateFinish}

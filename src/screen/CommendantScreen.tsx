@@ -50,18 +50,18 @@ const CommendantScreen: React.FC = () => {
             if (includeEmpty) {
                 if (bedsCountSort) {
                     let deepCopy: HotelModel[] = JSON.parse(JSON.stringify(hotelsData));
-                    setHotels(deepCopy.sort((a, b) => a.bedsCount - b.bedsCount).reverse());
+                    setHotels(deepCopy.sort((a, b) => (a.bedsCount ?? 0) - (b.bedsCount ?? 0)).reverse());
                 } else
                     setHotels(hotelsData);
-            } else setHotels(hotelsData.filter((f: HotelModel) => f.bedsCount > 0));
+            } else setHotels(hotelsData.filter((f: HotelModel) => (f.bedsCount ?? 0) > 0));
     }, [includeEmpty]);
     useEffect(() => {
         if (hotelsData) {
             let deepCopy: HotelModel[] = JSON.parse(JSON.stringify(hotels));
-            if (bedsCountSort) setHotels(deepCopy.sort((a, b) => a.bedsCount - b.bedsCount).reverse());
+            if (bedsCountSort) setHotels(deepCopy.sort((a, b) => (a.bedsCount ?? 0) - (b.bedsCount ?? 0)).reverse());
             else {
                 if (includeEmpty) setHotels(hotelsData);
-                else setHotels(hotelsData.filter((f: HotelModel) => f.bedsCount > 0));
+                else setHotels(hotelsData.filter((f: HotelModel) => (f.bedsCount ?? 0) > 0));
             }
         }
     }, [bedsCountSort]);
@@ -71,7 +71,7 @@ const CommendantScreen: React.FC = () => {
         <Flex gap="middle" align="start" vertical={true} wrap={'wrap'}>
             {messageContextHolder}
             <Flex style={{marginTop: 20, marginLeft: 15}} gap={'small'} align={'center'}>
-                <div style={{marginLeft: 20, fontSize: 24, fontWeight: 600}}>{hotels !== null ? hotels[0]?.filialName : ""}</div>
+                <div style={{marginLeft: 20, fontSize: 24, fontWeight: 600}}>{hotels !== null ? hotels[0]?.filial.name : ""}</div>
                 <Divider style={{height: 44}} type={'vertical'}/>
                 <Flex align={'center'}>
                     <div style={{width: 240, height: 44, wordBreak: 'break-word', whiteSpace: 'normal'}}>Остортировать по убыванию общего колличества мест</div>

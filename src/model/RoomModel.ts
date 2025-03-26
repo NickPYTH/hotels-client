@@ -1,17 +1,17 @@
 import {GuestModel} from "./GuestModel";
 import {FlatModel} from "./FlatModel";
+import {BedModel} from "./BedModel";
+import {StatusModel} from "./StatusModel";
 
 export type RoomModel = {
     id: number;
     name: string;
     bedsCount: number;
-    statusId: number;
-    statusName: string;
-    filialId: number;
-    hotelId: number;
-    flatId: number;
-    roomLockId: number;
-    guests: GuestModel[];
-    beds?: any[];
-    flat?: FlatModel,
+    flat: FlatModel,
+
+    // Вычисляемые поля
+    status: StatusModel | null;
+    roomLockId: number | null;
+    guests: GuestModel[] | null;
+    beds: BedModel[] | null;
 }

@@ -3,11 +3,11 @@ import {ContractModel} from "./ContractModel";
 import {OrganizationModel} from "./OrganizationModel";
 
 export type GuestModel = {
-    id: number;
+    id: number | null;
     tabnum: number | null;
-    firstname: string;
-    lastname: string;
-    secondName: string;
+    firstname: string | null;
+    lastname: string | null;
+    secondName: string | null;
     note: string;
     dateStart: string;
     dateFinish: string;

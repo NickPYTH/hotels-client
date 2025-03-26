@@ -11,14 +11,14 @@ type ContractCellRenderProps = {
     setGridData: Function,
     hotelId: number,
     selectedContract: ContractModel | null,
-    tabnum: number,
+    tabnum: number | null,
 }
 
 export const ContractCellRender = (props:ContractCellRenderProps) => {
 
     // States
     const [reason, setReason] = useState<ReasonModel | null>(null); // Основание
-    const [billing, setBilling] = useState(null); // Вид оплаты
+    const [billing, setBilling] = useState<string | null>(null); // Вид оплаты
     const [contracts, setContracts] = useState<ContractModel[]>(props.contracts);  // Список доступных договоров
     const [selectedContract, setSelectedContract] = useState<ContractModel | null>(props.selectedContract); // Выбранного договора
     // -----
@@ -26,7 +26,7 @@ export const ContractCellRender = (props:ContractCellRenderProps) => {
     // Effects
     useEffect(() => {
         if (props.selectedContract) {
-            if (props.selectedContract.id != selectedContract?.id)
+            if (props.selectedContract.id && props.selectedContract.id != selectedContract?.id)
                 selectContractHandler(props.selectedContract.id);
         }
     }, [props.selectedContract]);
@@ -35,7 +35,7 @@ export const ContractCellRender = (props:ContractCellRenderProps) => {
     // Handlers
     const selectReasonHandler = (reasonId: number) => {
         let reason = props.reasons.find((r: ReasonModel) => r.id == reasonId);
-        setReason(reason);
+        if (reason) setReason(reason);
         setSelectedContract(null);
         setContracts(props.contracts.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id === 11 && c.hotel.id === props.hotelId && (billing ? c.billing == billing : true) && c.reason.id == reasonId));
     }
@@ -46,9 +46,11 @@ export const ContractCellRender = (props:ContractCellRenderProps) => {
     }
     const selectContractHandler = (contractId: number) => {
         let contract = contracts.find((c:ContractModel) => c.id == contractId);
-        setBilling(contract.billing);
-        setReason(contract.reason);
-        setSelectedContract(contract);
+        if (contract) {
+            setBilling(contract.billing);
+            setReason(contract.reason);
+            setSelectedContract(contract);
+        }
         props.setGridData((prev:GuestModel[]) => {
             let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
             return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ? {...guest, contract}:guest);

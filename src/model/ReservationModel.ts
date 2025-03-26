@@ -6,7 +6,7 @@ import {StatusModel} from "./StatusModel";
 
 export type ReservationModel = {
     id: number | null;
-    tabnum: number;
+    tabnum: number | null;
     firstname: string;
     lastname: string;
     secondname: string;
@@ -19,6 +19,7 @@ export type ReservationModel = {
     note: string;
     guest: GuestModel | null;
     status: StatusModel,
+
     // Для вывода ошибок
     error?: string,
     fio?: string

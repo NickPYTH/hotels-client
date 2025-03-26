@@ -9,7 +9,7 @@ type DatesCellRenderProps = {
     setGridData: Function,
     dateTimeStart: string,
     dateTimeFinish: string,
-    tabnum: number,
+    tabnum: number | null,
 }
 
 export const DatesCellRender = (props:DatesCellRenderProps) => {
@@ -54,7 +54,7 @@ export const DatesCellRender = (props:DatesCellRenderProps) => {
             let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
             return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ?
                 {...guest,
-                    dateStart: `${dateStart.format('DD-MM-YYYY')} ${time.format("HH:mm")}`
+                    dateStart: `${dateStart?.format('DD-MM-YYYY')} ${time.format("HH:mm")}`
                 }
                 :guest);
         });
@@ -76,7 +76,7 @@ export const DatesCellRender = (props:DatesCellRenderProps) => {
             let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
             return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ?
                 {...guest,
-                    dateFinish: `${dateFinish.format('DD-MM-YYYY')} ${time.format("HH:mm")}`
+                    dateFinish: `${dateFinish?.format('DD-MM-YYYY')} ${time.format("HH:mm")}`
                 }
                 :guest);
         });

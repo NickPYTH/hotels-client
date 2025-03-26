@@ -42,7 +42,7 @@ export const FilialCard = ({filial, showWarningMsg, date}: CardProps) => {
                 title={filial.name}
                 description={
                     <div style={{marginBottom: 15}}>
-                        <div>Количество общежитий {filialWithStats ? filialWithStats.hotels.length : <Spin style={{marginLeft: 5}} size={'small'}/>}</div>
+                        <div>Количество общежитий {filialWithStats ? filialWithStats.hotels?.length : <Spin style={{marginLeft: 5}} size={'small'}/>}</div>
                         <div>Общее количество мест {filialWithStats ? filialWithStats.bedsCount : <Spin style={{marginLeft: 5}} size={'small'}/>}</div>
                         <div>Количество свободных мест {filialWithStats ? filialWithStats.emptyBedsCount : <Spin style={{marginLeft: 5}} size={'small'}/>}</div>
                         {filialWithStats ?
@@ -54,7 +54,7 @@ export const FilialCard = ({filial, showWarningMsg, date}: CardProps) => {
                                         style={{position: 'absolute', top: 5, right: 5}}
                                         size={'small'}
                                         type="circle"
-                                        percent={Number((100 - (filialWithStats.emptyBedsCount / filialWithStats.bedsCount) * 100).toFixed(1))}/>
+                                        percent={(filialWithStats.emptyBedsCount && filialWithStats.bedsCount) ? Number((100 - (filialWithStats.emptyBedsCount / filialWithStats.bedsCount) * 100).toFixed(1)) : 0}/>
                                 }
                             </Tooltip>
                             :

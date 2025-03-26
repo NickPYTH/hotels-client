@@ -91,7 +91,7 @@ export const NotCheckoutedModal = (props: ModalProps) => {
                     }}>Отчетный документ</Button>
 
                     <Popconfirm title={"Вы уверены?"} onConfirm={() => {
-                        checkout(props.guest.id);
+                        if (props.guest.id) checkout(props.guest.id);
                     }}>
                         <Button style={{marginTop: 5, width: 280}} danger>Выселить</Button>
                     </Popconfirm>
@@ -104,7 +104,7 @@ export const NotCheckoutedModal = (props: ModalProps) => {
             title: 'ИД',
             dataIndex: 'id',
             key: 'id',
-            sorter: (a, b) => a.id - b.id,
+            sorter: (a, b) => (a.id && b.id) ? a.id - b.id : 0,
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend',
         },
@@ -134,15 +134,15 @@ export const NotCheckoutedModal = (props: ModalProps) => {
             title: 'Фамилия',
             dataIndex: 'lastname',
             key: 'lastname',
-            sorter: (a, b) => a.lastname.length - b.lastname.length,
+            sorter: (a, b) => (a.lastname ? a.lastname.length : 0) - (b.lastname ? b.lastname.length : 0),
             sortDirections: ['descend', 'ascend'],
             filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 if (acc.find((g: { text: string, value: string }) => g.text === guest.lastname) === undefined)
-                    return acc.concat({text: guest.lastname, value: guest.lastname});
+                    return acc.concat({text: guest.lastname ?? "", value: guest.lastname ?? ""});
                 else return acc;
             }, []),
             onFilter: (value: any, record: GuestModel) => {
-                return record.lastname.indexOf(value) === 0
+                return record.lastname?.indexOf(value) === 0
             },
             filterSearch: true,
         },
@@ -150,15 +150,15 @@ export const NotCheckoutedModal = (props: ModalProps) => {
             title: 'Имя',
             dataIndex: 'firstname',
             key: 'firstname',
-            sorter: (a, b) => a.firstname.length - b.firstname.length,
+            sorter: (a, b) => (a.firstname ? a.firstname.length : 0) - (b.firstname ? b.firstname.length : 0),
             sortDirections: ['descend', 'ascend'],
             filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 if (acc.find((g: { text: string, value: string }) => g.text === guest.firstname) === undefined)
-                    return acc.concat({text: guest.firstname, value: guest.firstname});
+                    return acc.concat({text: guest.firstname ?? "", value: guest.firstname ?? ""});
                 else return acc;
             }, []),
             onFilter: (value: any, record: GuestModel) => {
-                return record.firstname.indexOf(value) === 0
+                return record.firstname?.indexOf(value) === 0
             },
             filterSearch: true,
         },
@@ -166,15 +166,15 @@ export const NotCheckoutedModal = (props: ModalProps) => {
             title: 'Отчество',
             dataIndex: 'secondName',
             key: 'secondName',
-            sorter: (a, b) => a.secondName.length - b.secondName.length,
+            sorter: (a, b) => (a.secondName ? a.secondName.length : 0) - (b.secondName ? b.secondName.length : 0),
             sortDirections: ['descend', 'ascend'],
             filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 if (acc.find((g: { text: string, value: string }) => g.text === guest.secondName) === undefined)
-                    return acc.concat({text: guest.secondName, value: guest.secondName});
+                    return acc.concat({text: guest.secondName ?? "", value: guest.secondName ?? ""});
                 else return acc;
             }, []),
             onFilter: (value: any, record: GuestModel) => {
-                return record.secondName.indexOf(value) === 0
+                return record.secondName?.indexOf(value) === 0
             },
             filterSearch: true,
         },

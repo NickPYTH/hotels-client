@@ -52,7 +52,7 @@ const HotelScreen: React.FC = () => {
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleManyGuestModal, setVisibleManyGuestModal] = useState(false);
     const [selectedView, setSelectedView] = useState<string>(() => {
-        if (localStorage.getItem("viewMode")) return localStorage.getItem('viewMode'); // 1 - Карточки, 2 - Шахматка, 3 - Таблица
+        if (localStorage.getItem("viewMode")) return localStorage.getItem('viewMode') ?? "1"; // 1 - Карточки, 2 - Шахматка, 3 - Таблица
         return "1";
     });
     // -----
@@ -102,8 +102,8 @@ const HotelScreen: React.FC = () => {
     useEffect(() => {
         if (hideBusy) setFlats(prev => prev ? prev.filter((f: FlatModel) => {
             let all = f.bedsCount;
-            let busy = f.rooms.reduce((acc, room) => {
-                return acc + room.guests.length;
+            let busy = f.rooms?.reduce((acc, room) => {
+                return acc + (room.guests ? room.guests.length : 0);
             }, 0);
             return all !== busy;
         }) : null);
@@ -111,8 +111,8 @@ const HotelScreen: React.FC = () => {
     }, [hideBusy]);
     useEffect(() => {
         if (flatsData) {
-            setHotelName(flatsData[0].hotelName);
-            setFilialId(flatsData[0].filialId);
+            setHotelName(flatsData[0].hotel.name);
+            setFilialId(flatsData[0].hotel.filial.id);
             setFlats(flatsData);
         }
     }, [flatsData]);
@@ -172,11 +172,11 @@ const HotelScreen: React.FC = () => {
                 return;
             }
             let res = flatsData.filter((flat: FlatModel) => {
-                let flats = flat.rooms.filter((room: RoomModel) => {
-                    let res: GuestModel | undefined = room.guests.find((guest: GuestModel) => guest.lastname?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1 || guest.firstname?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1 || guest.secondName?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1);
+                let flats = flat.rooms?.filter((room: RoomModel) => {
+                    let res: GuestModel | undefined = room.guests?.find((guest: GuestModel) => guest.lastname?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1 || guest.firstname?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1 || guest.secondName?.toUpperCase().indexOf(searchText.toUpperCase()) !== -1);
                     return !!res;
                 });
-                if (flats.length > 0) return true;
+                if (flats && flats.length > 0) return true;
                 else return false;
             });
             setFlats(res);
@@ -196,7 +196,7 @@ const HotelScreen: React.FC = () => {
     else
         return (
             <Flex gap="middle" align="start" vertical={true} wrap={'wrap'}>
-                {(thirdFloorPlanModalVisible && flatsData) &&
+                {(thirdFloorPlanModalVisible && flatsData && selectedFlatId && id) &&
                     <ThirdFloorPlanModal
                         setSelectedFlatId={setSelectedFlatId}
                         selectedFlatId={selectedFlatId}
@@ -212,7 +212,7 @@ const HotelScreen: React.FC = () => {
                 }
                 {(notCheckoutModalVisible && id) && <NotCheckoutedModal hotelId={id} visible={notCheckoutModalVisible} setVisible={setNotCheckoutModalVisible} selectedDate={selectedDate}/>}
                 {messageContextHolder}
-                {(visibleManyGuestModal && filialId) &&
+                {(visibleManyGuestModal && filialId && id) &&
                     <GroupGuestModal
                         filialId={filialId}
                         hotelId={parseInt(id)}
@@ -227,8 +227,6 @@ const HotelScreen: React.FC = () => {
                 }
                 {visibleGuestModal &&
                     <GuestModal
-                        room={null}
-                        bedId={null}
                         setGuests={() => {
                         }}
                         showSuccessMsg={showSuccessMsg}
@@ -239,7 +237,7 @@ const HotelScreen: React.FC = () => {
                         refresh={() => {
                             if (id) getAllFlatsSilent({hotelId: id, date: selectedDate.format('DD-MM-YYYY HH:mm')});
                         }}/>}
-                {selectedFlatId &&
+                {(selectedFlatId && id) &&
                     <FlatModal hotelId={id} date={selectedDate} flatId={selectedFlatId} visible={flatModalVisible} setVisible={setFlatModalVisible}/>
                 }
                 <Flex style={{marginTop: 15, marginLeft: 15}} gap={'small'} align={'center'}>
@@ -323,25 +321,25 @@ const HotelScreen: React.FC = () => {
                                         <h2>{floorNumber} этаж</h2>
                                         <div>Всего комнат {flatCount}</div>
                                         <div>Всего мест {flats?.filter((f: FlatModel) => f.floor === floorNumber && !f.tech).reduce(function (acc, flat) {
-                                            return acc + flat.bedsCount;
+                                            return acc + (flat.bedsCount ?? 0);
                                         }, 0)}</div>
                                         <div>Свободных мест {flats?.filter((f: FlatModel) => f.floor === floorNumber && !f.tech).reduce(function (acc, flat) {
-                                            if (flat.statusId === 4) { // Комната занята боряином не считаем
+                                            if (flat.status?.id == 4) { // Комната занята боряином не считаем
                                                 return acc;
-                                            } else {  // Расчет мест только в открытых комнтаха
-                                                return acc + flat.rooms.reduce((acc, room: RoomModel) => {
-                                                    if (room.statusId === 1) { // free
-                                                        return acc + room.bedsCount - room.guests.length;
+                                            } else {  // Расчет мест только в открытых комнатах
+                                                return acc + (flat.rooms?.reduce((acc, room: RoomModel) => {
+                                                    if (room.status?.id == 1) { // free
+                                                        return acc + room.bedsCount - (room.guests ? room.guests.length : 0);
                                                     }
                                                     return acc;
-                                                }, 0);
+                                                }, 0) ?? 0);
                                             }
                                         }, 0)}</div>
                                         <Button onClick={() => {
                                             if (flats) {
                                                 showWarningMsg("Отчет начал формироваться.")
                                                 let tmpButton = document.createElement('a')
-                                                tmpButton.href = `${host}/hotels/api/report/getFloorReport?hotelId=${flats[0].hotelId}&floor=${floorNumber}&date=${selectedDate.format('DD-MM-YYYY HH:mm')}`;
+                                                tmpButton.href = `${host}/hotels/api/report/getFloorReport?hotelId=${flats[0].hotel.id}&floor=${floorNumber}&date=${selectedDate.format('DD-MM-YYYY HH:mm')}`;
                                                 tmpButton.click();
                                             }
                                         }} style={{marginTop: 36, marginBottom: 5, width: 180}}>Скачать отчет по этажу</Button>
@@ -384,7 +382,7 @@ const HotelScreen: React.FC = () => {
                     hotelId={id}
                 />
                 }
-                {(selectedView === '0') &&
+                {(selectedView === '0' && id && flats) &&
                 <Flex>
                     <TableView
                         hotelId={id}

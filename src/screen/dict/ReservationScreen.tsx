@@ -54,7 +54,7 @@ const ReservationScreen: React.FC = () => {
             title: <TableTitleRender title={"ИД"} />,
             dataIndex: 'id',
             key: 'id',
-            sorter: (a, b) => a.id - b.id,
+            sorter: (a, b) => a.id && b.id ? a.id - b.id : 0,
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend'
         },
@@ -107,7 +107,7 @@ const ReservationScreen: React.FC = () => {
             title: <TableTitleRender title={'Табельный номер'} />,
             dataIndex: 'tabnum',
             key: 'tabnum',
-            sorter: (a, b) => a.tabnum - b.tabnum,
+            sorter: (a, b) => (a.tabnum && b.tabnum) ? a.tabnum - b.tabnum : 0,
             sortDirections: ['descend', 'ascend'],
         },
         {
@@ -174,7 +174,7 @@ const ReservationScreen: React.FC = () => {
             dataIndex: '',
             key: 'delete',
             render: (val: any, record: ReservationModel) => (
-                <Popconfirm title={"Удалить бронь?"} onConfirm={() => deleteReservation(record.id)}>
+                <Popconfirm title={"Удалить бронь?"} onConfirm={() => record.id ? deleteReservation(record.id) : console.error("Reservation id error")}>
                     <Button style={{margin: 3}} danger={true}>Удалить</Button>
                 </Popconfirm>
             )

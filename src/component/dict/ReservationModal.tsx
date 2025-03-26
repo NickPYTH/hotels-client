@@ -47,9 +47,9 @@ export const ReservationModal = (props: ModalProps) => {
     const [findByFioMode, setFindByFioMode] = useState(false); // Поиск данных через ФИО
     const [fio, setFio] = useState<string | null>(null);  // ФИО для поиска данных
     const [tabnum, setTabnum] = useState<number | null>(null);  // Табельный номер
-    const [lastname, setLastname] = useState(""); // Фамилия
-    const [firstname, setFirstname] = useState(""); // Имя
-    const [secondname, setSecondname] = useState(""); // Отчество
+    const [lastname, setLastname] = useState<string | null>(null); // Фамилия
+    const [firstname, setFirstname] = useState<string | null>(null); // Имя
+    const [secondname, setSecondname] = useState<string | null>(null); // Отчество
     const [male, setMale] = useState<boolean | null>(null); // Пол ДА - мужской, НЕТ - женский
     const [selectedEventId, setSelectedEventId] = useState<number | null>(null);  // ИД выбранного мероприятия
     const [selectedFromFilialId, setSelectedFromFilialId] = useState<number | null>(null); // ИД филиала отправителя заявки
@@ -136,8 +136,8 @@ export const ReservationModal = (props: ModalProps) => {
             setSelectedFlatId(parseInt(props.flatId.toString()));
             setSelectedRoomId(parseInt(props.roomId.toString()));
             setSelectedBedId(parseInt(props.bedId.toString()));
-            setDateStart(props?.dateStart);
-            setDateFinish(props?.dateFinish);
+            if (props.dateStart) setDateStart(props.dateStart);
+            if (props.dateFinish) setDateFinish(props.dateFinish);
         }
         // -----
 
@@ -170,11 +170,11 @@ export const ReservationModal = (props: ModalProps) => {
     }, []);
     useEffect(() => {
         if (props.room) {
-            setSelectedFilialId(props.room.filialId);
-            setSelectedHotelId(props.room.hotelId);
-            setSelectedFlatId(props.room.flatId);
+            setSelectedFilialId(props.room.flat.hotel.filial.id);
+            setSelectedHotelId(props.room.flat.hotel.id);
+            setSelectedFlatId(props.room.flat.id);
             setSelectedRoomId(props.room.id);
-            setSelectedBedId(props.bedId);
+            if (props.bedId) setSelectedBedId(props.bedId);
         }
     }, [props.room]);
     useEffect(() => {
@@ -196,8 +196,7 @@ export const ReservationModal = (props: ModalProps) => {
     }, [tabnumByFio]);
     useEffect(() => {
         if (props.selectedReservation) {
-            getGuestHistory(props.selectedReservation.id);
-            getFioByTabnum(props.selectedReservation.tabnum);
+            setTabnum(props.selectedReservation.tabnum);
             setLastname(props.selectedReservation.lastname);
             setFirstname(props.selectedReservation.firstname);
             setSecondname(props.selectedReservation.secondname);
@@ -209,12 +208,15 @@ export const ReservationModal = (props: ModalProps) => {
             setSelectedBedId(props.selectedReservation.bed.id);
             setSelectedEventId(props.selectedReservation.event.id);
             setSelectedFromFilialId(props.selectedReservation.fromFilial.id);
+            setNote(props.selectedReservation.note);
             getAllHotels({filialId: props.selectedReservation.bed.room.flat.hotel.filial.id.toString()});
             getAllFlats({hotelId: props.selectedReservation.bed.room.flat.hotel.id.toString(), dateStart: props.selectedReservation.dateStart, dateFinish: props.selectedReservation.dateFinish});
             getAllRooms({flatId: props.selectedReservation.bed.room.flat.id, dateStart: props.selectedReservation.dateStart, dateFinish: props.selectedReservation.dateFinish});
             getAllBeds({roomId: props.selectedReservation.bed.room.id, dateStart: props.selectedReservation.dateStart, dateFinish: props.selectedReservation.dateFinish});
-            setTabnum(props.selectedReservation.tabnum);
-            setNote(props.selectedReservation.note);
+            if (props.selectedReservation.tabnum) getFioByTabnum(props.selectedReservation.tabnum);
+            if (props.selectedReservation.id) {
+                getGuestHistory(props.selectedReservation.id);
+            }
         }
     }, [props.selectedReservation]);
     useEffect(() => {
@@ -224,22 +226,22 @@ export const ReservationModal = (props: ModalProps) => {
     useEffect(() => {
         if (selectedHotelId)
                 getAllFlats({hotelId: selectedHotelId.toString(),
-                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
-                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+                dateStart: dateStart == null ? "null" : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? "null" : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
             });
     }, [selectedHotelId]);
     useEffect(() => {
         if (selectedFlatId)
             getAllRooms({flatId: selectedFlatId,
-                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
-                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+                dateStart: dateStart == null ? "null" : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? "null" : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
             });
     }, [selectedFlatId]);
     useEffect(() => {
         if (selectedRoomId)
             getAllBeds({roomId: selectedRoomId,
-                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
-                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+                dateStart: dateStart == null ? "null" : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? "null" : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
             });
     }, [selectedRoomId]);
     useEffect(() => {
@@ -334,11 +336,11 @@ export const ReservationModal = (props: ModalProps) => {
             if (event && fromFilial) {
                 let reservation: ReservationModel = {
                     id: null,
-                    firstname,
-                    lastname,
-                    secondname,
+                    firstname: firstname ?? "",
+                    lastname: lastname ?? "",
+                    secondname: secondname ?? "",
                     male,
-                    bed: {id: selectedBedId, name: ''},
+                    bed: {id: selectedBedId, name: ''} as unknown as BedModel,
                     dateStart: ds,
                     dateFinish: df,
                     event,
@@ -411,7 +413,7 @@ export const ReservationModal = (props: ModalProps) => {
                                 <div style={{width: 220}}>ФИО</div>
                                 <Input disabled={isGetFioByTabnumLoading}
                                        style={{width: 450}}
-                                       value={fio}
+                                       value={fio ?? ""}
                                        onChange={(e) => setFio(e.target.value)}/>
                                 <Button placeholder={"Введите полностью ФИО через пробел"} disabled={isGetTabnumByFioLoading} style={{marginLeft: 5}}
                                         onClick={() => {
@@ -433,15 +435,15 @@ export const ReservationModal = (props: ModalProps) => {
 
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Фамилия</div>
-                    <Input value={lastname} onChange={(e) => setLastname(e.target.value.trim())}/>
+                    <Input value={lastname ?? ""} onChange={(e) => setLastname(e.target.value.trim())}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Имя</div>
-                    <Input value={firstname} onChange={(e) => setFirstname(e.target.value.trim())}/>
+                    <Input value={firstname ?? ""} onChange={(e) => setFirstname(e.target.value.trim())}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Отчество</div>
-                    <Input value={secondname} onChange={(e) => setSecondname(e.target.value.trim())}/>
+                    <Input value={secondname ?? ""} onChange={(e) => setSecondname(e.target.value.trim())}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 155}}>Пол</div>

@@ -93,23 +93,23 @@ export const ContractModal = (props: ModalProps) => {
 
     // Handlers
     const selectFilialHandler = (filialId:number) => {
-        let filial = filials.find((f:FilialModel) => f.id == filialId);
-        setFilial(filial);
+        let filial = filials?.find((f:FilialModel) => f.id == filialId);
+        if (filial) setFilial(filial);
     }
     const selectHotelHandler = (hotelId:number) => {
-        let hotel = hotels.find((h:HotelModel) => h.id == hotelId);
-        setHotel(hotel);
+        let hotel = hotels?.find((h:HotelModel) => h.id == hotelId);
+        if (hotel) setHotel(hotel);
     }
     const selectOrganizationHandler = (organizationId:number) => {
-        let organization = organizations.find((o:OrganizationModel) => o.id == organizationId);
-        setOrganization(organization);
+        let organization = organizations?.find((o:OrganizationModel) => o.id == organizationId);
+        if (organization) setOrganization(organization);
     }
     const selectReasonHandler = (reasonId:number) => {
-        let reason = reasons.find((r:ReasonModel) => r.id == reasonId);
-        setReason(reason);
+        let reason = reasons?.find((r:ReasonModel) => r.id == reasonId);
+        if (reason) setReason(reason);
     }
     const confirmHandler = () => {
-        if (filial && hotel && cost !== null && docnum && billing && reason) {
+        if (filial && hotel && cost !== null && docnum && billing && reason && organization) {
             let contract: ContractModel = {
                 id: null,
                 cost,

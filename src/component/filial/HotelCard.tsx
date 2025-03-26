@@ -45,7 +45,7 @@ export const HotelCard = ({hotel, showWarningMsg}: CardProps) => {
                                 <Progress style={{position: 'absolute', top: 5, right: 5}}
                                           size={'small'}
                                           type="circle"
-                                          percent={Number((100 - (hotel.emptyBedsCount / hotel.bedsCount) * 100).toFixed(1))}/>
+                                          percent={(hotel.emptyBedsCount && hotel.bedsCount) ? Number((100 - (hotel.emptyBedsCount / hotel.bedsCount) * 100).toFixed(1)) : 0}/>
                             }
                         </Tooltip>
                     </>

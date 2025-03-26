@@ -11,13 +11,13 @@ import {flatAPI} from "../../service/FlatService";
 
 type FlatRoomCellRendererProps = {
     s: boolean,
-    tabnum: number,
+    tabnum: number | null,
     showWarningMsg: Function,
     dateStart: string,
     dateFinish: string,
     setGridData: Function,
     bed: BedModel,
-    hotelId: number
+    hotelId: number | null
 }
 
 export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
@@ -69,7 +69,7 @@ export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
     }, [props.s]);
     useEffect(() => {
         if (props.dateStart && props.dateFinish){
-            getAllFlats({hotelId: props.hotelId.toString(), dateStart: props.dateStart, dateFinish: props.dateFinish});
+            if (props.hotelId) getAllFlats({hotelId: props.hotelId.toString(), dateStart: props.dateStart, dateFinish: props.dateFinish});
         }
     }, [props.dateStart, props.dateFinish])
     useEffect(() => {

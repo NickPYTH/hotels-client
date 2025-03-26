@@ -35,7 +35,7 @@ export const AddGuestExtrasModal = (props: ModalProps) => {
             title: 'ИД',
             dataIndex: 'id',
             key: 'id',
-            sorter: (a, b) => a.id - b.id,
+            sorter: (a, b) => (a.id && b.id) ? a.id - b.id : 0,
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend'
         },
@@ -57,7 +57,7 @@ export const AddGuestExtrasModal = (props: ModalProps) => {
     ]
 
     const addExtraHandler = () => {
-        addGuestExtra({guestId: props.guestId, extraId: selectedRecord.id})
+        if (selectedRecord) addGuestExtra({guestId: props.guestId, extraId: selectedRecord.id})
     }
 
     return (

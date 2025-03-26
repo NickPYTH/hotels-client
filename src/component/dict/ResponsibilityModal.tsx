@@ -18,9 +18,9 @@ export const ResponsibilityModal = (props: ModalProps) => {
 
     // States
     const [tabnum, setTabnum] = useState<number | null>(null);
-    const [firstname, setFirstname] = useState("");
-    const [lastname, setLastname] = useState("");
-    const [secondName, setSecondName] = useState("");
+    const [firstname, setFirstname] = useState<string | null>(null);
+    const [lastname, setLastname] = useState<string | null>(null);
+    const [secondName, setSecondName] = useState<string | null>(null);
     const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null);
     const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
     // -----
@@ -121,15 +121,15 @@ export const ResponsibilityModal = (props: ModalProps) => {
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 146}}>Фамилия</div>
-                    <Input disabled={true} value={lastname} onChange={(e) => setLastname(e.target.value)}/>
+                    <Input disabled={true} value={lastname ?? ""} onChange={(e) => setLastname(e.target.value)}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 146}}>Имя</div>
-                    <Input disabled={true} value={firstname} onChange={(e) => setFirstname(e.target.value)}/>
+                    <Input disabled={true} value={firstname ?? ""} onChange={(e) => setFirstname(e.target.value)}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 146}}>Отчество</div>
-                    <Input disabled={true} value={secondName} onChange={(e) => setSecondName(e.target.value)}/>
+                    <Input disabled={true} value={secondName ?? ""} onChange={(e) => setSecondName(e.target.value)}/>
                 </Flex>
                 <Select
                     value={selectedFilialId}

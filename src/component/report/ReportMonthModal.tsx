@@ -94,7 +94,7 @@ export const ReportMonthModal = (props: ModalProps) => {
                        let tmpButton = document.createElement('a');
                        if (dateRange && selectedEmpFilialId && responsibilityId && reasonId) {
                            if (selectedCehId != null)
-                               tmpButton.href = `${host}/hotels/api/report/getMonthReportByUttist?empFilialId=${selectedEmpFilialId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}&ceh=${uttistCehs.find((ceh: any) => ceh.id === selectedCehId).name}`
+                               tmpButton.href = `${host}/hotels/api/report/getMonthReportByUttist?empFilialId=${selectedEmpFilialId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}&ceh=${uttistCehs?.find((ceh: any) => ceh.id === selectedCehId)?.name}`
                            else
                                tmpButton.href = `${host}/hotels/api/report/getMonthReportByFilial?empFilialId=${selectedEmpFilialId}&responsibilityId=${responsibilityId}&reasonId=${reasonId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&billing=${billing}`
                        }

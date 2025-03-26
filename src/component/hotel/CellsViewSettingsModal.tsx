@@ -1,8 +1,6 @@
-import {Button, Checkbox, ColorPicker, Flex, Form, FormProps, Input, InputNumber, Modal} from "antd";
+import {ColorPicker, Flex, InputNumber, Modal} from "antd";
 import React, {useState} from "react";
 import {AggregationColor} from "antd/es/color-picker/color";
-import {RoomModel} from "../../model/RoomModel";
-import {Dayjs} from "dayjs";
 
 type ModalProps = {
     visible: boolean,
@@ -25,16 +23,13 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
         return "#fff";
     });
     const [columnWidth, setColumnWidth] = useState(() => {
-        if (localStorage.getItem("columnWidth")) return parseInt(localStorage.getItem('columnWidth'));
-        return 140;
+        return parseInt(localStorage.getItem('columnWidth') ?? "140");
     });
     const [fontSize, setFontSize] = useState(() => {
-        if (localStorage.getItem("fontSize")) return parseInt(localStorage.getItem('fontSize'));
-        return 10;
+        return parseInt(localStorage.getItem('fontSize') ?? "10");
     });
     const [cellBackgroundColor, setCellBackgroundColor] = useState(() => {
-        if (localStorage.getItem("cellBackgroundColor")) return localStorage.getItem('cellBackgroundColor');
-        return '#e1e1e1';
+        return localStorage.getItem('cellBackgroundColor') ?? '#e1e1e1';
     });
     // -----
 
@@ -50,16 +45,16 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
             window.location.reload();
         }
     }
-    const updateMaleCellsColor = (_, css:string) => {
+    const updateMaleCellsColor = (_: AggregationColor, css:string) => {
         setCellsMaleColor(css);
     }
-    const updateFemaleCellsColor = (_, css:string) => {
+    const updateFemaleCellsColor = (_: AggregationColor, css:string) => {
         setCellsFemaleColor(css);
     }
-    const updateCellBackgroundColor = (_, css:string) => {
+    const updateCellBackgroundColor = (_: AggregationColor, css:string) => {
         setCellBackgroundColor(css);
     }
-    const updateFontColor = (_, css:string) => {
+    const updateFontColor = (_: AggregationColor, css:string) => {
         setFontColor(css);
     }
     // -----
@@ -89,11 +84,15 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
                 </Flex>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
                     <div style={{width: 200, marginRight: 15}}>Размер текста</div>
-                    <InputNumber min={2} max={28} value={fontSize} onChange={(value) => setFontSize(value)}/>
+                    <InputNumber min={2} max={28} value={fontSize} onChange={(value) => {
+                        if (value) setFontSize(value);
+                    }}/>
                 </Flex>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
                     <div style={{width: 200, marginRight: 15}}>Ширина столбцов</div>
-                    <InputNumber min={70} max={200} value={columnWidth} onChange={(value) => setColumnWidth(value)}/>
+                    <InputNumber min={70} max={200} value={columnWidth} onChange={(value) => {
+                        if (value) setColumnWidth(value);
+                    }}/>
                 </Flex>
             </Flex>
         </Modal>

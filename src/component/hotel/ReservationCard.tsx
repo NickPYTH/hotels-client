@@ -34,10 +34,10 @@ export const ReservationCard = (props:CardProps) => {
 
     // Handlers
     const confirmHandler = () =>  {
-        confirm(props.reservation.id);
+        if (props.reservation.id) confirm(props.reservation.id);
     }
     const deleteHandler = () => {
-        deleteReservation(props.reservation.id);
+        if (props.reservation.id) deleteReservation(props.reservation.id);
     }
     const openHandler = () => {
         props.setVisibleReservationModal(true);

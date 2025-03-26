@@ -4,9 +4,12 @@ export type FilialModel = {
     id: number;
     name: string;
     code: number;
-    hotels: HotelModel[];
-    bedsCount: number;
-    emptyBedsCount: number;
-    emptyBedsCountWithBusy: number;
-    excluded: boolean
+    boss: string;
+    excluded: boolean;
+
+    // Вычисляемые поля
+    hotels: HotelModel[] | null;
+    bedsCount: number | null;
+    emptyBedsCount: number | null;
+    emptyBedsCountWithBusy: number | null;
 }

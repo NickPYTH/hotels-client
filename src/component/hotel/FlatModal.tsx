@@ -83,14 +83,14 @@ export const FlatModal = (props: ModalProps) => {
     }, [visibleGuestModal]);
     useEffect(() => {
         if (checkouted || deletedGuest) getFlat({flatId: props.flatId.toString(), date: props.date.format("DD-MM-YYYY HH:mm")});
-        if (deleteGuest) showSuccessMsg("Запись о проживании удалена");
+        if (deletedGuest) showSuccessMsg("Запись о проживании удалена");
     }, [checkouted, deletedGuest]);
     useEffect(() => {
         if (flat) {
             setNote(flat.note)
-            if (flat.rooms.length > 0)
+            if ((flat.rooms ? flat.rooms.length : 0) > 0)
                 setKey(prev => {
-                    if (prev === "") return flat.rooms[0].id.toString();
+                    if (prev === "" && flat.rooms) return flat.rooms[0].id.toString();
                     else return prev;
                 })
         }
@@ -126,8 +126,8 @@ export const FlatModal = (props: ModalProps) => {
                                visible={visibleRoomLockModal} setVisible={setVisibleRoomLockModal}/>}
             {visibleGuestModal && <GuestModal
                 flatName={flat?.name}
-                bedId={bedId}
-                room={selectedRoom}
+                bedId={bedId ?? undefined}
+                room={selectedRoom ?? undefined}
                 showSuccessMsg={showSuccessMsg}
                 isAddressDisabled={true}
                 selectedGuest={selectedGuest}
@@ -138,8 +138,8 @@ export const FlatModal = (props: ModalProps) => {
                 />}
             {visibleReservationModal &&
                 <ReservationModal
-                    bedId={bedId}
-                    room={selectedRoom}
+                    bedId={bedId ?? undefined}
+                    room={selectedRoom ?? undefined}
                     selectedReservation={selectedReservation}
                     visible={visibleReservationModal}
                     setVisible={setVisibleReservationModal}
@@ -158,7 +158,7 @@ export const FlatModal = (props: ModalProps) => {
                             onConfirm={() => setVisibleFlatLockModal(true)}
                             onCancel={() => setVisibleFlatLocksTimeLineModal(true)}
                         >
-                            <Tag style={{cursor: 'pointer'}}>{flat?.status}</Tag>
+                            <Tag style={{cursor: 'pointer'}}>{flat?.status?.name}</Tag>
                         </Popconfirm>
                     </Flex>
                     <Flex align={'center'}>
@@ -183,7 +183,7 @@ export const FlatModal = (props: ModalProps) => {
                 }}>Сохранить</Button>
             </Flex>
             <Flex gap={'small'} style={{width: '100%'}} align={'center'} wrap={true}>
-                <Tabs style={{width: '100%'}} onChange={(k) => setKey(k)} activeKey={key} items={flat?.rooms.map((room: RoomModel) => ({
+                <Tabs style={{width: '100%'}} onChange={(k) => setKey(k)} activeKey={key} items={flat?.rooms?.map((room: RoomModel) => ({
                     key: room.id.toString(),
                     label: `Комната ${room.name}`,
                     children:
@@ -205,7 +205,7 @@ export const FlatModal = (props: ModalProps) => {
                                         setVisibleRoomLocksTimeLineModal(true);
                                     }}
                                 >
-                                    <Tag style={{cursor: 'pointer'}}>{room.statusName}</Tag>
+                                    <Tag style={{cursor: 'pointer'}}>{room.status?.name}</Tag>
                                 </Popconfirm>
                             </Flex>
                             <Flex>
@@ -219,7 +219,7 @@ export const FlatModal = (props: ModalProps) => {
                                 roomName={room.name}
                             />}
                             <Flex vertical={false} justify={'center'} align={'center'} gap={'small'} wrap={'wrap'}>
-                                {room.guests.map((guest: GuestModel) => {
+                                {room.guests?.map((guest: GuestModel) => {
                                     if (guest.isReservation) return (
                                         <ReservationCard
                                             setVisibleReservationModal={setVisibleReservationModal}
@@ -242,16 +242,16 @@ export const FlatModal = (props: ModalProps) => {
                                         />
                                     )
                                 })}
-                                {room.statusId == 1 && flat.statusId == 1 &&
-                                    (room.guests.length < room.bedsCount) ?
+                                {room.status?.id == 1 && flat.status?.id == 1 &&
+                                    ((room.guests ? room.guests.length : 0) < room.bedsCount) ?
                                     <Flex vertical={true} justify={'center'} align={'center'}>
                                         <Button disabled={currentUser.roleId === 4 || currentUser.roleId === 3} type={'primary'} style={{height: 50, width: 330}} onClick={() => {
                                             setSelectedRoom(room);
                                             setVisibleGuestModal(true);
                                             let availableBedNumber = null;
-                                            room?.beds.forEach((bed:{id:number}) => {
+                                            room?.beds?.forEach((bed:{id:number}) => {
                                                 let exist = false;
-                                                room.guests.forEach((guest: GuestModel) => {
+                                                room.guests?.forEach((guest: GuestModel) => {
                                                     if (guest.bed.id == bed.id) exist = true;
                                                 });
                                                 if (!exist) availableBedNumber = bed.id;
@@ -266,9 +266,9 @@ export const FlatModal = (props: ModalProps) => {
                                             setSelectedRoom(room);
                                             setVisibleReservationModal(true);
                                             let availableBedNumber = null;
-                                            room?.beds.forEach((bed: { id: number }) => {
+                                            room?.beds?.forEach((bed: { id: number }) => {
                                                 let exist = false;
-                                                room.guests.forEach((guest: GuestModel) => {
+                                                room.guests?.forEach((guest: GuestModel) => {
                                                     if (guest.bed.id == bed.id) exist = true;
                                                 });
                                                 if (!exist) availableBedNumber = bed.id;

@@ -27,17 +27,17 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
     const [selectedGuest, setSelectedGuest] = useState<GuestModel | null>(null);
     return (
         <Card style={{minWidth: 300, margin: 8, marginRight: 28, boxShadow: "0px 0px 5px 3px rgba(34, 60, 80, 0.2)"}} onMouseEnter={() => setSpin(true)} onMouseLeave={() => setSpin(false)}>
-            {flat.categoryId === 2 && <StarFilled spin={spin} style={{position: 'absolute', top: 10, right: 10, boxShadow: "0px 0px 5px 3px rgba(34, 60, 80, 0.2)"}}/>}
-            {(flat.statusId == 2 || flat.statusId == 4) &&
-                <Tooltip title={flat.statusId == 2 ? "Секция закрыта от заселения" : "Секция выкуплена организацией"}>
-                    {flat.statusId == 2 ?
+            {flat.category?.id == 2 && <StarFilled spin={spin} style={{position: 'absolute', top: 10, right: 10, boxShadow: "0px 0px 5px 3px rgba(34, 60, 80, 0.2)"}}/>}
+            {(flat.status?.id == 2 || flat.status?.id == 4) &&
+                <Tooltip title={flat.status?.id == 2 ? "Секция закрыта от заселения" : "Секция выкуплена организацией"}>
+                    {flat.status?.id == 2 ?
                         <LockOutlined style={{color: '#d9534f', position: 'absolute', top: 10, left: 7}}/>
                         :
                         <HomeOutlined style={{color: '#f0ad4e', position: 'absolute', top: 26, left: 7}}/>
                     }
                 </Tooltip>
             }
-            {flat.rooms.map((room: RoomModel, i: number) => {
+            {flat.rooms?.map((room: RoomModel, i: number) => {
                 return (
                     <div key={room.id} style={{
                         position: 'absolute',
@@ -58,9 +58,9 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                             setVisible={setVisibleGuestModal}
                             refresh={() => {}}/>}
 
-                        {(room.statusId == 2 || room.statusId == 3) &&
-                            <Tooltip title={room.statusId == 2 ? "Комната закрыта от заселения" : "Комната выкуплена организацией"}>
-                                {room.statusId == 2 ?
+                        {(room.status?.id == 2 || room.status?.id == 3) &&
+                            <Tooltip title={room.status?.id == 2 ? "Комната закрыта от заселения" : "Комната выкуплена организацией"}>
+                                {room.status?.id == 2 ?
                                     <LockOutlined style={{color: '#d9534f', position: 'absolute', top: 10, left: -15}}/>
                                     :
                                     <HomeOutlined style={{color: '#f0ad4e', position: 'absolute', top: 10, left: -15}}/>
@@ -71,7 +71,7 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                             <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}>
                                 К{i + 1}
                             </Flex>
-                            {room.guests.map((guest: GuestModel) => {
+                            {room.guests?.map((guest: GuestModel) => {
                                 let daysBeforeCheckouted = dayjs(guest.dateFinish, "DD-MM-YYYY HH:mm").diff(selectedDate, 'days');
                                 return (
                                     <Popconfirm key={guest.id} cancelText={"Закрыть"} okText={"Открыть"}
@@ -109,15 +109,15 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                                         }
                                     </Popconfirm>)
                             })}
-                            {room.bedsCount - room.guests.length === 1 && <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>}
-                            {room.bedsCount - room.guests.length === 2 && <><Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex><Flex
+                            {room.bedsCount - (room.guests ? room.guests.length : 0) === 1 && <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>}
+                            {room.bedsCount - (room.guests ? room.guests.length : 0) === 2 && <><Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex><Flex
                                 justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex></>}
-                            {room.bedsCount - room.guests.length === 3 && <>
+                            {room.bedsCount - (room.guests ? room.guests.length : 0) === 3 && <>
                                 <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                 <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                 <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                             </>}
-                            {room.bedsCount - room.guests.length === 4 && <>
+                            {room.bedsCount - (room.guests ? room.guests.length : 0) === 4 && <>
                                 <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                 <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                 <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
@@ -128,7 +128,7 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                 )
             })}
             <Card.Meta
-                title={`${flat.name} ${flat.category === "ВИП" ? " - " + flat.category : ""} ${flat.tech ? " - Т/П" : ""}`}
+                title={`${flat.name} ${flat.category?.name == "ВИП" ? " - " + flat.category?.name : ""} ${flat.tech ? " - Т/П" : ""}`}
                 description={
                     <div style={{margin: 5}}>
                         <div>

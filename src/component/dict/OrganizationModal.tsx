@@ -10,7 +10,12 @@ type ModalProps = {
     refresh: Function
 }
 export const OrganizationModal = (props: ModalProps) => {
+
+    // States
     const [name, setName] = useState<string>("");
+    // -----
+
+    // Web requests
     const [createOrganization, {
         data: createdOrganization,
         isLoading: isCreateOrganizationLoading
@@ -19,6 +24,9 @@ export const OrganizationModal = (props: ModalProps) => {
         data: updatedOrganization,
         isLoading: isUpdateOrganizationLoading
     }] = organizationAPI.useUpdateMutation();
+    // -----
+
+    // Effects
     useEffect(() => {
         if (props.selectedOrganization) {
             setName(props.selectedOrganization.name);
@@ -30,6 +38,9 @@ export const OrganizationModal = (props: ModalProps) => {
             props.refresh();
         }
     }, [createdOrganization, updatedOrganization]);
+    // -----
+
+    // Handlers
     const confirmHandler = () => {
         if (name){
             let organization: OrganizationModel = {
@@ -40,6 +51,8 @@ export const OrganizationModal = (props: ModalProps) => {
             else createOrganization(organization);
         }
     }
+    // -----
+
     return (
         <Modal title={props.selectedOrganization ? "Редактирование организации" : "Создание организации"}
                open={props.visible}

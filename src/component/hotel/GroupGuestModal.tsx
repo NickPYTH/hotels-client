@@ -45,7 +45,7 @@ export const GroupGuestModal = (props: ModalProps) => {
     const [mode, setMode] = useState<boolean>(false); // 0 - by tab, 1 - by fio
     const [data, setData] = useState<GuestModel[] | null>(null); // Данные в таблице
     const [reason, setReason] = useState<ReasonModel | null>(null); // Основание
-    const [billing, setBilling] = useState(null); // Вид оплаты
+    const [billing, setBilling] = useState<string | null>(null); // Вид оплаты
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
     const [selectedContract, setSelectedContract] = useState<ContractModel | null>(null); // Выбранный договора
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
@@ -63,7 +63,7 @@ export const GroupGuestModal = (props: ModalProps) => {
             title: 'Табельный номер',
             dataIndex: 'tabnum',
             key: 'tabnum',
-            sorter: (a, b) => a.tabnum - b.tabnum,
+            sorter: (a, b) => (a.tabnum ?? 0) - (b.tabnum ?? 0),
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend'
         },
@@ -86,7 +86,7 @@ export const GroupGuestModal = (props: ModalProps) => {
             title: 'Договор',
             dataIndex: 'contract',
             key: 'contract',
-            render: (val, record:GuestModel) => (<ContractCellRender tabnum={record.tabnum} selectedContract={record.contract} reasons={reasons} contracts={contracts} setGridData={setData} hotelId={props.hotelId} />)
+            render: (val, record:GuestModel) => (<ContractCellRender tabnum={record.tabnum} selectedContract={record.contract} reasons={reasons ?? []} contracts={contracts} setGridData={setData} hotelId={props.hotelId} />)
         },
         {
             title: 'Даты проживания',
@@ -166,21 +166,25 @@ export const GroupGuestModal = (props: ModalProps) => {
     // Handlers
     const selectReasonHandler = (reasonId: number) => {
         let reason = reasons?.find((r: ReasonModel) => r.id == reasonId);
-        setReason(reason);
-        setSelectedContract(null);
-        setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id == 11 && c.hotel.id == props.hotelId && (billing ? c.billing == billing : true) && c.reason.id == reason.id));
+        if (reason) {
+            setReason(reason);
+            setSelectedContract(null);
+            setContracts(contractsFromRequest?.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id == 11 && c.hotel.id == props.hotelId && (billing ? c.billing == billing : true) && c.reason.id == reason?.id) ?? contracts);
+        }
     }
     const selectBillingHandler = (billing: string) => {
-        setBilling(billing);
+        if (billing) setBilling(billing);
         setSelectedContract(null);
-        setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id == 11 && c.hotel.id == props.hotelId && (reason ? c.reason == reason : true) && c.billing == billing));
+        setContracts(contractsFromRequest?.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id == 11 && c.hotel.id == props.hotelId && (reason ? c.reason == reason : true) && c.billing == billing) ?? contracts);
 
     }
     const selectContractHandler = (contractId: number) => {
         let contract = contracts.find((c:ContractModel) => c.id == contractId);
-        setBilling(contract.billing);
-        setReason(contract.reason);
-        setSelectedContract(contract);
+        if (contract) {
+            setBilling(contract.billing);
+            setReason(contract.reason);
+            setSelectedContract(contract);
+        }
     }
     const selectStartDateHandler = (date: Dayjs) => {
         setDateStart(date);
@@ -225,11 +229,9 @@ export const GroupGuestModal = (props: ModalProps) => {
                width={window.innerWidth - 10}
                maskClosable={false}
         >
-            {visibleGuestModal &&
+            {(visibleGuestModal && selectedRecord) &&
                 <GuestModal
                     semiAutoParams={selectedRecord}
-                    room={null}
-                    bedId={null}
                     setGuests={() => {
                     }}
                     showSuccessMsg={() => {

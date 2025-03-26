@@ -126,7 +126,7 @@ const GuestScreen: React.FC = () => {
             title: <TableTitleRender title={'ИД'} />,
             dataIndex: 'id',
             key: 'id',
-            sorter: (a, b) => a.id - b.id,
+            sorter: (a, b) => (a.id && b.id) ? a.id - b.id : 0,
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend',
         },
@@ -289,8 +289,10 @@ const GuestScreen: React.FC = () => {
             filters: guestsData?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 if (guest.filialEmployee && filials) {
                     let filialName = filials.find((f:FilialModel) => f.code.toString() == guest.filialEmployee);
-                    if (acc.find((g: { text: string, value: string }) => g.text === filialName.name) === undefined)
-                        return acc.concat({text: filialName.name, value: guest.filialEmployee});
+                    if (filialName) {
+                        if (acc.find((g: { text: string, value: string }) => g.text === filialName?.name) === undefined)
+                            return acc.concat({text: filialName.name, value: guest.filialEmployee});
+                    }
                 }
                 return acc;
             }, []),
@@ -309,7 +311,7 @@ const GuestScreen: React.FC = () => {
             key: 'delete',
             render: (value, record) =>
                 <Popconfirm title={"Вы точно хотите удалить запись о проживании?"} onConfirm={() => {
-                    deleteGuest(record.id);
+                    if (record.id) deleteGuest(record.id);
                 }}>
                     <Button style={{margin: 5}} danger>Удалить</Button>
                 </Popconfirm>
@@ -340,7 +342,7 @@ const GuestScreen: React.FC = () => {
         <Flex vertical={true}>
             {messageContextHolder}
             {isVisibleGuestModal &&
-                <GuestModal room={null} bedId={null} setGuests={setGuests} showSuccessMsg={showSuccessMsg} isAddressDisabled={false} selectedGuest={selectedGuest} visible={isVisibleGuestModal} setVisible={setIsVisibleGuestModal}
+                <GuestModal setGuests={setGuests} showSuccessMsg={showSuccessMsg} isAddressDisabled={false} selectedGuest={selectedGuest} visible={isVisibleGuestModal} setVisible={setIsVisibleGuestModal}
                             refresh={() => {
                             }}/>}
             <Flex justify={'space-between'}>

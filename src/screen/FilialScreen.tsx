@@ -37,7 +37,7 @@ const FilialScreen: React.FC = () => {
             title: 'ИД',
             dataIndex: 'id',
             key: 'id',
-            sorter: (a, b) => a.id - b.id,
+            sorter: (a, b) => (a.id && b.id) ? a.id - b.id : 0,
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend',
             width: 60
@@ -61,7 +61,7 @@ const FilialScreen: React.FC = () => {
             title: 'Количество секций',
             dataIndex: 'flatsCount',
             key: 'flatsCount',
-            sorter: (a, b) => a.flatsCount - b.flatsCount,
+            sorter: (a, b) => (a.flatsCount && b.flatsCount) ? a.flatsCount - b.flatsCount : 0,
             sortDirections: ['descend', 'ascend'],
             width: 200
         },
@@ -69,7 +69,7 @@ const FilialScreen: React.FC = () => {
             title: 'Общее количество мест',
             dataIndex: 'bedsCount',
             key: 'bedsCount',
-            sorter: (a, b) => a.bedsCount - b.bedsCount,
+            sorter: (a, b) => (a.bedsCount && b.bedsCount) ? a.bedsCount - b.bedsCount : 0,
             sortDirections: ['descend', 'ascend'],
             width: 200
         },
@@ -77,7 +77,7 @@ const FilialScreen: React.FC = () => {
             title: 'Количество свободных мест',
             dataIndex: 'emptyBedsCount',
             key: 'emptyBedsCount',
-            sorter: (a, b) => a.emptyBedsCount - b.emptyBedsCount,
+            sorter: (a, b) => (a.emptyBedsCount && b.emptyBedsCount) ? a.emptyBedsCount - b.emptyBedsCount : 0,
             sortDirections: ['descend', 'ascend'],
             width: 250
         },
@@ -98,7 +98,7 @@ const FilialScreen: React.FC = () => {
         }
     }, []);
     useEffect(() => {
-        if (hotelsDataWithStats) setHotels(hotelsDataWithStats.filter((f: HotelModel) => f.bedsCount > 0));
+        if (hotelsDataWithStats) setHotels(hotelsDataWithStats.filter((f: HotelModel) => (f.bedsCount ?? 0) > 0));
     }, [hotelsDataWithStats]);
     useEffect(() => {
         if (hotelsData) setHotels(hotelsData);
@@ -108,18 +108,18 @@ const FilialScreen: React.FC = () => {
             if (tableMode) {
                 if (bedsCountSort) {
                     let deepCopy: HotelModel[] = JSON.parse(JSON.stringify(hotelsDataWithStats));
-                    setHotels(deepCopy.sort((a, b) => a.bedsCount - b.bedsCount).reverse());
+                    setHotels(deepCopy.sort((a, b) => (a.bedsCount ?? 0) - (b.bedsCount ?? 0)).reverse());
                 } else
                     setHotels(hotelsDataWithStats);
-            } else setHotels(hotelsDataWithStats.filter((f: HotelModel) => f.bedsCount > 0));
+            } else setHotels(hotelsDataWithStats.filter((f: HotelModel) => (f.bedsCount ?? 0) > 0));
     }, [tableMode]);
     useEffect(() => {
         if (hotelsDataWithStats) {
             let deepCopy: HotelModel[] = JSON.parse(JSON.stringify(hotels));
-            if (bedsCountSort) setHotels(deepCopy.sort((a, b) => a.bedsCount - b.bedsCount).reverse());
+            if (bedsCountSort) setHotels(deepCopy.sort((a, b) => (a.bedsCount ?? 0) - (b.bedsCount ?? 0)).reverse());
             else {
                 if (tableMode) setHotels(hotelsDataWithStats);
-                else setHotels(hotelsDataWithStats.filter((f: HotelModel) => f.bedsCount > 0));
+                else setHotels(hotelsDataWithStats.filter((f: HotelModel) => (f.bedsCount ?? 0) > 0));
             }
         }
     }, [bedsCountSort]);
@@ -130,7 +130,7 @@ const FilialScreen: React.FC = () => {
             {messageContextHolder}
             <Flex style={{marginTop: 20, marginLeft: 15}} gap={'small'} align={'center'}>
                 <Button icon={<LeftOutlined/>} type={'primary'} onClick={() => navigate(-1)}>Назад</Button>
-                <div style={{marginLeft: 20, fontSize: 24, fontWeight: 600}}>{hotelsData ? hotelsData[0]?.filialName : ""}</div>
+                <div style={{marginLeft: 20, fontSize: 24, fontWeight: 600}}>{hotelsData ? hotelsData[0]?.filial.name : ""}</div>
                 <Divider style={{height: 44}} type={'vertical'}/>
                 <Flex align={'center'}>
                     <div>Табличный вид</div>

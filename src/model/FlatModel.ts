@@ -1,23 +1,22 @@
 import {RoomModel} from "./RoomModel";
 import {HotelModel} from "./HotelModel";
+import {CategoryModel} from "./CategoryModel";
+import {StatusModel} from "./StatusModel";
 
 export type FlatModel = {
     id: number;
     name: string;
     floor: number;
-    roomsCount: number;
-    statusId: number;
-    status: string;
-    hotelId: number;
-    hotelName: string;
-    filialId:number;
-    bedsCount : number;
-    emptyBedsCount: number;
-    categoryId: number;
-    category: string;
     note: string;
-    rooms: RoomModel[];
-    flatLockId: number;
     tech: boolean;
-    hotel?: HotelModel
+    hotel: HotelModel;
+    category: CategoryModel | null;
+
+    // Вычисляемые поля
+    status: StatusModel | null;
+    roomsCount: number | null;
+    bedsCount : number | null;
+    emptyBedsCount: number | null;
+    flatLockId: number | null;
+    rooms: RoomModel[] | null;
 }

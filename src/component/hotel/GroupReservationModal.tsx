@@ -60,7 +60,7 @@ export const GroupReservationModal = (props: ModalProps) => {
             title: 'Табельный номер',
             dataIndex: 'tabnum',
             key: 'tabnum',
-            sorter: (a, b) => a.tabnum - b.tabnum,
+            sorter: (a, b) => (a.tabnum ?? 0) - (b.tabnum ?? 0),
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend'
         },
@@ -174,16 +174,18 @@ export const GroupReservationModal = (props: ModalProps) => {
                 props.showWarningMsg("Дата заселения указана после даты выселения");
                 return;
             }
-            setData((reservations:ReservationModel[]) => {
+            setData((reservations:ReservationModel[]):any => {
                 let tmp: ReservationModel[] = JSON.parse(JSON.stringify(reservations));
-                let event: EventModel = events?.find((e:EventModel) => e.id == selectedEventId);
-                let filial: FilialModel = filialsFromRequest?.find((f:FilialModel) => f.id == selectedFromFilialId);
-                return tmp.map((res:ReservationModel) => ({...res,
-                    fromFilial: filial,
-                    event,
-                    dateStart: `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`,
-                    dateFinish: `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`
-                }))
+                let event = events?.find((e:EventModel) => e.id == selectedEventId);
+                let filial = filialsFromRequest?.find((f:FilialModel) => f.id == selectedFromFilialId);
+                return tmp.map((res:ReservationModel) => {
+                    if (event && filial) return {...res,
+                        fromFilial: filial,
+                        event,
+                        dateStart: `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`,
+                        dateFinish: `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`
+                    }
+                })
             });
         } else props.showWarningMsg("Некторые поля остались пустыми");
     }
@@ -203,7 +205,7 @@ export const GroupReservationModal = (props: ModalProps) => {
                width={window.innerWidth - 10}
                maskClosable={false}
         >
-            {isVisibleReservationModal &&
+            {(isVisibleReservationModal && selectedReservation) &&
                 <ReservationModal
                     semiAutoParams={selectedReservation}
                     selectedReservation={null}

@@ -77,7 +77,7 @@ export const TableView = (props:ModalProps) => {
             render: (_, flat) => {
                 return(
                     <>
-                        {flat.rooms.map((room: RoomModel, i: number) => {
+                        {flat.rooms?.map((room: RoomModel, i: number) => {
                             return (
                                 <div style={{
                                     padding: 5,
@@ -96,9 +96,9 @@ export const TableView = (props:ModalProps) => {
                                         setVisible={props.setVisibleGuestModal}
                                         refresh={() => {}}/>}
 
-                                    {(room.statusId == 2 || room.statusId == 3) &&
-                                        <Tooltip title={room.statusId == 2 ? "Комната закрыта от заселения" : "Комната выкуплена организацией"}>
-                                            {room.statusId == 2 ?
+                                    {(room.status?.id == 2 || room.status?.id == 3) &&
+                                        <Tooltip title={room.status?.id == 2 ? "Комната закрыта от заселения" : "Комната выкуплена организацией"}>
+                                            {room.status.id == 2 ?
                                                 <LockOutlined style={{color: '#d9534f', position: 'absolute', top: 10, left: -15}}/>
                                                 :
                                                 <HomeOutlined style={{color: '#f0ad4e', position: 'absolute', top: 10, left: -15}}/>
@@ -109,7 +109,7 @@ export const TableView = (props:ModalProps) => {
                                         <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}>
                                             К{i + 1}
                                         </Flex>
-                                        {room.guests.map((guest: GuestModel) => {
+                                        {room.guests?.map((guest: GuestModel) => {
                                             let daysBeforeCheckouted = dayjs(guest.dateFinish, "DD-MM-YYYY HH:mm").diff(props.selectedDate, 'days');
                                             return (
                                                 <Popconfirm cancelText={"Закрыть"} okText={"Открыть"}
@@ -142,15 +142,15 @@ export const TableView = (props:ModalProps) => {
                                                     }
                                                 </Popconfirm>)
                                         })}
-                                        {room.bedsCount - room.guests.length === 1 && <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>}
-                                        {room.bedsCount - room.guests.length === 2 && <><Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex><Flex
+                                        {room.bedsCount - (room.guests?.length ?? 0) === 1 && <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>}
+                                        {room.bedsCount - (room.guests?.length ?? 0) === 2 && <><Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex><Flex
                                             justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex></>}
-                                        {room.bedsCount - room.guests.length === 3 && <>
+                                        {room.bedsCount - (room.guests?.length ?? 0) === 3 && <>
                                             <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                             <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                             <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                         </>}
-                                        {room.bedsCount - room.guests.length === 4 && <>
+                                        {room.bedsCount - (room.guests?.length ?? 0) === 4 && <>
                                             <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                             <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
                                             <Flex justify={'center'} align={'center'} style={{width: 22, height: 22}}><Badge status={'success'}/></Flex>
@@ -168,15 +168,15 @@ export const TableView = (props:ModalProps) => {
             title: 'Колличество комнат',
             dataIndex: 'roomsCount',
             key: 'roomsCount',
-            sorter: (a, b) => a.roomsCount - b.roomsCount,
+            sorter: (a, b) => (a.roomsCount ?? 0) - (b.roomsCount ?? 0),
             sortDirections: ['descend', 'ascend'],
             filters: props.flatsData?.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === flat.roomsCount.toString()) === undefined)
-                    return acc.concat({text: flat.roomsCount.toString(), value: flat.roomsCount.toString()});
+                if (acc.find((g: { text: string, value: string }) => g.text === flat.roomsCount?.toString()) === undefined)
+                    return acc.concat({text: (flat.roomsCount?.toString() ?? ""), value: (flat.roomsCount?.toString() ?? "")});
                 return acc;
             }, []),
             onFilter: (value: any, flat: FlatModel) => {
-                return flat.roomsCount.toString().indexOf(value) === 0
+                return flat.roomsCount?.toString().indexOf(value) === 0
             },
             filterSearch: true,
         },
@@ -184,15 +184,15 @@ export const TableView = (props:ModalProps) => {
             title: 'Свободных мест',
             dataIndex: 'emptyBedsCount',
             key: 'emptyBedsCount',
-            sorter: (a, b) => a.emptyBedsCount - b.emptyBedsCount,
+            sorter: (a, b) => (a.emptyBedsCount ?? 0) - (b.emptyBedsCount ?? 0),
             sortDirections: ['descend', 'ascend'],
             filters: props.flatsData?.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === flat.emptyBedsCount.toString()) === undefined)
-                    return acc.concat({text: flat.emptyBedsCount.toString(), value: flat.emptyBedsCount.toString()});
+                if (acc.find((g: { text: string, value: string }) => g.text === flat.emptyBedsCount?.toString()) === undefined)
+                    return acc.concat({text: (flat.emptyBedsCount?.toString() ?? ""), value: (flat.emptyBedsCount?.toString() ?? "")});
                 return acc;
             }, []),
             onFilter: (value: any, flat: FlatModel) => {
-                return flat.emptyBedsCount.toString().indexOf(value) === 0
+                return flat.emptyBedsCount?.toString().indexOf(value) === 0
             },
             filterSearch: true,
         },
@@ -200,18 +200,28 @@ export const TableView = (props:ModalProps) => {
             title: 'Занятых мест',
             dataIndex: 'busyBedsCount',
             key: 'busyBedsCount',
-            render: (_, flat) => (<div>{flat.bedsCount - flat.emptyBedsCount}</div>),
-            sorter: (a, b) => (a.bedsCount - a.emptyBedsCount) - (b.bedsCount - b.emptyBedsCount),
+            render: (_, flat) => {
+                if (flat.bedsCount != null && flat.emptyBedsCount != null) return flat.bedsCount - flat.emptyBedsCount;
+            },
+            sorter: (a, b) => {
+                if (a.bedsCount != null && a.emptyBedsCount && b.bedsCount != null && b.emptyBedsCount != null)
+                    return (a.bedsCount - a.emptyBedsCount) - (b.bedsCount - b.emptyBedsCount);
+                else return 0;
+            },
             sortDirections: ['descend', 'ascend'],
             filters: props.flatsData?.reduce((acc: { text: string, value: string }[], flat: FlatModel) => {
-                let tmp = flat.bedsCount - flat.emptyBedsCount;
-                if (acc.find((g: { text: string, value: string }) => g.text === tmp.toString()) === undefined)
-                    return acc.concat({text: tmp.toString(), value: tmp.toString()});
-                return acc;
+                if (flat.bedsCount && flat.emptyBedsCount) {
+                    let tmp = flat.bedsCount - flat.emptyBedsCount;
+                    if (acc.find((g: { text: string, value: string }) => g.text === tmp.toString()) === undefined)
+                        return acc.concat({text: tmp.toString(), value: tmp.toString()});
+                    return acc;
+                } else return acc;
             }, []),
             onFilter: (value: any, flat: FlatModel) => {
-                let tmp = flat.bedsCount - flat.emptyBedsCount;
-                return tmp.toString().indexOf(value) === 0
+                if (flat.bedsCount && flat.emptyBedsCount) {
+                    let tmp = flat.bedsCount - flat.emptyBedsCount;
+                    return tmp.toString().indexOf(value) === 0
+                } else return false;
             },
             filterSearch: true,
         },

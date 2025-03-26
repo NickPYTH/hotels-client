@@ -3,7 +3,7 @@ import {
     Alert,
     Badge,
     Button,
-    Checkbox,
+    Checkbox, CheckboxChangeEvent,
     DatePicker,
     Flex,
     Input,
@@ -72,14 +72,14 @@ export const GuestModal = (props: ModalProps) => {
     const [tabnum, setTabnum] = useState<number | null>(null);  // Табельный номер
     const [familyTabnum, setFamilyTabnum] = useState<number | null>(null);  // Табельный номер члена семьи
     const [selectedOrganization, setSelectedOrganization] = useState<OrganizationModel | null>(null); // Выбранная организация
-    const [lastname, setLastname] = useState(""); // Фамилия
-    const [firstname, setFirstname] = useState(""); // Имя
-    const [secondName, setSecondName] = useState(""); // Отчество
+    const [lastname, setLastname] = useState<string | null>(null); // Фамилия
+    const [firstname, setFirstname] = useState<string | null>(null); // Имя
+    const [secondName, setSecondName] = useState<string | null>(null); // Отчество
     const [male, setMale] = useState<boolean | null>(null); // Пол ДА - мужской, НЕТ - женский
     const [memo, setMemo] = useState(""); // Номер маршрутного листа или служебного задания
     const [reason, setReason] = useState<ReasonModel | null>(null); // Выбранное основание
     const [reasons, setReasons] = useState<ReasonModel[]>([]); // Список оснований
-    const [billing, setBilling] = useState(null); // Выбранный вид оплаты
+    const [billing, setBilling] = useState<string | null>(null); // Выбранный вид оплаты
     const [selectedContract, setSelectedContract] = useState<ContractModel | null>(null); // Выбранный договор
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
     const [contractsStep2, setContractsStep2] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) а тут по причине и оплате
@@ -190,8 +190,8 @@ export const GuestModal = (props: ModalProps) => {
             setSelectedFlatId(parseInt(props.flatId.toString()));
             setSelectedRoomId(parseInt(props.roomId.toString()));
             setSelectedBedId(parseInt(props.bedId.toString()));
-            setDateStart(props?.dateStart);
-            setDateFinish(props?.dateFinish);
+            if (props.dateStart) setDateStart(props.dateStart);
+            if (props.dateFinish) setDateFinish(props.dateFinish);
         }
         // -----
     }, []);
@@ -258,12 +258,14 @@ export const GuestModal = (props: ModalProps) => {
                 setFamilyTabnum(props.selectedGuest.familyMemberOfEmployee);
             }
             setNote(props.selectedGuest.note);
-            getAllExtras(props.selectedGuest.id);
+            if (props.selectedGuest.id) {
+                getAllExtras(props.selectedGuest.id);
+                getGuestHistory(props.selectedGuest.id); // В фоне загружаем историю изменений
+            }
             getAllHotels({filialId: props.selectedGuest.bed.room.flat.hotel.filial.id.toString()});
             getAllFlats({hotelId: props.selectedGuest.bed.room.flat.hotel.id.toString(), dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
             getAllRooms({flatId: props.selectedGuest.bed.room.flat.id, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
             getAllBeds({roomId: props.selectedGuest.bed.room.id, dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});
-            getGuestHistory(props.selectedGuest.id); // В фоне загружаем историю изменений
         }
     }, [props.selectedGuest]);
     useEffect(() => {
@@ -281,7 +283,7 @@ export const GuestModal = (props: ModalProps) => {
                 setDateFinish(dayjs(props.semiAutoParams.dateFinish, 'DD-MM-YYYY'));
                 setTimeFinish(dayjs(props.semiAutoParams.dateFinish.split(" ")[1], 'HH:mm'));
             }
-            getFioByTabnum(props.semiAutoParams.tabnum);
+            if (props.semiAutoParams.tabnum) getFioByTabnum(props.semiAutoParams.tabnum);
             setMemo("-");
             setSelectedFilialId(props.semiAutoParams.bed.room.flat.hotel.filial.id);
             setSelectedHotelId(props.semiAutoParams.bed.room.flat.hotel.id);
@@ -293,11 +295,12 @@ export const GuestModal = (props: ModalProps) => {
     }, [props.semiAutoParams]);
     useEffect(() => {
         if (props.room) {
-            setSelectedFilialId(props.room.filialId);
-            setSelectedHotelId(props.room.hotelId);
-            setSelectedFlatId(props.room.flatId);
+            setSelectedFilialId(props.room.flat.hotel.filial.id);
+            setSelectedHotelId(props.room.flat.hotel.id);
+            setSelectedFlatId(props.room.flat.id);
             setSelectedRoomId(props.room.id);
-            setSelectedBedId(props.bedId);
+            setSelectedRoomId(props.room.id);
+            setSelectedBedId(props.bedId ?? null);
             if (!props.bedId) setIsExtra(true);
         }
     }, [props.room]);
@@ -309,28 +312,28 @@ export const GuestModal = (props: ModalProps) => {
         if (selectedHotelId)
             getAllFlats({
                 hotelId: selectedHotelId.toString(),
-                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
-                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+                dateStart: dateStart == null ? "null" : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? "null" : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
             });
     }, [selectedHotelId]);
     useEffect(() => {
         if (selectedFlatId)
             getAllRooms({
                 flatId: selectedFlatId,
-                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
-                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+                dateStart: dateStart == null ? "null" : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? "null" : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
             });
     }, [selectedFlatId]);
     useEffect(() => {
         if (selectedRoomId)
             getAllBeds({
                 roomId: selectedRoomId,
-                dateStart: dateStart == null ? null : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
-                dateFinish: dateFinish == null ? null : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
+                dateStart: dateStart == null ? "null" : `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
+                dateFinish: dateFinish == null ? "null" : `${dateFinish.format('DD-MM-YYYY')} ${timeFinish.format('HH:mm')}`,
             });
     }, [selectedRoomId]);
     useEffect(() => {
-        if (dateStart && dateFinish) {
+        if (dateStart && dateFinish && selectedHotelId && selectedFlatId && selectedRoomId) {
             getAllFlats({
                 hotelId: selectedHotelId.toString(),
                 dateStart: `${dateStart.format('DD-MM-YYYY')} ${timeStart.format('HH:mm')}`,
@@ -359,7 +362,8 @@ export const GuestModal = (props: ModalProps) => {
     }, [selectedContract]);
     useEffect(() => {
         if (organizations && !props.selectedGuest) {
-            setSelectedOrganization(organizations.find((o:OrganizationModel) => o.id == 11));
+            let GTS = organizations.find((o:OrganizationModel) => o.id == 11);
+            if (GTS) setSelectedOrganization(GTS);
         }
     }, [organizations]);
     useEffect(() => {
@@ -426,7 +430,7 @@ export const GuestModal = (props: ModalProps) => {
                         {
                             ...p,
                             tabnum: createdGuest.tabnum,
-                            organization: updatedGuest.organization,
+                            organization: createdGuest.organization,
                             lastname: createdGuest.lastname,
                             firstname: createdGuest.firstname,
                             secondName: createdGuest.secondName,
@@ -515,7 +519,7 @@ export const GuestModal = (props: ModalProps) => {
     const selectFinishTimeHandler = (time: Dayjs) => {
         setTimeFinish(time);
     }
-    const switchIsEmployerHandler = (e) => {
+    const switchIsEmployerHandler = (e: CheckboxChangeEvent) => {
         setIsEmployee(e.target.checked);
         setReason(null);
         setBilling(null);
@@ -526,16 +530,17 @@ export const GuestModal = (props: ModalProps) => {
             setFirstname("");
             setSecondName("");
         } else {
-            setSelectedOrganization(organizations.find((org: OrganizationModel) => org.id == 11));
+            let GTS = organizations?.find((o:OrganizationModel) => o.id == 11);
+            if (GTS) setSelectedOrganization(GTS);
         }
     }
-    const switchIsFamilyMemberOfEmployeeHandler = (e) => {
+    const switchIsFamilyMemberOfEmployeeHandler = (e: CheckboxChangeEvent) => {
         setIsEmployee(false);
         setIsFamilyMemberOfEmployee(e.target.checked);
         if (e.target.checked) {
             // Устанавливаем организацию
             let familyOrg = organizations?.find((org: OrganizationModel) => org.name.toLowerCase().indexOf("семьи") !== -1);
-            setSelectedOrganization(familyOrg);
+            if (familyOrg) setSelectedOrganization(familyOrg);
             // -----
 
             // Устанавливаем договор
@@ -560,14 +565,14 @@ export const GuestModal = (props: ModalProps) => {
         setSecondName("");
     }
     const selectOrganizationHandler = (organizationId: number) => {
-        let organization = organizations.find((o:OrganizationModel) => o.id == organizationId);
+        let organization = organizations?.find((o:OrganizationModel) => o.id == organizationId);
         setFamilyTabnum(null);
-        setSelectedOrganization(organization);
-        setContracts(contractsFromRequest.filter((c: ContractModel) => c.organization.id == organization.id && c.hotel.id === selectedHotelId && c.year == 2025));
+        if (organization) setSelectedOrganization(organization);
+        if (contractsFromRequest) setContracts(contractsFromRequest.filter((c: ContractModel) => c.organization.id == organization?.id && c.hotel.id === selectedHotelId && c.year == 2025));
     }
     const selectReasonHandler = (reasonId: number) => {
         let reason = reasons.find((r:ReasonModel) => r.id == reasonId);
-        setReason(reason);
+        if (reason) setReason(reason);
         setContractsStep2(() => contracts.filter((c: ContractModel) => (billing ? c.billing == billing : true) && (reason ? c.reason.id == reason.id : true)));
         setSelectedContract(null);
     }
@@ -578,14 +583,14 @@ export const GuestModal = (props: ModalProps) => {
     }
     const selectContractHandler = (contractId: number) => {
         let contract = contracts.find((c:ContractModel) => c.id == contractId);
-        setSelectedContract(contract);
+        if (contract) setSelectedContract(contract);
     }
     const confirmHandler = () => {
         if (currentUser.roleId === 4 || currentUser.roleId === 3) {
             showWarningMsg("Вы находитесь в режиме просмотра");
             return;
         }
-        if (firstname && lastname && secondName && dateStart && dateFinish && selectedFlatId && selectedRoomId && memo && male !== null && selectedOrganization) {
+        if (firstname && lastname && secondName && dateStart && dateFinish && selectedFlatId && selectedRoomId && memo && male !== null && selectedOrganization && selectedContract) {
             let ds = `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`;
             let df = `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`;
             if (dayjs(ds, 'DD-MM-YYYY HH:mm').isAfter(dayjs(df, 'DD-MM-YYYY HH:mm'))) {
@@ -659,7 +664,7 @@ export const GuestModal = (props: ModalProps) => {
                                          visible={visibleSelectGuestModal}
                                          setVisible={setVisibleSelectGuestModal} showSuccessMsg={showWarningMsg}/>}
             {(visibleHistoryModal && history) && <HistoryModal visible={visibleHistoryModal} setVisible={setVisibleHistoryModal} history={history}/>}
-            {(visibleExtrasModal && props.selectedGuest) && <GuestExtrasModal visible={visibleExtrasModal} setVisible={setVisibleExtrasModal} guestId={props.selectedGuest.id}/>}
+            {(visibleExtrasModal && props.selectedGuest?.id) && <GuestExtrasModal visible={visibleExtrasModal} setVisible={setVisibleExtrasModal} guestId={props.selectedGuest.id}/>}
             <Flex gap={'middle'} vertical={true}>
                 <Flex align={"center"}>
                     <div style={{width: 155}}>Работник</div>
@@ -680,7 +685,7 @@ export const GuestModal = (props: ModalProps) => {
                                 <div style={{width: 220}}>ФИО</div>
                                 <Input disabled={isGetFioByTabnumLoading}
                                        style={{width: 450}}
-                                       value={fio}
+                                       value={fio??""}
                                        onChange={(e) => setFio(e.target.value)}/>
                                 <Button placeholder={"Введите полностью ФИО через пробел"} disabled={isGetTabnumByFioLoading} style={{marginLeft: 5}}
                                         onClick={() => {
@@ -749,15 +754,15 @@ export const GuestModal = (props: ModalProps) => {
                 }
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Фамилия</div>
-                    <Input disabled={isEmployee} value={lastname} onChange={(e) => setLastname(e.target.value)}/>
+                    <Input disabled={isEmployee} value={lastname??""} onChange={(e) => setLastname(e.target.value)}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Имя</div>
-                    <Input disabled={isEmployee} value={firstname} onChange={(e) => setFirstname(e.target.value)}/>
+                    <Input disabled={isEmployee} value={firstname??""} onChange={(e) => setFirstname(e.target.value)}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 220}}>Отчество</div>
-                    <Input disabled={isEmployee} value={secondName} onChange={(e) => setSecondName(e.target.value)}/>
+                    <Input disabled={isEmployee} value={secondName??""} onChange={(e) => setSecondName(e.target.value)}/>
                 </Flex>
                 <Flex align={"center"}>
                     <div style={{width: 155}}>Пол</div>

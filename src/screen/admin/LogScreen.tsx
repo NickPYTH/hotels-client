@@ -30,7 +30,7 @@ const LogScreen: React.FC = () => {
             title: 'ИД',
             dataIndex: 'id',
             key: 'id',
-            sorter: (a, b) => a.id - b.id,
+            sorter: (a, b) => (a.id && b.id) ? a.id - b.id : 0,
             sortDirections: ['descend', 'ascend'],
             defaultSortOrder: 'descend'
         },
