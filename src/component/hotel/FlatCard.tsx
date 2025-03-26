@@ -39,7 +39,7 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
             }
             {flat.rooms.map((room: RoomModel, i: number) => {
                 return (
-                    <div style={{
+                    <div key={room.id} style={{
                         position: 'absolute',
                         padding: 5,
                         paddingRight: 8,
@@ -74,12 +74,12 @@ export const FlatCard = ({flat, setVisible, setSelectedFlatId, selectedDate}: Ca
                             {room.guests.map((guest: GuestModel) => {
                                 let daysBeforeCheckouted = dayjs(guest.dateFinish, "DD-MM-YYYY HH:mm").diff(selectedDate, 'days');
                                 return (
-                                    <Popconfirm cancelText={"Закрыть"} okText={"Открыть"}
+                                    <Popconfirm key={guest.id} cancelText={"Закрыть"} okText={"Открыть"}
                                                 onConfirm={() => {
                                                     setVisibleGuestModal(true);
                                                     setSelectedGuest(guest);
                                                 }}
-                                                title={`${guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""} ${guest.post ?? ""} ${guest.organizationName ?? ""}`}
+                                                title={`${guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.secondName ? guest.secondName[0]+"." : ""} ${guest.post ?? ""} ${guest.organization ? guest.organization.name : ""}`}
                                                 description={
                                                 guest.isReservation ?
                                                     `Бронирование с ${guest.dateStart} по ${guest.dateFinish}.`

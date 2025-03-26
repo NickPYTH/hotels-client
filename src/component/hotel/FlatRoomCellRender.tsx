@@ -83,7 +83,6 @@ export const FlatRoomCellRenderer = (props:FlatRoomCellRendererProps) => {
             props.setGridData((data:GuestModel[]) => {
                 let tmp = JSON.parse(JSON.stringify(data));
                 let bed = bedsFromRequest?.find((b:BedModel) => b.id == selectedBedId);
-                console.log(selectedBedId, bedsFromRequest)
                 return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ?
                     {...guest,
                         bed

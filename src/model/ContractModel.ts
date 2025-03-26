@@ -1,17 +1,17 @@
+import {ReasonModel} from "./ReasonModel";
+import {FilialModel} from "./FilialModel";
+import {HotelModel} from "./HotelModel";
+import {OrganizationModel} from "./OrganizationModel";
+
 export type ContractModel = {
-    id: number;
-    filial: string;
-    filialId: number;
-    hotel: string;
-    hotelId: number;
-    organization: string | null;
-    organizationId: number | null;
+    id: number | null;
+    reason: ReasonModel;
+    filial: FilialModel;
+    hotel: HotelModel;
+    organization: OrganizationModel;
     docnum: string;
     cost: number;
     note: string;
-    reason?: string;
-    reasonId?: number;
-    billing?: string;
+    billing: string;
     year: number;
-    roomNumber: number | null;
 }

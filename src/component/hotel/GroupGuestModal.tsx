@@ -44,10 +44,10 @@ export const GroupGuestModal = (props: ModalProps) => {
     // States
     const [mode, setMode] = useState<boolean>(false); // 0 - by tab, 1 - by fio
     const [data, setData] = useState<GuestModel[] | null>(null); // Данные в таблице
-    const [reason, setReason] = useState(null); // Основание
+    const [reason, setReason] = useState<ReasonModel | null>(null); // Основание
     const [billing, setBilling] = useState(null); // Вид оплаты
     const [contracts, setContracts] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) фильтр по оргам и году и отелю
-    const [selectedContractId, setSelectedContractId] = useState<number | null>(null); // ИД выбранного договора
+    const [selectedContract, setSelectedContract] = useState<ContractModel | null>(null); // Выбранный договора
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [dateStart, setDateStart] = useState<Dayjs | null>(null); // Дата заселения
     const [timeStart, setTimeStart] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время заселения
@@ -86,7 +86,7 @@ export const GroupGuestModal = (props: ModalProps) => {
             title: 'Договор',
             dataIndex: 'contract',
             key: 'contract',
-            render: (val, record:GuestModel) => (<ContractCellRender tabnum={record.tabnum} selectedContractId={record.contractId} reasons={reasons} contracts={contracts} setGridData={setData} hotelId={props.hotelId} />)
+            render: (val, record:GuestModel) => (<ContractCellRender tabnum={record.tabnum} selectedContract={record.contract} reasons={reasons} contracts={contracts} setGridData={setData} hotelId={props.hotelId} />)
         },
         {
             title: 'Даты проживания',
@@ -119,7 +119,6 @@ export const GroupGuestModal = (props: ModalProps) => {
             }}>Заселить</Button>)
         },
     ]
-
     const uploadProps: UploadProps = {
         name: 'file',
         multiple: false,
@@ -159,28 +158,29 @@ export const GroupGuestModal = (props: ModalProps) => {
     }, [])
     useEffect(() => {
         if (contractsFromRequest) {
-            setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === props.hotelId));
+            setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id == 11 && c.hotel.id == props.hotelId));
         }
     }, [contractsFromRequest]);
     // -----
 
     // Handlers
-    const selectReasonHandler = (reason: string) => {
+    const selectReasonHandler = (reasonId: number) => {
+        let reason = reasons?.find((r: ReasonModel) => r.id == reasonId);
         setReason(reason);
-        setSelectedContractId(null);
-        setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === props.hotelId && (billing ? c.billing == billing : true) && c.reason == reason));
+        setSelectedContract(null);
+        setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id == 11 && c.hotel.id == props.hotelId && (billing ? c.billing == billing : true) && c.reason.id == reason.id));
     }
     const selectBillingHandler = (billing: string) => {
         setBilling(billing);
-        setSelectedContractId(null);
-        setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === props.hotelId && (reason ? c.reason == reason : true) && c.billing == billing));
+        setSelectedContract(null);
+        setContracts(contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id == 11 && c.hotel.id == props.hotelId && (reason ? c.reason == reason : true) && c.billing == billing));
 
     }
-    const selectContractHandler = (id: number) => {
-        let contract = contracts.find((c:ContractModel) => c.id == id);
+    const selectContractHandler = (contractId: number) => {
+        let contract = contracts.find((c:ContractModel) => c.id == contractId);
         setBilling(contract.billing);
         setReason(contract.reason);
-        setSelectedContractId(id);
+        setSelectedContract(contract);
     }
     const selectStartDateHandler = (date: Dayjs) => {
         setDateStart(date);
@@ -195,7 +195,7 @@ export const GroupGuestModal = (props: ModalProps) => {
         setTimeFinish(time);
     }
     const fillTableHandler = () => {
-        if (selectedContractId && reason && billing && dateStart && dateFinish) {
+        if (selectedContract && reason && billing && dateStart && dateFinish) {
             if (dateStart.isAfter(dateFinish)){
                 props.showWarningMsg("Дата заселения указана после даты выселения");
                 return;
@@ -205,7 +205,7 @@ export const GroupGuestModal = (props: ModalProps) => {
                 return tmp.map((guest:GuestModel) => ({...guest,
                     reason,
                     billing,
-                    contractId: selectedContractId,
+                    contract: selectedContract,
                     dateStart: `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`,
                     dateFinish: `${dateFinish.format("DD-MM-YYYY")} ${timeFinish.format("HH:mm")}`
 
@@ -286,11 +286,11 @@ export const GroupGuestModal = (props: ModalProps) => {
                                 <div style={{width: 120}}>Основание</div>
                                 <Select
                                     loading={isReasonsLoading}
-                                    value={reason}
+                                    value={reason ? reason.id : null}
                                     placeholder={"Выберите основание"}
                                     style={{width: 300}}
                                     onChange={selectReasonHandler}
-                                    options={reasons?.filter((r: ReasonModel) => r.isDefault).map((r: ReasonModel) => ({value: r.name, label: r.name}))}
+                                    options={reasons?.map((r: ReasonModel) => ({value: r.id, label: r.name}))}
                                 />
                             </Flex>
                             <Flex align={"center"} style={{marginBottom: 5}}>
@@ -307,7 +307,7 @@ export const GroupGuestModal = (props: ModalProps) => {
                                 <div style={{width: 120}}>Договор</div>
                                 <Select
                                     loading={isContractsLoading}
-                                    value={selectedContractId}
+                                    value={selectedContract ? selectedContract.id : null}
                                     placeholder={"Перед выбором договора заполните предыдущие поля"}
                                     style={{width: 300}}
                                     onChange={selectContractHandler}

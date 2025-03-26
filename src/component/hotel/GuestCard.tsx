@@ -20,7 +20,7 @@ export const GuestCard = (props:CardProps) => {
               bordered={true}
               style={{width: 340}}>
             <div>
-                Филиал: {props.guest?.filialEmployee}
+                {props.guest?.filialEmployee ? `Филиал: ${props.guest.filialEmployee}` : `Организация: ${props.guest?.organization?.name}`}
             </div>
             <div>
                 Должность: {props.guest?.post}

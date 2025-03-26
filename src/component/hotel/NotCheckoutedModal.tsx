@@ -62,7 +62,7 @@ export const NotCheckoutedModal = (props: ModalProps) => {
                     Должность: {props.guest?.post}
                 </div>
                 <div>
-                    № договор: {props.guest?.contractNumber}
+                    № договор: {props.guest?.contract.docnum}
                 </div>
                 <div>
                     Общая стоимость проживания: {props.guest?.cost}

@@ -10,56 +10,59 @@ type ContractCellRenderProps = {
     contracts: ContractModel[],
     setGridData: Function,
     hotelId: number,
-    selectedContractId: number | null,
+    selectedContract: ContractModel | null,
     tabnum: number,
 }
 
 export const ContractCellRender = (props:ContractCellRenderProps) => {
 
     // States
-    const [reason, setReason] = useState(null); // Основание
+    const [reason, setReason] = useState<ReasonModel | null>(null); // Основание
     const [billing, setBilling] = useState(null); // Вид оплаты
     const [contracts, setContracts] = useState<ContractModel[]>(props.contracts);  // Список доступных договоров
-    const [selectedContractId, setSelectedContractId] = useState<number | null>(props.selectedContractId); // ИД выбранного договора
+    const [selectedContract, setSelectedContract] = useState<ContractModel | null>(props.selectedContract); // Выбранного договора
     // -----
 
     // Effects
     useEffect(() => {
-        if (props.selectedContractId) selectContractHandler(props.selectedContractId);
-    }, [props.selectedContractId]);
+        if (props.selectedContract) {
+            if (props.selectedContract.id != selectedContract?.id)
+                selectContractHandler(props.selectedContract.id);
+        }
+    }, [props.selectedContract]);
     // -----
 
     // Handlers
-    const selectReasonHandler = (reason: string) => {
+    const selectReasonHandler = (reasonId: number) => {
+        let reason = props.reasons.find((r: ReasonModel) => r.id == reasonId);
         setReason(reason);
-        setSelectedContractId(null);
-        setContracts(props.contracts.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === props.hotelId && (billing ? c.billing == billing : true) && c.reason == reason));
+        setSelectedContract(null);
+        setContracts(props.contracts.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id === 11 && c.hotel.id === props.hotelId && (billing ? c.billing == billing : true) && c.reason.id == reasonId));
     }
     const selectBillingHandler = (billing: string) => {
         setBilling(billing);
-        setSelectedContractId(null);
-        setContracts(props.contracts.filter((c: ContractModel) => c.year == dayjs().year() && c.organizationId === 11 && c.hotelId === props.hotelId && (reason ? c.reason == reason : true) && c.billing == billing));
-
+        setSelectedContract(null);
+        setContracts(props.contracts.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id === 11 && c.hotel.id === props.hotelId && (reason ? c.reason == reason : true) && c.billing == billing));
     }
-    const selectContractHandler = (id: number) => {
-        let contract = contracts.find((c:ContractModel) => c.id == id);
+    const selectContractHandler = (contractId: number) => {
+        let contract = contracts.find((c:ContractModel) => c.id == contractId);
         setBilling(contract.billing);
         setReason(contract.reason);
-        setSelectedContractId(id);
+        setSelectedContract(contract);
         props.setGridData((prev:GuestModel[]) => {
             let tmp: GuestModel[] = JSON.parse(JSON.stringify(prev));
-            return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ? {...guest, contractId: id}:guest);
+            return tmp.map((guest: GuestModel) => guest.tabnum == props.tabnum ? {...guest, contract}:guest);
         });
     }
     // -----
 
     return <Flex vertical={true}>
         <Select
-            value={reason}
+            value={reason ? reason.id : null}
             placeholder={"Основание"}
             style={{width: 200, margin: 3}}
             onChange={selectReasonHandler}
-            options={props.reasons.filter((r: ReasonModel) => r.isDefault).map((r: ReasonModel) => ({value: r.name, label: r.name}))}
+            options={props.reasons.map((r: ReasonModel) => ({value: r.id, label: r.name}))}
         />
         <Select
             value={billing}
@@ -69,7 +72,7 @@ export const ContractCellRender = (props:ContractCellRenderProps) => {
             options={[{value: "наличный расчет", label: "наличный расчет"}, {value: "безналичный расчет", label: "безналичный расчет"}]}
         />
         <Select
-            value={selectedContractId}
+            value={selectedContract ? selectedContract.id : null}
             placeholder={"Договор"}
             style={{width: 200, margin: 3}}
             onChange={selectContractHandler}

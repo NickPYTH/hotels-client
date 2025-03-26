@@ -21,10 +21,10 @@ type ModalProps = {
 export const ContractModal = (props: ModalProps) => {
 
     // States
-    const [filial, setFilial] = useState<number | null>(null);
-    const [hotel, setHotel] = useState<number | null>(null);
-    const [organization, setOrganization] = useState<number | null>(null);
-    const [reason, setReason] = useState<number | null>(null);
+    const [filial, setFilial] = useState<FilialModel | null>(null);
+    const [hotel, setHotel] = useState<HotelModel | null>(null);
+    const [organization, setOrganization] = useState<OrganizationModel | null>(null);
+    const [reason, setReason] = useState<ReasonModel | null>(null);
     const [billing, setBilling] = useState<string | null>(null);
     const [docnum, setDocnum] = useState<string>("");
     const [cost, setCost] = useState<number>(0);
@@ -66,20 +66,20 @@ export const ContractModal = (props: ModalProps) => {
         getAllReasons();
     }, []);
     useEffect(() => {
-        if (filial) getAllHotels({filialId: filial.toString()});
+        if (filial) getAllHotels({filialId: filial.id.toString()});
         else setHotel(null);
     }, [filial])
     useEffect(() => {
         if (props.selectedContract) {
-            setFilial(props.selectedContract.filialId);
-            setHotel(props.selectedContract.hotelId);
-            setOrganization(props.selectedContract.organizationId);
+            setFilial(props.selectedContract.filial);
+            setHotel(props.selectedContract.hotel);
+            setOrganization(props.selectedContract.organization);
             setDocnum(props.selectedContract.docnum);
             setCost(props.selectedContract.cost);
             setNote(props.selectedContract.note);
-            setBilling(props.selectedContract.billing ?? "");
+            setBilling(props.selectedContract.billing);
             setYear(props.selectedContract.year);
-            if (props.selectedContract.reasonId) setReason(props.selectedContract.reasonId);
+            setReason(props.selectedContract.reason);
         }
     }, [props.selectedContract]);
     useEffect(() => {
@@ -92,23 +92,35 @@ export const ContractModal = (props: ModalProps) => {
     // -----
 
     // Handlers
+    const selectFilialHandler = (filialId:number) => {
+        let filial = filials.find((f:FilialModel) => f.id == filialId);
+        setFilial(filial);
+    }
+    const selectHotelHandler = (hotelId:number) => {
+        let hotel = hotels.find((h:HotelModel) => h.id == hotelId);
+        setHotel(hotel);
+    }
+    const selectOrganizationHandler = (organizationId:number) => {
+        let organization = organizations.find((o:OrganizationModel) => o.id == organizationId);
+        setOrganization(organization);
+    }
+    const selectReasonHandler = (reasonId:number) => {
+        let reason = reasons.find((r:ReasonModel) => r.id == reasonId);
+        setReason(reason);
+    }
     const confirmHandler = () => {
         if (filial && hotel && cost !== null && docnum && billing && reason) {
             let contract: ContractModel = {
+                id: null,
                 cost,
                 docnum,
-                filialId: filial,
-                filial: "",
-                hotel: "",
-                hotelId: hotel,
-                id: 0,
-                organization: "",
-                organizationId: organization,
+                filial,
+                hotel,
+                organization,
                 note,
-                billing: billing.toString(),
-                reason: reason.toString(),
+                billing,
+                reason,
                 year,
-                roomNumber: props?.selectedContract?.roomNumber ?? null,
             };
             if (props.selectedContract) updateContract({...contract, id: props.selectedContract.id});
             else createContract(contract);
@@ -129,10 +141,10 @@ export const ContractModal = (props: ModalProps) => {
                 <Select
                     disabled={isGetAllFilialsLoading}
                     loading={isGetAllFilialsLoading}
-                    value={filial}
+                    value={filial ? filial.id : null}
                     placeholder={"Выберите филиал"}
                     style={{width: '100%'}}
-                    onChange={(e) => setFilial(e)}
+                    onChange={selectFilialHandler}
                     options={filials?.map((f: FilialModel) => ({value: f.id, label: f.name}))}
                     allowClear={true}
                     showSearch
@@ -142,10 +154,10 @@ export const ContractModal = (props: ModalProps) => {
                 <Select
                     disabled={filial === null || isGetAllHotelsLoading}
                     loading={isGetAllHotelsLoading}
-                    value={hotel}
+                    value={hotel ? hotel.id : null}
                     placeholder={"Выберите отель"}
                     style={{width: '100%'}}
-                    onChange={(e) => setHotel(e)}
+                    onChange={selectHotelHandler}
                     options={hotels?.map((f: HotelModel) => ({value: f.id, label: f.name}))}
                     allowClear={true}
                     showSearch
@@ -155,10 +167,10 @@ export const ContractModal = (props: ModalProps) => {
                 <Select
                     disabled={isGetAllOrganizationsLoading}
                     loading={isGetAllOrganizationsLoading}
-                    value={organization}
+                    value={organization ? organization.id : null}
                     placeholder={"Выберите организцацию"}
                     style={{width: '100%'}}
-                    onChange={(e) => setOrganization(e)}
+                    onChange={selectOrganizationHandler}
                     options={organizations?.map((f: OrganizationModel) => ({value: f.id, label: f.name}))}
                     allowClear={true}
                     showSearch
@@ -198,10 +210,10 @@ export const ContractModal = (props: ModalProps) => {
                     <Select
                         disabled={isGetAllReasonsLoading}
                         loading={isGetAllReasonsLoading}
-                        value={reason}
+                        value={reason ? reason.id : null}
                         placeholder={"Выберите основание"}
                         style={{width: '100%'}}
-                        onChange={(e) => setReason(e)}
+                        onChange={selectReasonHandler}
                         options={reasons?.map((f: ReasonModel) => ({value: f.id, label: f.name}))}
                         allowClear={true}
                         showSearch

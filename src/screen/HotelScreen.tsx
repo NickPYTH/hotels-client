@@ -318,7 +318,7 @@ const HotelScreen: React.FC = () => {
                         let flatCount = flats?.filter((f: FlatModel) => f.floor === floorNumber && !f.tech)?.length;
                         if (flatCount)
                             return (
-                                <Flex style={{marginRight: 15, marginLeft: 15}} gap="middle" align="start" vertical={false} justify="center">
+                                <Flex key={floorNumber+flatCount} style={{marginRight: 15, marginLeft: 15}} gap="middle" align="start" vertical={false} justify="center">
                                     <div style={{width: 200}}>
                                         <h2>{floorNumber} этаж</h2>
                                         <div>Всего комнат {flatCount}</div>
@@ -352,9 +352,9 @@ const HotelScreen: React.FC = () => {
                                         <Flex>
                                             {flats?.filter((f: FlatModel) => f.floor === floorNumber).map((flat: FlatModel) => {
                                                     if (flat.tech === false) return (
-                                                        <FlatCard selectedDate={selectedDate} flat={flat} setVisible={setFlatModalVisible} setSelectedFlatId={setSelectedFlatId}/>);
+                                                        <FlatCard key={flat.id} selectedDate={selectedDate} flat={flat} setVisible={setFlatModalVisible} setSelectedFlatId={setSelectedFlatId}/>);
                                                     if (hideTech === false) return (
-                                                        <FlatCard selectedDate={selectedDate} flat={flat} setVisible={setFlatModalVisible} setSelectedFlatId={setSelectedFlatId}/>);
+                                                        <FlatCard key={flat.id} selectedDate={selectedDate} flat={flat} setVisible={setFlatModalVisible} setSelectedFlatId={setSelectedFlatId}/>);
                                                 }
                                             )}
                                         </Flex>

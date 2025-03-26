@@ -12,6 +12,7 @@ import {TableTitleRender} from "../../component/TableTitleRender";
 import {filialAPI} from "../../service/FilialService";
 import {FilialModel} from "../../model/FilialModel";
 import {BedModel} from "../../model/BedModel";
+import {OrganizationModel} from "../../model/OrganizationModel";
 
 export interface DataType extends GuestModel {
     key: React.Key;
@@ -188,17 +189,17 @@ const GuestScreen: React.FC = () => {
             title: 'Филиал',
             dataIndex: 'bed',
             key: 'filial',
-            render: (bed:BedModel) => (<>{bed.room.flat.hotel.filial.name}</>),
-            sorter: (a, b) => a.bed.room.flat.hotel.filial.name.length - b.bed.room.flat.hotel.filial.name.length,
+            render: (bed:BedModel) => bed.room.flat.hotel.filial.name,
+            sorter: (a, b) => a.bed.room.flat.hotel.filial.name.charCodeAt(0) - b.bed.room.flat.hotel.filial.name.charCodeAt(0),
             sortDirections: ['descend', 'ascend'],
-            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 let filial = guest.bed.room.flat.hotel.filial;
-                if (acc.find((g: { text: string, value: number }) => g.value == filial.id) === undefined)
-                    return acc.concat({text: filial.name, value: filial.id});
+                if (acc.find((g: { text: string, value: string }) => g.text == filial.name) === undefined)
+                    return acc.concat({text: filial.name, value: filial.name});
                 else return acc;
             }, []),
             onFilter: (value: string, record: GuestModel) => {
-                return record.bed.room.flat.hotel.filial.name.indexOf(value) === 0
+                return record.bed.room.flat.hotel.filial.name.indexOf(value) == 0;
             },
             filterSearch: true,
         },
@@ -206,17 +207,17 @@ const GuestScreen: React.FC = () => {
             title: 'Общежитие',
             dataIndex: 'bed',
             key: 'hotel',
-            render: (bed:BedModel) => (<>{bed.room.flat.hotel.name}</>),
-            sorter: (a, b) => a.bed.room.flat.hotel.name.length - b.bed.room.flat.hotel.name.length,
+            render: (bed:BedModel) => bed.room.flat.hotel.name,
+            sorter: (a, b) => a.bed.room.flat.hotel.name.charCodeAt(0) - b.bed.room.flat.hotel.name.charCodeAt(0),
             sortDirections: ['descend', 'ascend'],
-            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 let hotel = guest.bed.room.flat.hotel;
-                if (acc.find((g: { text: string, value: number }) => g.value == hotel.id) === undefined)
-                    return acc.concat({text: hotel.name, value: hotel.id});
+                if (acc.find((g: { text: string, value: string }) => g.value == hotel.name) === undefined)
+                    return acc.concat({text: hotel.name, value: hotel.name});
                 else return acc;
             }, []),
             onFilter: (value: string, record: GuestModel) => {
-                return record.bed.room.flat.hotel.name.indexOf(value) === 0
+                return record.bed.room.flat.hotel.name.indexOf(value) == 0;
             },
             filterSearch: true,
         },
@@ -227,14 +228,14 @@ const GuestScreen: React.FC = () => {
             render: (bed:BedModel) => (<>{bed.room.flat.name}</>),
             sorter: (a, b) => a.bed.room.flat.name.length - b.bed.room.flat.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 let flat = guest.bed.room.flat;
-                if (acc.find((g: { text: string, value: number }) => g.value == flat.id) === undefined)
-                    return acc.concat({text: flat.name, value: flat.id});
+                if (acc.find((g: { text: string, value: string }) => g.value == flat.name) === undefined)
+                    return acc.concat({text: flat.name, value: flat.name});
                 else return acc;
             }, []),
             onFilter: (value: string, record: GuestModel) => {
-                return record.bed.room.flat.name.indexOf(value) === 0
+                return record.bed.room.flat.name.indexOf(value) == 0;
             },
             filterSearch: true,
         },
@@ -245,30 +246,32 @@ const GuestScreen: React.FC = () => {
             render: (bed:BedModel) => (<>{bed.room.name}</>),
             sorter: (a, b) => a.bed.room.name.length - b.bed.room.name.length,
             sortDirections: ['descend', 'ascend'],
-            filters: guests?.reduce((acc: { text: string, value: number }[], guest: GuestModel) => {
+            filters: guests?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 let room = guest.bed.room;
-                if (acc.find((g: { text: string, value: number }) => g.value == room.id) === undefined)
-                    return acc.concat({text: room.name, value: room.id});
+                if (acc.find((g: { text: string, value: string }) => g.value == room.name) === undefined)
+                    return acc.concat({text: room.name, value: room.name});
                 else return acc;
             }, []),
             onFilter: (value: string, record: GuestModel) => {
-                return record.bed.room.name.indexOf(value) === 0
+                return record.bed.room.name.indexOf(value) == 0;
             },
             filterSearch: true,
         },
         {
             title: <TableTitleRender title={'Организация'} />,
-            dataIndex: 'organizationName',
-            key: 'organizationName',
+            dataIndex: 'organization',
+            key: 'organization',
+            render: (org:OrganizationModel) => (org.name),
             filters: guestsData?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
-                if (guest.organizationName) {
-                    if (acc.find((g: { text: string, value: string }) => g.text === guest.organizationName) === undefined)
-                        return acc.concat({text: guest.organizationName, value: guest.organizationName});
+                let organization = guest.organization;
+                if (organization) {
+                    if (acc.find((g: { text: string, value: string }) => g.value == organization.name) === undefined)
+                        return acc.concat({text: organization.name, value: guest.organization.name});
+                    return acc;
                 }
-                return acc;
             }, []),
-            onFilter: (value: any, record: GuestModel) => {
-                return record.organizationName.indexOf(value) === 0
+            onFilter: (value: string, record: GuestModel) => {
+                return record.organization?.name.indexOf(value) == 0;
             },
             filterSearch: true,
         },
@@ -285,9 +288,9 @@ const GuestScreen: React.FC = () => {
             },
             filters: guestsData?.reduce((acc: { text: string, value: string }[], guest: GuestModel) => {
                 if (guest.filialEmployee && filials) {
-                    let filialName = filials.find((f:FilialModel) => f.code.toString() == guest.filialEmployee)?.name;
-                    if (acc.find((g: { text: string, value: string }) => g.text === filialName) === undefined)
-                        return acc.concat({text: filialName, value: guest.filialEmployee});
+                    let filialName = filials.find((f:FilialModel) => f.code.toString() == guest.filialEmployee);
+                    if (acc.find((g: { text: string, value: string }) => g.text === filialName.name) === undefined)
+                        return acc.concat({text: filialName.name, value: guest.filialEmployee});
                 }
                 return acc;
             }, []),
@@ -349,6 +352,7 @@ const GuestScreen: React.FC = () => {
                 }} style={{width: 100, margin: 10}}>Отчет</Button>
             </Flex>
             <Table
+                bordered
                 style={{width: '100vw'}}
                 columns={columns}
                 dataSource={guests}

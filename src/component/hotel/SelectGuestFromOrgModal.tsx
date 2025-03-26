@@ -9,7 +9,7 @@ type ModalProps = {
     visible: boolean,
     setVisible: Function,
     showSuccessMsg: Function,
-    selectedOrganizationId: number,
+    selectedOrganization: OrganizationModel,
     organizations: OrganizationModel[],
     setFirstname: Function,
     setLastname: Function,
@@ -17,11 +17,19 @@ type ModalProps = {
     setMale: Function,
 }
 export const SelectGuestFromOrgModal = (props: ModalProps) => {
+
+    // States
     const [selectedRecord, setSelectedRecord] = useState<GuestModel | null>(null);
+    // -----
+
+    // Web requests
     const [getGuests, {
         data: guests,
         isLoading: isGuestsLoading
     }] = guestAPI.useGetAllByOrganizationIdMutation();
+    // -----
+
+    // Useful utils
     const columns: TableProps<GuestModel>['columns'] = [
         {
             title: 'ИД',
@@ -105,10 +113,15 @@ export const SelectGuestFromOrgModal = (props: ModalProps) => {
                 return date1 - date2;
             },
         },
-    ]
+    ];
+    // -----
+
+    // Effects
     useEffect(() => {
-        getGuests(props.selectedOrganizationId);
+        getGuests(props.selectedOrganization.id);
     }, []);
+    // -----
+
     return (
         <Modal title={"Перечень жильцов"}
                open={props.visible}

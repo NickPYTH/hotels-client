@@ -154,7 +154,7 @@ const FilialScreen: React.FC = () => {
                 :
                 <Flex style={{marginRight: 15, marginLeft: 15}} gap="middle" align="start" vertical={false} wrap={'wrap'} justify="center">
                     {hotels?.map((hotel: HotelModel) => (
-                        <HotelCard showWarningMsg={showWarningMsg} hotel={hotel}/>
+                        <HotelCard key={hotel.id} showWarningMsg={showWarningMsg} hotel={hotel}/>
                     ))}
                 </Flex>
             }

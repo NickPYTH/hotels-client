@@ -4,6 +4,10 @@ import {ContractModel} from "../../model/ContractModel";
 import {contractAPI} from "../../service/ContractService";
 import {ContractModal} from "../../component/dict/ContractModal";
 import {host} from "../../config/constants";
+import {FilialModel} from "../../model/FilialModel";
+import {HotelModel} from "../../model/HotelModel";
+import {OrganizationModel} from "../../model/OrganizationModel";
+import {ReasonModel} from "../../model/ReasonModel";
 
 const ContractScreen: React.FC = () => {
 
@@ -52,13 +56,16 @@ const ContractScreen: React.FC = () => {
             title: 'Филиал',
             dataIndex: 'filial',
             key: 'filial',
+            render: (f:FilialModel) => f.name,
+            sorter: (a, b) => a.filial.name.charCodeAt(0) - b.filial.name.charCodeAt(0),
             filters: contracts?.reduce((acc: { text: string, value: string }[], contract: ContractModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === contract.filial) === undefined)
-                    return acc.concat({text: contract.filial, value: contract.filial});
+                let filial = contract.filial;
+                if (acc.find((g: { text: string, value: string }) => g.value == filial.name) === undefined)
+                    return acc.concat({text: filial.name, value: filial.name});
                 return acc;
             }, []),
             onFilter: (value: any, record: ContractModel) => {
-                return record.filial.indexOf(value) === 0
+                return record.filial.name.indexOf(value) == 0
             },
             filterSearch: true,
         },
@@ -66,14 +73,16 @@ const ContractScreen: React.FC = () => {
             title: 'Общежитие',
             dataIndex: 'hotel',
             key: 'hotel',
+            render: (h:HotelModel) => h.name,
+            sorter: (a, b) => a.hotel.name.charCodeAt(0) - b.hotel.name.charCodeAt(0),
             filters: contracts?.reduce((acc: { text: string, value: string }[], contract: ContractModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === contract.hotel) === undefined)
-                    return acc.concat({text: contract.hotel, value: contract.hotel});
+                let hotel = contract.hotel;
+                if (acc.find((g: { text: string, value: string }) => g.value == contract.hotel.name) == undefined)
+                    return acc.concat({text: contract.hotel.name, value: contract.hotel.name});
                 return acc;
             }, []),
             onFilter: (value: any, record: ContractModel) => {
-                if (record.hotel === null && value === null) return true;
-                return record.hotel?.indexOf(value) === 0
+                return record.hotel.name.indexOf(value) == 0
             },
             filterSearch: true,
         },
@@ -81,15 +90,17 @@ const ContractScreen: React.FC = () => {
             title: 'Организация',
             dataIndex: 'organization',
             key: 'organization',
+            render: (o:OrganizationModel) => o.name,
+            sorter: (a, b) => a.organization.name.charCodeAt(0) - b.organization.name.charCodeAt(0),
             filters: contracts?.reduce((acc: { text: string, value: string }[], contract: ContractModel) => {
-                if (contract.organization)
-                    if (acc.find((g: { text: string, value: string }) => g.text === contract.organization) === undefined)
-                        return acc.concat({text: contract.organization, value: contract.organization});
+                let organization = contract.organization;
+                if (acc.find((g: { text: string, value: string }) => g.value == organization.name) === undefined)
+                    return acc.concat({text: organization.name, value: organization.name});
                 return acc;
             }, []),
             onFilter: (value: any, record: ContractModel) => {
-                if (record.organization === null && value === null) return true;
-                return record.organization?.indexOf(value) === 0
+                if (record.organization == null && value == null) return true;
+                return record.organization.name.indexOf(value) === 0
             },
             filterSearch: true,
         },
@@ -127,13 +138,16 @@ const ContractScreen: React.FC = () => {
             title: 'Основание',
             dataIndex: 'reason',
             key: 'reason',
+            render: (r:ReasonModel) => r.name,
+            sorter: (a, b) => a.reason.name.charCodeAt(0) - b.reason.name.charCodeAt(0),
             filters: contracts?.reduce((acc: { text: string, value: string }[], contract: ContractModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === contract.reason) === undefined)
-                    return acc.concat({text: contract.reason ?? "", value: contract.reason ?? ""});
+                let reason = contract.reason;
+                if (acc.find((g: { text: string, value: string }) => g.value == reason.name) === undefined)
+                    return acc.concat({text: reason.name, value: reason.name});
                 return acc;
             }, []),
             onFilter: (value: any, record: ContractModel) => {
-                return record.reason?.indexOf(value) === 0
+                return record.reason.name.indexOf(value) === 0
             },
         },
         {
@@ -196,6 +210,7 @@ const ContractScreen: React.FC = () => {
                 columns={columns}
                 dataSource={contracts}
                 loading={isContractsLoading}
+                bordered
                 pagination={{
                     defaultPageSize: 100,
                 }}

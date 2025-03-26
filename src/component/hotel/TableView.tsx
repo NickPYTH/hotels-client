@@ -117,7 +117,7 @@ export const TableView = (props:ModalProps) => {
                                                                 props.setVisibleGuestModal(true);
                                                                 setSelectedGuest(guest);
                                                             }}
-                                                            title={`${guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.post ?? ""} ${guest.organizationName ?? ""}`}
+                                                            title={`${guest.lastname} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.firstname ? guest.firstname[0]+"." : ""} ${guest.post ?? ""} ${guest.organization?.name ?? ""}`}
                                                             description={`Даты проживания C ${guest.dateStart} По ${guest.dateFinish}. До выселения(суток): ${daysBeforeCheckouted == 0 ? "Сегодня" : daysBeforeCheckouted}`}>
                                                     {guest.isReservation ?
                                                         <img style={{marginTop: 2}} width={22} height={22} src={ConfirmedReservation}/>
