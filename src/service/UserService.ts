@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {UserModel} from "../model/UserModel";
-import {host} from "../config/constants";
+import {UserModel} from "entities/UserModel";
+import {host} from "shared/config/constants";
 
 export const userAPI = createApi({
     reducerPath: 'userAPI',

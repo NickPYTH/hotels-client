@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {HotelModel} from "../model/HotelModel";
-import {host} from "../config/constants";
-import {HotelStatsReportModel} from "../model/forReports/HotelStatsReportModel";
+import {HotelModel} from "entities/HotelModel";
+import {host} from "shared/config/constants";
+import {HotelStatsReportModel} from "entities/report/HotelStatsReportModel";
 
 export const hotelAPI = createApi({
     reducerPath: 'hotelAPI',

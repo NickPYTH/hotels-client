@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {LogModel} from "../model/LogModel";
-import {host} from "../config/constants";
+import {LogModel} from "entities/LogModel";
+import {host} from "shared/config/constants";
 //${host}
 export const logAPI = createApi({
     reducerPath: 'logAPI',

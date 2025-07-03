@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {MVZModel} from "../model/MVZModel";
-import {host} from "../config/constants";
+import {MVZModel} from "entities/MVZModel";
+import {host} from "shared/config/constants";
 
 export const MVZAPI = createApi({
     reducerPath: 'MVZAPI',

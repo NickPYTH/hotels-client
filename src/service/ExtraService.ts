@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {ExtraModel} from "../model/ExtraModel";
-import {host} from "../config/constants";
+import {ExtraModel} from "entities/ExtraModel";
+import {host} from "shared/config/constants";
 
 export const extraAPI = createApi({
     reducerPath: 'extraAPI',
@@ -26,6 +26,13 @@ export const extraAPI = createApi({
         get: build.mutation<ExtraModel, number>({
             query: (id) => ({
                 url: `/get?id=${id}`,
+                method: 'GET',
+            }),
+            invalidatesTags: ['extra']
+        }),
+        confirmPayment: build.mutation<void, { guestId: number, extraId: number, paymentTypeId: number }>({
+            query: ({guestId, extraId, paymentTypeId}) => ({
+                url: `/confirmPayment?guestId=${guestId}&extraId=${extraId}&paymentTypeId=${paymentTypeId}`,
                 method: 'GET',
             }),
             invalidatesTags: ['extra']

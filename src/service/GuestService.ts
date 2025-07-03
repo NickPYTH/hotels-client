@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {GuestModel} from "../model/GuestModel";
-import {host} from "../config/constants";
+import {GuestModel} from "entities/GuestModel";
+import {host} from "shared/config/constants";
 
 export const guestAPI = createApi({
     reducerPath: 'guestAPI',

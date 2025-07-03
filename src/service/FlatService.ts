@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {FlatModel} from "../model/FlatModel";
-import {host} from "../config/constants";
-import {GuestModel} from "../model/GuestModel";
+import {FlatModel} from "entities/FlatModel";
+import {host} from "shared/config/constants";
+import {GuestModel} from "entities/GuestModel";
 
 export const flatAPI = createApi({
     reducerPath: 'flatAPI',
@@ -64,6 +64,13 @@ export const flatAPI = createApi({
                 url: `/updateNote`,
                 method: 'POST',
                 body
+            }),
+            invalidatesTags: ['flat']
+        }),
+        getNewChess: build.mutation<FlatModel[], { hotelId: string, dateStart: number, dateFinish: number }>({
+            query: (props) => ({
+                url: `/getNewChess?hotelId=${props.hotelId}&dateStart=${props.dateStart}&dateFinish=${props.dateFinish}`,
+                method: 'GET',
             }),
             invalidatesTags: ['flat']
         }),

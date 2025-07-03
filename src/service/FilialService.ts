@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {FilialModel} from "../model/FilialModel";
-import {host} from "../config/constants";
+import {FilialModel} from "entities/FilialModel";
+import {host} from "shared/config/constants";
 
 export const filialAPI = createApi({
     reducerPath: 'filialAPI',

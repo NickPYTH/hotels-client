@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {host} from "../config/constants";
-import {FlatLocksModel} from "../model/FlatLocksModel";
+import {host} from "shared/config/constants";
+import {FlatLocksModel} from "entities/FlatLocksModel";
 
 export const flatLocksAPI = createApi({
     reducerPath: 'flatLocksAPI',

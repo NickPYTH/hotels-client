@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {EventTypeModel} from "../model/EventTypeModel";
-import {host} from "../config/constants";
+import {EventTypeModel} from "entities/EventTypeModel";
+import {host} from "shared/config/constants";
 
 export const eventTypeAPI = createApi({
     reducerPath: 'eventTypeAPI',

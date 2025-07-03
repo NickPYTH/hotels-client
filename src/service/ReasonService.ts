@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {ReasonModel} from "../model/ReasonModel";
-import {host} from "../config/constants";
+import {ReasonModel} from "entities/ReasonModel";
+import {host} from "shared/config/constants";
 
 //${host}
 export const reasonAPI = createApi({

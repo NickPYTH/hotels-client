@@ -15,11 +15,13 @@ import {logAPI} from "../service/LogService";
 import {roomLocksAPI} from "../service/RoomLocksService";
 import {flatLocksAPI} from "../service/FlatLocksService";
 import {historyAPI} from "../service/HistoryService";
-import {eventAPI} from "../service/EventService";
+import {eventKindAPI} from "../service/EventKindService";
 import {MVZAPI} from "../service/MVZService";
 import {extraAPI} from "../service/ExtraService";
 import {reservationAPI} from "../service/ReservationService";
 import {eventTypeAPI} from "../service/EventTypeService";
+import {paymentTypeAPI} from "service/PaymentTypeService";
+import {eventAPI} from "service/EventService";
 
 export type RootStateType = {
     filialList: FilialModelStateType,
@@ -45,9 +47,11 @@ const rootReducer = combineReducers({
     [flatLocksAPI.reducerPath]: flatLocksAPI.reducer,
     [historyAPI.reducerPath]: historyAPI.reducer,
     [MVZAPI.reducerPath]: MVZAPI.reducer,
-    [eventAPI.reducerPath]: eventAPI.reducer,
+    [eventKindAPI.reducerPath]: eventKindAPI.reducer,
     [extraAPI.reducerPath]: extraAPI.reducer,
     [eventTypeAPI.reducerPath]: eventTypeAPI.reducer,
+    [eventAPI.reducerPath]: eventAPI.reducer,
+    [paymentTypeAPI.reducerPath]: paymentTypeAPI.reducer,
 })
 
 export const setupStore = () => {
@@ -70,10 +74,12 @@ export const setupStore = () => {
                 .concat(roomLocksAPI.middleware)
                 .concat(flatLocksAPI.middleware)
                 .concat(historyAPI.middleware)
-                .concat(eventAPI.middleware)
+                .concat(eventKindAPI.middleware)
                 .concat(extraAPI.middleware)
                 .concat(reservationAPI.middleware)
                 .concat(eventTypeAPI.middleware)
+                .concat(eventAPI.middleware)
+                .concat(paymentTypeAPI.middleware)
     })
 }
 

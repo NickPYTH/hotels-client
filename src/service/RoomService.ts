@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {RoomModel} from "../model/RoomModel";
-import {host} from "../config/constants";
-import {BedModel} from "../model/BedModel";
+import {RoomModel} from "entities/RoomModel";
+import {host} from "shared/config/constants";
+import {BedModel} from "entities/BedModel";
 
 export const roomAPI = createApi({
     reducerPath: 'roomAPI',

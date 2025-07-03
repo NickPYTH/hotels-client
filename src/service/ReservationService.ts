@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {host} from "../config/constants";
-import {ReservationModel} from "../model/ReservationModel";
+import {host} from "shared/config/constants";
+import {ReservationModel} from "entities/ReservationModel";
 
 export const reservationAPI = createApi({
     reducerPath: 'reservationAPI',
@@ -42,6 +42,13 @@ export const reservationAPI = createApi({
             query: (id) => ({
                 url: `/delete?id=${id}`,
                 method: 'DELETE',
+            }),
+            invalidatesTags: ['reservation']
+        }),
+        checkSpaces: build.mutation<{ Status: string }, { peopleCount: number, dateStart: number, dateFinish: number, eventId: number, hotelId: number, needReserve: boolean, soloMode: boolean }>({
+            query: (props) => ({
+                url: `/checkSpaces?peopleCount=${props.peopleCount}&dateStart=${props.dateStart}&dateFinish=${props.dateFinish}&eventId=${props.eventId}&hotelId=${props.hotelId}&needReserve=${props.needReserve}&soloMode=${props.soloMode}`,
+                method: 'GET',
             }),
             invalidatesTags: ['reservation']
         }),

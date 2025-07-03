@@ -1,5 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {FilialModel} from "../../model/FilialModel";
+import {FilialModel} from "entities/FilialModel";
 
 export type FilialModelStateType = {
     filialList: FilialModel[]

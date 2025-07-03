@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import { host } from "../config/constants";
-import {ContractModel} from "../model/ContractModel";
-import {OrganizationModel} from "../model/OrganizationModel";
+import { host } from "shared/config/constants";
+import {ContractModel} from "entities/ContractModel";
+import {OrganizationModel} from "entities/OrganizationModel";
 
 export const contractAPI = createApi({
     reducerPath: 'contractAPI',

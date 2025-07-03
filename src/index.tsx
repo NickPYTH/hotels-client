@@ -1,33 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import ruRU from 'antd/locale/ru_RU';
-import {ConfigProvider} from "antd";
-import {setupStore} from "./store/store";
-import {Provider} from "react-redux";
-import {Router} from "./component/Router";
-
-const store = setupStore();
+import {ReduxProvider} from "app/providers/ReduxProvider";
+import {AntdProvider} from "app/providers/AntdProvider";
+import {Router} from "component/Router";
 
 ReactDOM.render(
     <React.StrictMode>
-        <Provider store={store}>
-            <ConfigProvider
-                locale={ruRU}
-                theme={{
-                    components: {
-                        Table: {
-                            cellPaddingInline: 0,
-                            cellPaddingBlock: 0
-                        }
-                    }
-                }}
-            >
+        <ReduxProvider>
+            <AntdProvider>
                 <Router/>
-            </ConfigProvider>
-        </Provider>
+            </AntdProvider>
+        </ReduxProvider>
     </React.StrictMode>,
     document.getElementById('root')
 );
-
-

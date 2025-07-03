@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {host} from "../config/constants";
-import {HistoryModel} from "../model/HistoryModel";
+import {host} from "shared/config/constants";
+import {HistoryModel} from "entities/HistoryModel";
 
 export const historyAPI = createApi({
     reducerPath: 'historyAPI',

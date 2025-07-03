@@ -1,7 +1,7 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {EventModel} from "../model/EventModel";
-import {host} from "../config/constants";
-import {EventTypeModel} from "../model/EventTypeModel";
+import {EventModel} from "entities/EventModel";
+import {host} from "shared/config/constants";
+import {ChessEvent} from "pages/HotelPage/ui/chess/NewChess";
 
 export const eventAPI = createApi({
     reducerPath: 'eventAPI',
@@ -37,6 +37,13 @@ export const eventAPI = createApi({
                 url: `/create`,
                 method: 'POST',
                 body
+            }),
+            invalidatesTags: ['event']
+        }),
+        getAllByDateRange: build.mutation<ChessEvent[], { dateStart: number, dateFinish: number, hotelId: string }>({
+            query: ({dateStart, dateFinish, hotelId}) => ({
+                url: `/getAllByDateRange?dateStart=${dateStart}&dateFinish=${dateFinish}&hotelId=${hotelId}`,
+                method: 'GET',
             }),
             invalidatesTags: ['event']
         }),

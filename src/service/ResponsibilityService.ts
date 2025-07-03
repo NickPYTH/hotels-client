@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {ResponsibilityModel} from "../model/ResponsibilityModel";
-import {host} from "../config/constants";
+import {ResponsibilityModel} from "entities/ResponsibilityModel";
+import {host} from "shared/config/constants";
 
 //${'https'}://${'}
 export const responsibilityAPI = createApi({
