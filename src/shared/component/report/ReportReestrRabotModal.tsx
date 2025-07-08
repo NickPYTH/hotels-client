@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Checkbox, CheckboxChangeEvent, DatePicker, Flex, message, Modal, Select} from 'antd';
+import {Button, Checkbox, CheckboxChangeEvent, DatePicker, Flex, message, Modal, Select} from 'antd';
 import {FilialModel} from "entities/FilialModel";
 import {filialAPI} from "service/FilialService";
 import {responsibilityAPI} from "service/ResponsibilityService";
@@ -10,6 +10,8 @@ import {HotelModel} from "entities/HotelModel";
 import {useSelector} from "react-redux";
 import {RootStateType} from "store/store";
 import {host, ukgBosses} from "shared/config/constants";
+import {reasonAPI} from "service/ReasonService";
+import {ReasonModel} from "entities/ReasonModel";
 
 const {RangePicker} = DatePicker;
 
@@ -24,6 +26,7 @@ export const ReportReestrRabotModal = (props: ModalProps) => {
     const [dateRange, setDateRange] = useState<Dayjs[] | null>(null);
     const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null);
     const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
+    const [selectedReasonList, setSelectedReasonList] = useState<number[] | null>(null);
     const [responsibilityId, setResponsibilityId] = useState<number | null>(null);
     const [selectedUkgBoss, setSelectedUkgBoss] = useState<string | null>(null);
     const [isOrganization, setIsOrganization] = useState<boolean>(false);
@@ -43,6 +46,10 @@ export const ReportReestrRabotModal = (props: ModalProps) => {
         data: responsibilities,
         isLoading: isResponsibilityLoading
     }] = responsibilityAPI.useGetAllByHotelIdMutation();
+    const [getReasons, {
+        data: reasons,
+        isLoading: isReasonsLoading
+    }] = reasonAPI.useGetAllMutation();
     // -----
 
     // Useful utils
@@ -55,6 +62,7 @@ export const ReportReestrRabotModal = (props: ModalProps) => {
     // Effects
     useEffect(() => {
         getAllFilials();
+        getReasons();
     }, []);
     useEffect(() => {
         if (selectedFilialId)
@@ -72,9 +80,17 @@ export const ReportReestrRabotModal = (props: ModalProps) => {
     // Handlers
     const switchIsOrganizationHandler = (e: CheckboxChangeEvent) => {
         setIsOrganization(e.target.checked);
-    }
+    };
     const switchIsGuestCountModeHandler = (e: CheckboxChangeEvent) => {
         setIsGuestCountMode(e.target.checked);
+    };
+    const selectReasonHandler = (idList: number[]) => {
+        setSelectedReasonList(idList);
+    }
+    const selectAllReasonsHandler = () => {
+        if (reasons) {
+            setSelectedReasonList(reasons.map((reason: ReasonModel) => reason.id));
+        }
     }
     // -----
 
@@ -88,9 +104,9 @@ export const ReportReestrRabotModal = (props: ModalProps) => {
                    let tmpButton = document.createElement('a');
                    if (dateRange && responsibilityId && selectedHotelId && selectedUkgBoss) {
                        if (isGuestCountMode)
-                           tmpButton.href = `${host}/hotels/api/report/getReestrRabotErmakReport?hotelId=${selectedHotelId}&responsibilityId=${responsibilityId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&ukgBoss=${selectedUkgBoss.split(" ")[0]} ${selectedUkgBoss.split(" ")[1][0]}. ${selectedUkgBoss.split(" ")[2][0]}.&workType=Услуги по проживанию в общежитии&isOrganization=${isOrganization}`
+                           tmpButton.href = `${host}/hotels/api/report/getReestrRabotErmakReport?reasonList=${selectedReasonList}&hotelId=${selectedHotelId}&responsibilityId=${responsibilityId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&ukgBoss=${selectedUkgBoss.split(" ")[0]} ${selectedUkgBoss.split(" ")[1][0]}. ${selectedUkgBoss.split(" ")[2][0]}.&workType=Услуги по проживанию в общежитии&isOrganization=${isOrganization}`
                        else
-                           tmpButton.href = `${host}/hotels/api/report/getReestrRabotReport?hotelId=${selectedHotelId}&responsibilityId=${responsibilityId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&ukgBoss=${selectedUkgBoss.split(" ")[0]} ${selectedUkgBoss.split(" ")[1][0]}. ${selectedUkgBoss.split(" ")[2][0]}.&workType=Услуги по проживанию в общежитии&isOrganization=${isOrganization}`
+                           tmpButton.href = `${host}/hotels/api/report/getReestrRabotReport?reasonList=${selectedReasonList}&hotelId=${selectedHotelId}&responsibilityId=${responsibilityId}&dateStart=${dateRange[0].format("DD-MM-YYYY")}&dateFinish=${dateRange[1].format("DD-MM-YYYY")}&ukgBoss=${selectedUkgBoss.split(" ")[0]} ${selectedUkgBoss.split(" ")[1][0]}. ${selectedUkgBoss.split(" ")[2][0]}.&workType=Услуги по проживанию в общежитии&isOrganization=${isOrganization}`
                        tmpButton.click();
                    }
                }}
@@ -128,12 +144,31 @@ export const ReportReestrRabotModal = (props: ModalProps) => {
                             return acc.concat([hotel]);
                         }
                         return acc;
-                    }, []).map((hotel: HotelModel) => ({value: hotel.id, label: `${hotel.mvz}`}))}
+                    }, []).map((hotel: HotelModel) => ({value: hotel.id, label: `${hotel.mvz} - ${hotel.name}`}))}
                     allowClear={true}
                     showSearch
                     filterOption={(inputValue, option) => (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
                     filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
                 />
+                <Flex style={{width: '100%'}} justify={'space-between'} align={'center'}>
+                    <Select
+                        mode={"multiple"}
+                        loading={isReasonsLoading}
+                        disabled={isReasonsLoading}
+                        value={selectedReasonList}
+                        placeholder={"Выберите основания"}
+                        style={{width: '80%'}}
+                        onChange={selectReasonHandler}
+                        options={reasons?.map((reason: ReasonModel) => ({value: reason.id, label: reason.name}))}
+                        allowClear={true}
+                        showSearch
+                        filterOption={(inputValue, option) => (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                        filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
+                    />
+                    <Button style={{width: '18%'}} onClick={selectAllReasonsHandler}>
+                        Выбрать все
+                    </Button>
+                </Flex>
                 <Select
                     loading={isResponsibilityLoading}
                     disabled={selectedHotelId === null || isResponsibilityLoading}
