@@ -387,17 +387,22 @@ const GuestPage: React.FC = () => {
         <Flex vertical={true}>
             {messageContextHolder}
             {isVisibleGuestModal &&
-                <GuestModal setGuests={setGuests} showSuccessMsg={showSuccessMsg} isAddressDisabled={false} selectedGuest={selectedGuest} visible={isVisibleGuestModal}
+                <GuestModal setGuests={setGuests} showSuccessMsg={showSuccessMsg} isAddressDisabled={false}
+                            selectedGuest={selectedGuest} visible={isVisibleGuestModal}
                             setVisible={setIsVisibleGuestModal}
                             refresh={() => {
                             }}/>}
-            <Flex justify={'space-between'}>
-                <Button type={'primary'} onClick={() => setIsVisibleGuestModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
-                <Button type={'primary'} onClick={() => {
-                    let tmpButton = document.createElement('a');
-                    tmpButton.href = `${host}/hotels/api/report/getGuestReport`
-                    tmpButton.click();
-                }} style={{width: 100, margin: 10}}>Отчет</Button>
+            <Flex vertical={true}>
+                <h3 style={{marginLeft: 15}}>Записи о проживании</h3>
+                <Flex justify={'space-between'}>
+                    <Button type={'primary'} onClick={() => setIsVisibleGuestModal(true)}
+                            style={{width: 100, margin: 10}}>Добавить</Button>
+                    <Button type={'primary'} onClick={() => {
+                        let tmpButton = document.createElement('a');
+                        tmpButton.href = `${host}/hotels/api/report/getGuestReport`
+                        tmpButton.click();
+                    }} style={{width: 100, margin: 10}}>Отчет</Button>
+                </Flex>
             </Flex>
             <Table
                 bordered

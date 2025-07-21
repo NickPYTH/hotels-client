@@ -147,7 +147,7 @@ export const NewChess = (props: PropsType) => {
     const [dates, setDates] = useState<Dayjs[]>([]);
     const [selectedRow, setSelectedRow] = useState<BedModel | null>(null);
     const [cellWidth] = useState<number>(window.innerWidth - 165);
-    const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(false);
+    const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(true);
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleReservationModal, setVisibleReservationModal] = useState(false);
     const [filialId, setFilialId] = useState<number | null>(null);

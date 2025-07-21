@@ -19,7 +19,8 @@ export const PlanZaezdReportModal = (props: ModalProps) => {
     const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null);
     const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
     const [messageApi, messageContextHolder] = message.useMessage();
-    const [date, setDate] = useState<Dayjs | null>(dayjs());
+    const [startDate, setStartDate] = useState<Dayjs | null>(null);
+    const [endDate, setEndDate] = useState<Dayjs | null>(null);
     // -----
 
     // Useful utils
@@ -55,15 +56,18 @@ export const PlanZaezdReportModal = (props: ModalProps) => {
     const confirmHandler = () => {
         showWarningMsg("Отчет начал формироваться")
         let tmpButton = document.createElement('a')
-        if (date && selectedHotelId) {
-            tmpButton.href = `${host}/hotels/api/report/getPlanZaezdReport?hotelId=${selectedHotelId}&date=${date.format("DD-MM-YYYY")}`;
+        if (startDate && endDate && selectedHotelId) {
+            tmpButton.href = `${host}/hotels/api/report/getPlanZaezdReport?hotelId=${selectedHotelId}&dateStart=${startDate.format("DD-MM-YYYY")}&dateFinish=${startDate.format("DD-MM-YYYY")}`;
             tmpButton.click();
         } else {
             showWarningMsg("Не все поля заполнены");
         }
     }
     const selectStartDateHandler = (date: Dayjs) => {
-        setDate(date);
+        setStartDate(date);
+    }
+    const selectEndDateHandler = (date: Dayjs) => {
+        setEndDate(date);
     }
     // -----
 
@@ -108,8 +112,9 @@ export const PlanZaezdReportModal = (props: ModalProps) => {
                     />
                 </Flex>
                 <Flex align={"center"}>
-                    <div style={{width: 170}}>Выберите дату заезда</div>
-                    <DatePicker placeholder={'Заезд'} format={'DD.MM.YYYY'} value={date} onChange={selectStartDateHandler} style={{width: 140, marginRight: 5}} allowClear={false}/>
+                    <div style={{width: 170}}>Выберите период заезда</div>
+                    <DatePicker placeholder={'Начало периода'} format={'DD.MM.YYYY'} value={startDate} onChange={selectStartDateHandler} style={{width: 197, marginRight: 6}} allowClear={false}/>
+                    <DatePicker placeholder={'Конец периода'} format={'DD.MM.YYYY'} value={endDate} onChange={selectEndDateHandler} style={{width: 197}} allowClear={false}/>
                 </Flex>
             </Flex>
         </Modal>

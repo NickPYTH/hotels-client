@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {UserAddOutlined, UsergroupAddOutlined} from "@ant-design/icons";
-import {Button, Flex, message, Popconfirm, Table, TableProps} from 'antd';
+import React, {useEffect, useRef, useState} from 'react';
+import {SearchOutlined, UserAddOutlined, UsergroupAddOutlined} from "@ant-design/icons";
+import {Button, Flex, Input, InputRef, message, Popconfirm, Space, Table, TableProps} from 'antd';
 import {ReservationModel} from "entities/ReservationModel";
 import {reservationAPI} from "service/ReservationService";
 import dayjs from "dayjs";
@@ -12,6 +12,15 @@ import {TableTitleRender} from "shared/component/TableTitleRender";
 import {GroupReservationModal} from "shared/component/GroupReservationModal";
 import {CustomDateFilter} from "shared/component/CustomDateFilter";
 import {GuestModel} from "entities/GuestModel";
+import {FilterConfirmProps} from "antd/es/table/interface";
+import {ColumnType} from "antd/es/table";
+
+export interface DataType extends ReservationModel {
+    key: React.Key;
+    children?: any;
+}
+
+type DataIndex = keyof DataType;
 
 const ReservationPage: React.FC = () => {
 
@@ -51,6 +60,71 @@ const ReservationPage: React.FC = () => {
     // -----
 
     // Useful utils
+    const searchInput = useRef<InputRef>(null);
+    const getColumnSearchProps = (dataIndex: any): ColumnType<any> => ({
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters, close}) => (
+            <div style={{padding: 8}} onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                    ref={searchInput}
+                    placeholder={`Поиск`}
+                    value={selectedKeys[0]}
+                    onChange={(e: any) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+                    style={{marginBottom: 8, display: 'block'}}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+                        icon={<SearchOutlined/>}
+                        size="small"
+                        style={{width: 90}}
+                    >
+                        Поиск
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleReset(clearFilters)}
+                        size="small"
+                        style={{width: 90}}
+                    >
+                        Сбросить
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Закрыть
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered: boolean) => (
+            <SearchOutlined style={{color: filtered ? '#1677ff' : undefined}}/>
+        ),
+        onFilter: (value, record) => {
+            if (record[dataIndex])
+                try {
+                    return record[dataIndex]
+                        .toString()
+                        .toLowerCase()
+                        .includes((value as string).toLowerCase())
+                } catch (e) {
+                    return !!record.children.find((child: any) => child[dataIndex]
+                        .toString()
+                        .toLowerCase()
+                        .includes((value as string).toLowerCase()));
+                }
+        },
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) => (<div>{text}</div>)
+    });
     const columns: TableProps<ReservationModel>['columns'] = [
         {
             title: <TableTitleRender title={"ИД"}/>,
@@ -111,15 +185,19 @@ const ReservationPage: React.FC = () => {
             key: 'tabnum',
             sorter: (a, b) => (a.tabnum && b.tabnum) ? a.tabnum - b.tabnum : 0,
             sortDirections: ['descend', 'ascend'],
-            filters: reservations?.reduce((acc: { text: string, value: number }[], reservation: ReservationModel) => {
-                if (acc.find((g: { text: string, value: number }) => g.value === reservation.tabnum) === undefined)
-                    return acc.concat({text: reservation.tabnum?.toString() ?? "", value: reservation.tabnum ?? 999});
-                else return acc;
-            }, []),
-            onFilter: (value: any, record: ReservationModel) => {
-                return record.tabnum?.toString().indexOf(value) === 0
+            ...getColumnSearchProps('tabnum'),
+        },
+        {
+            title: <TableTitleRender title={'ФИО'}/>,
+            render: (value: any, reservation)=> (<div>{reservation.lastname} {reservation.firstname} {reservation.secondName}</div>),
+            dataIndex: 'fio',
+            key: 'fio',
+            sorter: (a, b) => {
+                if (!a.lastname || !b.lastname) return 0;
+                else return a.lastname.charCodeAt(0) - b.lastname.charCodeAt(0);
             },
-            filterSearch: true,
+            sortDirections: ['descend', 'ascend'],
+            ...getColumnSearchProps('fio'),
         },
         {
             title: <TableTitleRender title={'Дата заезда'}/>,
@@ -234,7 +312,16 @@ const ReservationPage: React.FC = () => {
                 </Popconfirm>
             )
         },
-    ]
+    ];
+    // -----
+
+    // Handlers
+    const handleSearch = (selectedKeys: string[], confirm: (param?: FilterConfirmProps) => void, dataIndex: DataIndex) => {
+        confirm();
+    };
+    const handleReset = (clearFilters: () => void) => {
+        clearFilters();
+    };
     // -----
 
     return (
@@ -243,9 +330,12 @@ const ReservationPage: React.FC = () => {
             {isVisibleReservationModal && <ReservationModal selectedReservation={selectedReservation} visible={isVisibleReservationModal} setVisible={setIsVisibleReservationModal} refresh={getAll}/>}
             {visibleGroupReservationModal &&
                 <GroupReservationModal visible={visibleGroupReservationModal} setVisible={setVisibleGroupReservationModal} refresh={getAll} showWarningMsg={showWarningMsg}/>}
-            <Flex>
-                <Button icon={<UserAddOutlined/>} type={'primary'} onClick={() => setIsVisibleReservationModal(true)} style={{width: 180, margin: 10}}>Добавить бронь</Button>
-                <Button icon={<UsergroupAddOutlined/>} type={'primary'} onClick={() => setVisibleGroupReservationModal(true)} style={{width: 210, margin: 10}}>Групповое бронирование</Button>
+            <Flex vertical={true}>
+                <h3 style={{marginLeft: 15}}>Записи о бронировании</h3>
+                <Flex>
+                    <Button icon={<UserAddOutlined/>} type={'primary'} onClick={() => setIsVisibleReservationModal(true)} style={{width: 180, margin: 10}}>Добавить бронь</Button>
+                    <Button icon={<UsergroupAddOutlined/>} type={'primary'} onClick={() => setVisibleGroupReservationModal(true)} style={{width: 210, margin: 10}}>Групповое бронирование</Button>
+                </Flex>
             </Flex>
             <Table
                 style={{width: '100vw'}}

@@ -53,11 +53,20 @@ export const GuestCell = (props: {
     const [cellsNotCheckoutedColor] = useState(() => {
         return localStorage.getItem('cellColorGuestDeadline') ?? '#de4343';
     });
-    const [cellsMaleColor] = useState(() => {
+    const [cellsMaleBeforeColor] = useState(() => {
         return localStorage.getItem('cellsMaleColor') ?? "#75a5f2";
     });
-    const [cellsFemaleColor] = useState(() => {
+    const [cellsMaleAfterColor] = useState(() => {
+        return localStorage.getItem('cellsMaleAfterColor') ?? "#196ded";
+    });
+    const [cellsFemaleBeforeColor] = useState(() => {
         return localStorage.getItem('cellsFemaleColor') ?? "#f1259b";
+    });
+    const [cellsFemaleAfterColor] = useState(() => {
+        return localStorage.getItem('cellsFemaleAfterColor') ?? "#951660";
+    });
+    const [fontColor] = useState(() => {
+        return localStorage.getItem('fontColor') ?? "#fff";
     });
     const [fontSize] = useState(() => {
         return parseInt(localStorage.getItem('fontSize') ?? "10");
@@ -80,7 +89,8 @@ export const GuestCell = (props: {
                 left: position == Position.LEFT ? 0 : 'initial',
                 right: position == Position.RIGHT ? 0 : 'initial',
                 position: "absolute",
-                backgroundColor: dateStart.format("DD-MM") == dayjs().format("DD-MM") ? "#92fc8a": guestNotCheckouted ? cellsNotCheckoutedColor : props.guest.male ? cellsMaleColor : cellsFemaleColor,
+                backgroundColor: guestNotCheckouted ? cellsNotCheckoutedColor : props.guest.male ?
+                    dateStart.unix() >= dayjs().unix() ? cellsMaleAfterColor : cellsMaleBeforeColor : dateStart.unix() >= dayjs().unix() ? cellsFemaleAfterColor : cellsFemaleBeforeColor,
                 height: 24,
                 width: `${percent}%`,
                 borderTopRightRadius: position == Position.LEFT ? 10 : 0,
@@ -94,18 +104,21 @@ export const GuestCell = (props: {
             {visible &&
                 <div
                     style={{
-                    zIndex: 1000,
-                    position: 'absolute',
-                    top: -90,
-                    width: 280,
-                    height: 90,
-                    background: '#ffffff',
-                    border: "1px solid #f0f0f0",
-                    boxShadow: "0px 0px 8px 4px rgba(34, 60, 80, 0.25)",
-                    borderRadius: 5, paddingLeft: 5
-                }}>
+                        zIndex: 1000,
+                        position: 'absolute',
+                        top: -90,
+                        width: 280,
+                        height: 90,
+                        background: '#ffffff',
+                        border: "1px solid #f0f0f0",
+                        boxShadow: "0px 0px 8px 4px rgba(34, 60, 80, 0.25)",
+                        borderRadius: 5, paddingLeft: 5
+                    }}>
                     <Flex vertical justify='space-evenly' style={{width: 280, height: 90, fontSize: 12}}>
-                        <div style={{fontWeight: 600, marginBottom: 5}}>{`${props.guest.lastname} ${props.guest.name} ${props.guest.secondName} `}</div>
+                        <div style={{
+                            fontWeight: 600,
+                            marginBottom: 5
+                        }}>{`${props.guest.lastname} ${props.guest.name} ${props.guest.secondName} `}</div>
                         <Flex vertical>
                             {props.guest.post && <div>{props.guest.post}</div>}
                             <div>{dateStart.format("DD-MM-YYYY HH:mm")} по {dateFinish.format("DD-MM-YYYY HH:mm")}</div>
@@ -116,7 +129,16 @@ export const GuestCell = (props: {
                 </div>
             }
             {isStartCell &&
-                <div style={{position: "absolute", left: 3, top: 5, width: 150, zIndex: 100, fontSize, fontWeight: props.guest.isReservation ? 'bold' : 'normal'}}>
+                <div style={{
+                    position: "absolute",
+                    left: 3,
+                    top: 5,
+                    width: 150,
+                    zIndex: 100,
+                    fontSize,
+                    fontWeight: props.guest.isReservation ? 'bold' : 'normal',
+                    color: fontColor
+                }}>
                     <div style={{zIndex: 1000}}>
                         {`${props.guest.lastname} ${props.guest.name ? props.guest.name[0] + "." : ""} ${props.guest.secondName ? props.guest.secondName[0] + "." : ""} `}
                     </div>

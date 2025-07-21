@@ -127,7 +127,10 @@ const ContractPage: React.FC = () => {
             key: 'cost',
             sorter: (a, b) => a.cost - b.cost,
             filters: contracts?.reduce((acc: { text: string, value: string }[], contract: ContractModel) => {
-                if (acc.find((g: { text: string, value: string }) => g.text === contract.cost?.toString()) === undefined)
+                if (acc.find((g: {
+                    text: string,
+                    value: string
+                }) => g.text === contract.cost?.toString()) === undefined)
                     return acc.concat({text: contract.cost.toString(), value: contract.cost.toString()});
                 return acc;
             }, []),
@@ -184,7 +187,10 @@ const ContractPage: React.FC = () => {
             key: 'year',
             filters: contracts?.reduce((acc: { text: string, value: string }[], contract: ContractModel) => {
                 if (contract.year)
-                    if (acc.find((g: { text: string, value: string }) => g.text === contract.year.toString()) === undefined)
+                    if (acc.find((g: {
+                        text: string,
+                        value: string
+                    }) => g.text === contract.year.toString()) === undefined)
                         return acc.concat({text: contract.year.toString(), value: contract.year.toString()});
                 return acc;
             }, []),
@@ -197,14 +203,20 @@ const ContractPage: React.FC = () => {
 
     return (
         <Flex vertical={true}>
-            {isVisibleContractModal && <ContractModal selectedContract={selectedContract} visible={isVisibleContractModal} setVisible={setIsVisibleContractModal} refresh={getAllSilent}/>}
-            <Flex justify={'space-between'}>
-                <Button type={'primary'} onClick={() => setIsVisibleContractModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
-                <Button type={'primary'} onClick={() => {
-                    let tmpButton = document.createElement('a');
-                    tmpButton.href = `${host}/hotels/api/report/getAllContractReport`
-                    tmpButton.click();
-                }} style={{width: 100, margin: 10}}>Отчет</Button>
+            {isVisibleContractModal &&
+                <ContractModal selectedContract={selectedContract} visible={isVisibleContractModal}
+                               setVisible={setIsVisibleContractModal} refresh={getAllSilent}/>}
+            <Flex vertical={true}>
+                <h3 style={{marginLeft: 15}}>Договоры</h3>
+                <Flex justify={'space-between'}>
+                    <Button type={'primary'} onClick={() => setIsVisibleContractModal(true)}
+                            style={{width: 100, margin: 10}}>Добавить</Button>
+                    <Button type={'primary'} onClick={() => {
+                        let tmpButton = document.createElement('a');
+                        tmpButton.href = `${host}/hotels/api/report/getAllContractReport`
+                        tmpButton.click();
+                    }} style={{width: 100, margin: 10}}>Отчет</Button>
+                </Flex>
             </Flex>
             <Table
                 style={{width: '100vw'}}

@@ -57,8 +57,13 @@ const OrganizationPage: React.FC = () => {
     return (
         <Flex vertical={true}>
             {isVisibleOrganizationModal &&
-                <OrganizationModal selectedOrganization={selectedOrganization} visible={isVisibleOrganizationModal} setVisible={setIsVisibleOrganizationModal} refresh={getAll}/>}
-            <Button type={'primary'} onClick={() => setIsVisibleOrganizationModal(true)} style={{width: 100, margin: 10}}>Добавить</Button>
+                <OrganizationModal selectedOrganization={selectedOrganization} visible={isVisibleOrganizationModal}
+                                   setVisible={setIsVisibleOrganizationModal} refresh={getAll}/>}
+            <Flex vertical={true}>
+                <h3 style={{marginLeft: 15}}>Организации</h3>
+                <Button type={'primary'} onClick={() => setIsVisibleOrganizationModal(true)}
+                        style={{width: 100, margin: 10}}>Добавить</Button>
+            </Flex>
             <Table
                 style={{width: '100vw'}}
                 columns={columns}

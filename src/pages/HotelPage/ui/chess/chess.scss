@@ -1,22 +1,22 @@
 .flaming-aura {
     box-shadow:
-        0 0 10px #fc4d4d,
-        0 0 20px #ff6600,
-        0 0 20px #ffcc00;
+        0 0 5px #fc4d4d,
+        0 0 10px #ff6600,
+        0 0 10px #ffcc00;
     animation: flicker 2s infinite alternate;
 }
 
 @keyframes flicker {
     0%, 100% {
         box-shadow:
-                0 0 10px #fc4d4d,
-                0 0 20px #ff6600,
-                0 0 20px #ffcc00;
+                0 0 5px #fc4d4d,
+                0 0 10px #ff6600,
+                0 0 10px #ffcc00;
     }
     50% {
         box-shadow:
-                0 0 15px #fc4d4d,
-                0 0 30px #ff6600,
-                0 0 30px #ffcc00;
+                0 0 7px #fc4d4d,
+                0 0 15px #ff6600,
+                0 0 15px #ffcc00;
     }
 }
