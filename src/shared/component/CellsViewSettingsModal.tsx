@@ -97,22 +97,22 @@ export const CellsViewSettingsModal = (props: ModalProps) => {
         >
             <Flex vertical={true}>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
-                    <div style={{width: 300, marginRight: 15}}>Цвет записей мужчин до заезда</div>
+                    <div style={{width: 300, marginRight: 15}}>Цвет записей мужчин после заезда</div>
                     <ColorPicker value={cellsMaleColor} onChange={updateMaleCellsColor} defaultValue={cellsMaleColor}/>
                 </Flex>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
-                    <div style={{width: 300, marginRight: 15}}>Цвет записей мужчин после заезда</div>
+                    <div style={{width: 300, marginRight: 15}}>Цвет записей мужчин до заезда</div>
                     <ColorPicker value={cellsMaleAfterColor} onChange={updateMaleCellsAfterColor}
                                  defaultValue={cellsMaleAfterColor}/>
                 </Flex>
                 <Divider style={{margin: 0, marginBottom: 15}}/>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
-                    <div style={{width: 300, marginRight: 15}}>Цвет записей женщин до заезда</div>
+                    <div style={{width: 300, marginRight: 15}}>Цвет записей женщин после заезда</div>
                     <ColorPicker value={cellsFemaleColor} onChange={updateFemaleCellsColor}
                                  defaultValue={cellsFemaleColor}/>
                 </Flex>
                 <Flex vertical={false} align={'center'} style={{marginBottom: 15}}>
-                    <div style={{width: 300, marginRight: 15}}>Цвет записей женщин после заезда</div>
+                    <div style={{width: 300, marginRight: 15}}>Цвет записей женщин до заезда</div>
                     <ColorPicker value={cellsFemaleAfterColor} onChange={updateFemaleCellsAfterColor}
                                  defaultValue={cellsFemaleAfterColor}/>
                 </Flex>

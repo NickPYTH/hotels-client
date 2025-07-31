@@ -117,7 +117,7 @@ export const HotelReportModal = (props: ModalProps) => {
         }
     };
     // -----
-    console.log(reportData)
+
     return (
         <Modal title={"Загрузка общежитий"}
                open={props.visible}

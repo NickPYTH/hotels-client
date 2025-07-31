@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, ConfigProvider, Flex, Table, TableProps} from 'antd';
+import {Button, ConfigProvider, Flex, Popconfirm, Table, TableProps} from 'antd';
 import {EventKindModel} from "entities/EventKindModel";
 import {TableTitleRender} from "shared/component/TableTitleRender";
 
@@ -25,6 +25,16 @@ const EventPage: React.FC = () => {
         data: events,
         isLoading: isEventsLoading
     }] = eventAPI.useGetAllMutation();
+    const [deleteEvent, {
+        isSuccess: deleteEventSuccess,
+        isLoading: isEventDeleteLoading
+    }] = eventAPI.useDeleteMutation();
+    // -----
+
+    // Handlers
+    const deleteEventHandler = (id: number|null) => {
+        if (id) deleteEvent(id);
+    }
     // -----
 
     // Useful utils
@@ -68,6 +78,17 @@ const EventPage: React.FC = () => {
             key: 'dateFinish',
             render: (_, record) => (<div>{dayjs(record.dateFinish).format("DD-MM-YYYY")}</div>),
         },
+        {
+            title: <TableTitleRender title={''}/>,
+            dataIndex: 'dateFinish',
+            key: 'dateFinish',
+            render: (_, record) => (
+                <Flex align={'center'} justify={'center'}>
+                    <Popconfirm title={'Вы точно хотите удалить мероприятие?'} onConfirm={() => deleteEventHandler(record.id)}>
+                        <Button danger>Удалить</Button>
+                    </Popconfirm>
+                </Flex>),
+        },
     ]
     // -----
 
@@ -78,6 +99,9 @@ const EventPage: React.FC = () => {
     useEffect(() => {
         if (!isVisibleEventModal) setSelectedEvent(null);
     }, [isVisibleEventModal]);
+    useEffect(() => {
+        if (deleteEventSuccess) getAll();
+    }, [deleteEventSuccess])
     // -----
 
     return (

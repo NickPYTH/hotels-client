@@ -9,9 +9,9 @@ export const historyAPI = createApi({
     }),
     tagTypes: ['history'],
     endpoints: (build) => ({
-        getGuestHistory: build.mutation<HistoryModel[], number>({
-            query: (guestId) => ({
-                url: `/getGuestHistory?guestId=${guestId}`,
+        getEntityHistory: build.mutation<HistoryModel[], { entityId: number, entityType: string }>({
+            query: ({entityId, entityType}) => ({
+                url: `/getEntityHistory?entityId=${entityId}&entityType=${entityType}`,
                 method: 'GET',
             }),
             invalidatesTags: ['history']

@@ -14,6 +14,9 @@ import {EventKindModel} from "entities/EventKindModel";
 import {eventKindAPI} from "service/EventKindService";
 import {ReservationModal} from "shared/component/ReservationModal";
 import {reservationAPI} from "service/ReservationService";
+import {ReasonModel} from "entities/ReasonModel";
+import {ContractModel} from "entities/ContractModel";
+import {contractAPI} from "service/ContractService";
 
 const {Dragger} = Upload;
 
@@ -42,7 +45,7 @@ const MemoizedTable = React.memo(TableComponent);
 export const GroupReservationModal = (props: ModalProps) => {
 
     // States
-    const [reservationMode, setReservationMode] = useState<number>(2);
+    const [reservationMode, setReservationMode] = useState<number>(1);
     const [peopleCount, setPeopleCount] = useState<number | null>(1);
     const [mode, setMode] = useState<boolean>(false); // 0 - by tab, 1 - by fio
     const [data, setData] = useState<ReservationModel[] | null>(null); // Данные в таблице
@@ -58,6 +61,12 @@ export const GroupReservationModal = (props: ModalProps) => {
     const [timeFinish, setTimeFinish] = useState<Dayjs>(dayjs('12:00', 'HH:mm')); // Время выселения
     const [soloMode, setSoloMode] = useState(false);
     const [s, ss] = useState(true);
+    const [reason, setReason] = useState<ReasonModel | null>(null); // Выбранное основание
+    const [reasons, setReasons] = useState<ReasonModel[]>([]); // Список оснований
+    const [billing, setBilling] = useState<string | null>(null); // Выбранный вид оплаты
+    const [selectedContract, setSelectedContract] = useState<ContractModel | null>(null); // Выбранный договор
+    const [contracts, setContracts] = useState<ContractModel[]>([]);
+    const [contractsStep2, setContractsStep2] = useState<ContractModel[]>([]);  // Список доступных договоров (осторожно фильтруется после получения с сервера) а тут по причине и оплате
     // -----
 
     // Useful utils
@@ -155,19 +164,59 @@ export const GroupReservationModal = (props: ModalProps) => {
         data: checkSpacesData,
         isLoading: isCheckSpacesLoading
     }] = reservationAPI.useCheckSpacesMutation(); // Получение списка мероприятий
+    const [getContracts, {
+        data: contractsFromRequest,
+        isLoading: isContractsLoading
+    }] = contractAPI.useGetAllMutation(); // Получение всех договоров
     // -----
 
     // Effects
     useEffect(() => {
         getAllEvents();
         getAllFilials();
+        getContracts();
     }, []);
     useEffect(() => {
         if (selectedFilialId) getAllHotels({filialId: selectedFilialId.toString()});
     }, [selectedFilialId]);
+    useEffect(() => {
+        if (contractsFromRequest && selectedHotelId) {
+            let filteredContracts: ContractModel[] = contractsFromRequest.filter((c: ContractModel) => c.year == dayjs().year() && c.organization.id === 11 && c.hotel.id === selectedHotelId && c.year == 2025);
+            setContracts(filteredContracts);
+            setReasons(filteredContracts.reduce((acc: ReasonModel[], contract: ContractModel) => {
+                if (!acc.find((reason: ReasonModel) => reason.id == contract.reason.id))
+                    return acc.concat([contract.reason]);
+                return acc;
+            }, []));
+        }
+    }, [contractsFromRequest, selectedHotelId]);
     // -----
 
     // Handlers
+    const selectReasonHandler = (reasonId: number | null) => {
+        let reason = reasons.find((r: ReasonModel) => r.id == reasonId);
+        if (reason) setReason(reason);
+        else setReason(null);
+        setContractsStep2(() => contracts.filter((c: ContractModel) => (billing ? c.billing == billing : true) && (reason ? c.reason.id == reason.id : true)));
+        setSelectedContract(null);
+    }
+    const selectBillingHandler = (billing: string) => {
+        setBilling(billing);
+        setContractsStep2(() => contracts.filter((c: ContractModel) => (reason ? c.reason == reason : true) && (billing ? c.billing == billing : true)));
+        setSelectedContract(null);
+    }
+    const selectContractHandler = (contractId: number) => {
+        let contract = contracts.find((c: ContractModel) => c.id == contractId);
+        if (contract) {
+            setSelectedContract(contract);
+            setBilling(contract.billing);
+            setReason(contract.reason);
+        } else {
+            setSelectedContract(null);
+            setBilling("");
+            setReason(null);
+        }
+    }
     const selectStartDateHandler = (date: Dayjs) => {
         setDateStart(date);
     }
@@ -181,7 +230,7 @@ export const GroupReservationModal = (props: ModalProps) => {
         setTimeFinish(time);
     }
     const fillTableHandler = () => {
-        if (dateStart && dateFinish) {
+        if (dateStart && dateFinish && selectedContract) {
             if (dateStart.isAfter(dateFinish)) {
                 props.showWarningMsg("Дата заселения указана после даты выселения");
                 return;
@@ -193,6 +242,7 @@ export const GroupReservationModal = (props: ModalProps) => {
                 return tmp.map((res: ReservationModel) => {
                     if (event && filial) return {
                         ...res,
+                        contract: selectedContract,
                         fromFilial: filial,
                         event,
                         dateStart: `${dateStart.format("DD-MM-YYYY")} ${timeStart.format("HH:mm")}`,
@@ -250,7 +300,7 @@ export const GroupReservationModal = (props: ModalProps) => {
                     }}
                 />
             }
-            <Space direction='vertical'>
+            <Space direction='vertical' style={{width:'100%'}}>
                 <Space style={{marginBottom: 15}}>
                     Режим бронирования
                     <Select
@@ -263,7 +313,7 @@ export const GroupReservationModal = (props: ModalProps) => {
                 </Space>
 
                 {(data == null && reservationMode == 1) &&
-                    <Flex gap={'small'} vertical={true} style={{marginBottom: 5}}>
+                    <Flex gap={'small'} justify={'center'} vertical={true} style={{marginBottom: 5, width: '100%'}}>
                         <Flex align={"center"}>
                             <div style={{width: 300}}>Загрузить список табельный номеров</div>
                             <Checkbox checked={mode} onChange={(e) => setMode(e.target.checked)}/>
@@ -285,10 +335,10 @@ export const GroupReservationModal = (props: ModalProps) => {
                 }
                 {(data != null && reservationMode == 1) &&
                     <Flex vertical={true}>
-                        <Flex>
-                            <Flex vertical={true}>
-                                <Flex align={"center"} style={{marginBottom: 5}}>
-                                    <div style={{width: 150}}>Филиал заказчик</div>
+                        <Flex style={{width: '100%'}} justify={'space-between'}>
+                            <Flex vertical={true} gap={'small'}>
+                                <Flex align={"center"}>
+                                    <div style={{width: 120}}>Филиал заказчик</div>
                                     <Select
                                         disabled={isFilialsLoading}
                                         loading={isFilialsLoading}
@@ -299,8 +349,8 @@ export const GroupReservationModal = (props: ModalProps) => {
                                         options={filialsFromRequest?.map((filial: FilialModel) => ({value: filial.id, label: filial.name}))}
                                     />
                                 </Flex>
-                                <Flex align={"center"} style={{marginBottom: 5}}>
-                                    <div style={{width: 150}}>Филиал</div>
+                                <Flex align={"center"}>
+                                    <div style={{width: 120}}>Филиал</div>
                                     <Select
                                         disabled={isFilialsLoading}
                                         loading={isFilialsLoading}
@@ -311,8 +361,8 @@ export const GroupReservationModal = (props: ModalProps) => {
                                         options={filialsFromRequest?.map((filial: FilialModel) => ({value: filial.id, label: filial.name}))}
                                     />
                                 </Flex>
-                                <Flex align={"center"} style={{marginBottom: 5}}>
-                                    <div style={{width: 150}}>Общежитие</div>
+                                <Flex align={"center"}>
+                                    <div style={{width: 120}}>Общежитие</div>
                                     <Select
                                         allowClear={true}
                                         value={selectedHotelId}
@@ -325,7 +375,7 @@ export const GroupReservationModal = (props: ModalProps) => {
                                     />
                                 </Flex>
                                 <Flex align={"center"}>
-                                    <div style={{width: 150}}>Мероприятие</div>
+                                    <div style={{width: 120}}>Мероприятие</div>
                                     <Select
                                         value={selectedEventId}
                                         placeholder={"Выберите мероприятие"}
@@ -335,22 +385,72 @@ export const GroupReservationModal = (props: ModalProps) => {
                                     />
                                 </Flex>
                             </Flex>
-                            <Flex vertical={true} style={{marginLeft: 15}}>
-                                <Flex align={"center"} style={{marginBottom: 5}}>
+                            <Flex vertical={true} gap={'small'}>
+                                <Flex align={"center"}>
+                                    <div style={{width: 120}}>Основание</div>
+                                    <Flex vertical={true}>
+                                        <Select
+                                            loading={isContractsLoading}
+                                            value={reason ? reason.id : null}
+                                            placeholder={"Необязательно"}
+                                            style={{width: 390}}
+                                            onChange={selectReasonHandler}
+                                            options={reasons?.map((r: ReasonModel) => ({value: r.id, label: r.name}))}
+                                            allowClear={true}
+                                            showSearch
+                                            filterOption={(inputValue, option) => (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                                            filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
+                                        />
+                                    </Flex>
+                                </Flex>
+                                <Flex align={"center"}>
+                                    <div style={{width: 120}}>Вид оплаты</div>
+                                    <Select
+                                        value={billing}
+                                        placeholder={"Необязательно"}
+                                        style={{width: 390}}
+                                        onChange={selectBillingHandler}
+                                        options={[{value: "наличный расчет", label: "наличный расчет"}, {value: "безналичный расчет", label: "безналичный расчет"}]}
+                                        allowClear={true}
+                                        showSearch
+                                        filterOption={(inputValue, option) => (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                                        filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
+                                    />
+                                </Flex>
+                                <Flex align={"center"}>
+                                    <div style={{width: 120}}>Договор</div>
+                                    <Flex vertical={true}>
+                                        <Select
+                                            loading={isContractsLoading}
+                                            value={selectedContract ? selectedContract.id : null}
+                                            placeholder={"Необязательно"}
+                                            style={{width: 390}}
+                                            onChange={selectContractHandler}
+                                            options={contractsStep2?.map((contractModel: ContractModel) => ({value: contractModel.id, label: `Год: ${contractModel.year} №: ${contractModel.docnum}`}))}
+                                            allowClear={true}
+                                            showSearch
+                                            filterOption={(inputValue, option) => (option?.label.toLowerCase() ?? '').includes(inputValue.toLowerCase())}
+                                            filterSort={(optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())}
+                                        />
+                                    </Flex>
+                                </Flex>
+                            </Flex>
+                            <Flex vertical={true} gap={'small'}>
+                                <Flex align={"center"}>
                                     <div style={{width: 150}}>Дата и время заезда</div>
                                     <DatePicker placeholder={'Заезд'} format={'DD.MM.YYYY'} value={dateStart} onChange={selectStartDateHandler} style={{width: 140, marginRight: 5}}
                                                 allowClear={false}/>
                                     <TimePicker needConfirm={false} value={timeStart} style={{width: 140}} onChange={selectStartTimeHandler} minuteStep={15} showSecond={false} hourStep={1}
                                                 allowClear={false}/>
                                 </Flex>
-                                <Flex align={"center"} style={{marginBottom: 5}}>
+                                <Flex align={"center"}>
                                     <div style={{width: 150}}>Дата и время выезда</div>
                                     <DatePicker placeholder={'Выезд'} format={'DD.MM.YYYY'} value={dateFinish} onChange={selectFinishDateHandler} style={{width: 140, marginRight: 5}}
                                                 allowClear={false}/>
                                     <TimePicker needConfirm={false} value={timeFinish} style={{width: 140}} onChange={selectFinishTimeHandler} minuteStep={15} showSecond={false} hourStep={1}
                                                 allowClear={false}/>
                                 </Flex>
-                                <Button onClick={fillTableHandler}>Применить заполненные параметры</Button>
+                                <Button type={'primary'} color={'primary'} onClick={fillTableHandler}>Применить заполненные параметры</Button>
                             </Flex>
                         </Flex>
                         <MemoizedTable columns={columns} data={data}/>

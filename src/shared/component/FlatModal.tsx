@@ -18,6 +18,7 @@ import {GuestCard} from "shared/component/GuestCard";
 import {ReservationCard} from 'shared/component/ReservationCard';
 import {ReservationModal} from "shared/component/ReservationModal";
 import {ReservationModel} from "entities/ReservationModel";
+import {ConfirmReservationReportModal} from "shared/component/ConfirmReservationReportModal";
 
 type ModalProps = {
     hotelId: string,
@@ -45,6 +46,7 @@ export const FlatModal = (props: ModalProps) => {
     const [key, setKey] = useState(""); // room id
     const [bedId, setBedId] = useState<number | null>(null);
     const [confirmCheckoutReportVisible, setConfirmCheckoutReportVisible] = useState(false);
+    const [confirmReservationReportVisible, setConfirmReservationReportVisible] = useState(false);
     const [isFilialUEZS] = useState(() => props.hotelId === '182' || props.hotelId === '183' || props.hotelId === '184' || props.hotelId === '327');
     const [isFilialVingapur, setIsFilialVingapur] = useState(() => props.hotelId === '186' || props.hotelId === '185');  // Исключения для создания доп. мест
     // -----
@@ -229,10 +231,18 @@ export const FlatModal = (props: ModalProps) => {
                                 guest={selectedGuest}
                                 roomName={room.name}
                             />}
+                            {(confirmReservationReportVisible && selectedReservation) && <ConfirmReservationReportModal
+                                visible={confirmReservationReportVisible}
+                                setVisible={setConfirmReservationReportVisible}
+                                showWarningMsg={showWarningMsg}
+                                reservation={selectedReservation}
+                                roomName={room.name}
+                            />}
                             <Flex vertical={false} justify={'center'} align={'center'} gap={'small'} wrap={'wrap'}>
                                 {room.guests?.map((guest: GuestModel) => {
                                     if (guest.isReservation) return (
                                         <ReservationCard
+                                            setConfirmReservationReportVisible={setConfirmReservationReportVisible}
                                             setVisibleReservationModal={setVisibleReservationModal}
                                             reservation={guest}
                                             setSelectedReservation={setSelectedReservation}

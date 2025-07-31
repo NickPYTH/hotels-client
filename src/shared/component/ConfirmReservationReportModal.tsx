@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Button, DatePicker, Flex} from 'antd';
+import {DatePicker, Flex} from 'antd';
 import {host} from "shared/config/constants";
 import {GuestModel} from "entities/GuestModel";
 import dayjs, {Dayjs} from 'dayjs';
 import {PDFViewer} from "shared/component/PDFViewer";
+import {ReservationModel} from "entities/ReservationModel";
 
 const {RangePicker} = DatePicker;
 
@@ -11,10 +12,10 @@ type ModalProps = {
     visible: boolean,
     setVisible: Function,
     showWarningMsg: Function,
-    guest: GuestModel,
+    reservation: ReservationModel,
     roomName: string,
 }
-export const ConfirmCheckoutReport = (props: ModalProps) => {
+export const ConfirmReservationReportModal = (props: ModalProps) => {
 
     // States
     const [dateRange, setDateRange] = useState<Dayjs[] | null>(null);
@@ -22,8 +23,8 @@ export const ConfirmCheckoutReport = (props: ModalProps) => {
 
     // Effects
     useEffect(() => {
-        const start = dayjs(props.guest.dateStart, "DD-MM-YYYY HH:mm");
-        const finish = dayjs(props.guest.dateFinish, "DD-MM-YYYY HH:mm");
+        const start = dayjs(props.reservation.dateStart, "DD-MM-YYYY HH:mm");
+        const finish = dayjs(props.reservation.dateFinish, "DD-MM-YYYY HH:mm");
         setDateRange([start, finish]);
     }, []);
     // -----
@@ -32,14 +33,14 @@ export const ConfirmCheckoutReport = (props: ModalProps) => {
         <PDFViewer
             visible={props.visible}
             setVisible={props.setVisible}
-            url={!dateRange ? "" : `${host}/hotels/api/report/getCheckoutReport?id=${props.guest.id}&roomNumber=${props.roomName}&periodStart=${dateRange[0].format("DD-MM-YYYY HH:mm")}&periodEnd=${dateRange[1].format("DD-MM-YYYY HH:mm")}&format=pdf`}
+            url={!dateRange ? "" : `${host}/hotels/api/report/getReservationConfirmReportSingle?reservationId=${props.reservation.id}&format=pdf`}
             reportName={"Уточните период для формирования отчетного документа"}
         >
             <Flex gap={'small'} vertical={true}>
                 <Flex align={"center"}>
-                    <div style={{width: 170}}>Период проживания</div>
+                    <div style={{width: 170}}>Период бронирования</div>
                     {/*//@ts-ignore*/}
-                    <RangePicker showTime allowClear={false} format={"DD-MM-YYYY HH:mm"} value={dateRange} onChange={(e) => {
+                    <RangePicker allowClear={false} showTime format={"DD-MM-YYYY HH:mm"} value={dateRange} onChange={(e) => {
                         setDateRange(e as any)
                     }}/>
                 </Flex>

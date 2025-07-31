@@ -206,6 +206,10 @@ export const Navbar = () => {
                                 label: 'Журнал',
                                 key: 'logs',
                             },
+                            {
+                                label: 'Журнал бронирования',
+                                key: 'bookLogs',
+                            },
                         ]
                     },
                     {
@@ -550,6 +554,7 @@ export const Navbar = () => {
         if (e.key === 'reservations') navigate(`hotels/reservations`)
         if (e.key === 'users') navigate(`hotels/users`)
         if (e.key === 'logs') navigate(`hotels/logs`)
+        if (e.key === 'bookLogs') navigate(`hotels/bookLogs`)
         if (e.key === 'about') navigate(`hotels/about`)
         if (e.key === 'organizations') navigate(`hotels/organizations`)
         if (e.key === 'MVZ') navigate(`hotels/MVZ`)

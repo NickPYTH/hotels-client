@@ -42,12 +42,12 @@ const HotelPage: React.FC = () => {
             label: 'Карточки',
         },
         {
-            key: 2,
+            key: 3,
             label: 'Шахматка',
         },
         {
-            key: 3,
-            label: 'Шахматка NEW!',
+            key: 2,
+            label: 'Шахматка(устар)',
         },
     ];
     // -----
@@ -253,8 +253,8 @@ const HotelPage: React.FC = () => {
                                     Выбран режим:
                                     {selectedView === "0" && " Таблица"}
                                     {selectedView === "1" && " Карточки"}
-                                    {selectedView === "2" && " Шахматка"}
-                                    {selectedView === "3" && " Шахматка NEW!"}
+                                    {selectedView === "2" && " Шахматка(устар)"}
+                                    {selectedView === "3" && " Шахматка"}
                                 </div>
                             </Dropdown.Button>
                             {selectedView != "2" &&

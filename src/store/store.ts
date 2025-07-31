@@ -1,27 +1,28 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit";
-import {filialAPI} from "../service/FilialService";
+import {filialAPI} from "service/FilialService";
 import filialSlice, {FilialModelStateType} from "./slice/FilialSlice";
-import {hotelAPI} from "../service/HotelService";
-import {flatAPI} from "../service/FlatService";
-import {guestAPI} from "../service/GuestService";
-import {roomAPI} from "../service/RoomService";
-import {userAPI} from "../service/UserService";
+import {hotelAPI} from "service/HotelService";
+import {flatAPI} from "service/FlatService";
+import {guestAPI} from "service/GuestService";
+import {roomAPI} from "service/RoomService";
+import {userAPI} from "service/UserService";
 import userSlice, {CurrentUserModelStateType} from "./slice/UserSlice";
-import {contractAPI} from "../service/ContractService";
-import {organizationAPI} from "../service/OrganizationService";
-import {responsibilityAPI} from "../service/ResponsibilityService";
-import {reasonAPI} from "../service/ReasonService";
-import {logAPI} from "../service/LogService";
-import {roomLocksAPI} from "../service/RoomLocksService";
-import {flatLocksAPI} from "../service/FlatLocksService";
-import {historyAPI} from "../service/HistoryService";
-import {eventKindAPI} from "../service/EventKindService";
-import {MVZAPI} from "../service/MVZService";
-import {extraAPI} from "../service/ExtraService";
-import {reservationAPI} from "../service/ReservationService";
-import {eventTypeAPI} from "../service/EventTypeService";
+import {contractAPI} from "service/ContractService";
+import {organizationAPI} from "service/OrganizationService";
+import {responsibilityAPI} from "service/ResponsibilityService";
+import {reasonAPI} from "service/ReasonService";
+import {logAPI} from "service/LogService";
+import {roomLocksAPI} from "service/RoomLocksService";
+import {flatLocksAPI} from "service/FlatLocksService";
+import {historyAPI} from "service/HistoryService";
+import {eventKindAPI} from "service/EventKindService";
+import {MVZAPI} from "service/MVZService";
+import {extraAPI} from "service/ExtraService";
+import {reservationAPI} from "service/ReservationService";
+import {eventTypeAPI} from "service/EventTypeService";
 import {paymentTypeAPI} from "service/PaymentTypeService";
 import {eventAPI} from "service/EventService";
+import {bookReportAPI} from "service/BookReportService";
 
 export type RootStateType = {
     filialList: FilialModelStateType,
@@ -52,6 +53,7 @@ const rootReducer = combineReducers({
     [eventTypeAPI.reducerPath]: eventTypeAPI.reducer,
     [eventAPI.reducerPath]: eventAPI.reducer,
     [paymentTypeAPI.reducerPath]: paymentTypeAPI.reducer,
+    [bookReportAPI.reducerPath]: bookReportAPI.reducer,
 })
 
 export const setupStore = () => {
@@ -80,6 +82,7 @@ export const setupStore = () => {
                 .concat(eventTypeAPI.middleware)
                 .concat(eventAPI.middleware)
                 .concat(paymentTypeAPI.middleware)
+                .concat(bookReportAPI.middleware)
     })
 }
 

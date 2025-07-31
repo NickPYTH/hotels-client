@@ -156,9 +156,9 @@ export const GuestModal = (props: ModalProps) => {
         data: updatedGuest,
         isLoading: isUpdateGuestLoading
     }] = guestAPI.useUpdateMutation(); // Запрос на обновление записи о проживании
-    const [getGuestHistory, {
+    const [getEntityHistory, {
         data: history,
-    }] = historyAPI.useGetGuestHistoryMutation(); // Запрос на получение истории изменения карточки проживания по ИД гостя
+    }] = historyAPI.useGetEntityHistoryMutation(); // Запрос на получение истории изменения карточки проживания по ИД гостя
     const [getAllExtras, {
         data: extras,
     }] = extraAPI.useGetAllByGuestMutation(); // Запрос на получение информации о доп. услугах по ИД гостя (только для Ермака)
@@ -234,7 +234,6 @@ export const GuestModal = (props: ModalProps) => {
                     return acc.concat([contract.billing]);
                 return acc;
             }, []));
-            setIsCreditCard(null);
         }
     }, [contractsStep2]);  // Фильтрация нужных видов оплат и оснований, при последней фильтрации списка договоров
     useEffect(() => {
@@ -278,7 +277,7 @@ export const GuestModal = (props: ModalProps) => {
             setNote(props.selectedGuest.note);
             if (props.selectedGuest.id) {
                 getAllExtras(props.selectedGuest.id);
-                getGuestHistory(props.selectedGuest.id); // В фоне загружаем историю изменений
+                getEntityHistory({entityId: props.selectedGuest.id, entityType: "guest"}); // В фоне загружаем историю изменений
             }
             getAllHotels({filialId: props.selectedGuest.bed.room.flat.hotel.filial.id.toString()});
             getAllFlats({hotelId: props.selectedGuest.bed.room.flat.hotel.id.toString(), dateStart: props.selectedGuest.dateStart, dateFinish: props.selectedGuest.dateFinish});

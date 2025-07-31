@@ -100,13 +100,14 @@ export const GuestCell = (props: {
                 backgroundImage: props.guest.isReservation ? "radial-gradient(white 1px, transparent 0)" : "inherit",
                 backgroundSize: props.guest.isReservation ? "8px 8px" : 'inherit',
             }}
-            onMouseOver={() => setVisible(true)} onMouseOut={() => setVisible(false)}>
+            onMouseOver={() => setVisible(true)}
+            onMouseOut={() => setVisible(false)}>
             {visible &&
                 <div
                     style={{
                         zIndex: 1000,
                         position: 'absolute',
-                        top: -90,
+                        top: props.flat.flatIndex !== undefined ? props.flat.flatIndex < 3 ? 25 : -90 : -90,
                         width: 280,
                         height: 90,
                         background: '#ffffff',

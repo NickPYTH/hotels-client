@@ -24,6 +24,13 @@ export const eventAPI = createApi({
             }),
             invalidatesTags: ['event']
         }),
+        delete: build.mutation<EventModel, number>({
+            query: (id) => ({
+                url: `/delete?id=${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['event']
+        }),
         update: build.mutation<EventModel, EventModel>({
             query: (body) => ({
                 url: `/update`,

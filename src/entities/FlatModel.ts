@@ -19,4 +19,7 @@ export type FlatModel = {
     emptyBedsCount: number | null;
     flatLockId: number | null;
     rooms: RoomModel[] | null;
+
+    // Для шахматки
+    flatIndex?: number // Свойство для определения номера секции в цикле
 }

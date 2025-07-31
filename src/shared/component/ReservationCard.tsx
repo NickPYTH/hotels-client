@@ -7,7 +7,8 @@ type CardProps = {
     reservation: GuestModel,
     getFlat: Function,
     setSelectedReservation: Function,
-    setVisibleReservationModal: Function
+    setVisibleReservationModal: Function,
+    setConfirmReservationReportVisible: Function,
 }
 export const ReservationCard = (props: CardProps) => {
 
@@ -38,12 +39,16 @@ export const ReservationCard = (props: CardProps) => {
     const deleteHandler = () => {
         if (props.reservation.id) deleteReservation(props.reservation.id);
     }
+    const openReportHandler = () => {
+        props.setConfirmReservationReportVisible(true);
+        props.setSelectedReservation(props.reservation);
+    }
     const openHandler = () => {
         props.setVisibleReservationModal(true);
         props.setSelectedReservation(props.reservation);
     }
     // -----
-
+    console.log(props)
     return (
         <Card
             title={`${props.reservation.lastname ?? ""} ${props.reservation.firstname ? props.reservation.firstname[0] + "." : ""} ${props.reservation.secondName ? props.reservation.secondName[0] + "." : ""}`}
@@ -59,10 +64,16 @@ export const ReservationCard = (props: CardProps) => {
             <div>
                 Место: {props.reservation?.bed.name}
             </div>
+            {props.reservation.post &&
+                <div>
+                    Должность: {props.reservation?.post}
+                </div>
+             }
             <Button disabled={isConfirmLoading} style={{marginTop: 5, width: 300}} onClick={openHandler}>Открыть карточку брони</Button>
             <Popconfirm title={"Вы точно хотите подтвердить бронь?"} onConfirm={confirmHandler}>
                 <Button disabled={isConfirmLoading} style={{marginTop: 5, width: 300}}>Подтвердить бронь и добавить жильца</Button>
             </Popconfirm>
+            <Button disabled={isConfirmLoading} onClick={openReportHandler} style={{marginTop: 5, width: 300}}>Получить подтверждение бронирования</Button>
             <Popconfirm title={"Вы точно хотите удалить бронь?"} onConfirm={deleteHandler}>
                 <Button danger disabled={isDeleteLoading} style={{marginTop: 5, width: 300}}>Удалить запись о бронировании</Button>
             </Popconfirm>

@@ -137,9 +137,9 @@ export const ReservationModal = (props: ModalProps) => {
         data: updatedReservation,
         isLoading: isUpdateReservationLoading
     }] = reservationAPI.useUpdateMutation(); // Запрос на обновление брони
-    const [getGuestHistory, {
+    const [getEntityHistory, {
         data: history,
-    }] = historyAPI.useGetGuestHistoryMutation(); // Запрос на получение истории изменения брони по ИД гостя
+    }] = historyAPI.useGetEntityHistoryMutation(); // Запрос на получение истории изменения брони по ИД гостя
     const [getAllEvents, {
         data: events,
     }] = eventKindAPI.useGetAllMutation(); // Получение списка видов мероприятий
@@ -184,6 +184,7 @@ export const ReservationModal = (props: ModalProps) => {
         // Заполнение парамаетрами из массового заполнения
         if (props.semiAutoParams) {
             if (props.semiAutoParams.tabnum) {
+                setIsEmployee(true);
                 setTabnum(props.semiAutoParams.tabnum);
                 getFioByTabnum(props.semiAutoParams.tabnum);
             }
@@ -197,6 +198,11 @@ export const ReservationModal = (props: ModalProps) => {
             }
             setSelectedEventId(props.semiAutoParams.event?.id);
             setSelectedFromFilialId(props.semiAutoParams.fromFilial?.id);
+            if (props.semiAutoParams.contract) {
+                setSelectedContract(props.semiAutoParams.contract);
+                setReason(props.semiAutoParams.contract.reason);
+                setBilling(props.semiAutoParams.contract.billing);
+            }
             // Поля совпадают, но мне лень переделывать их под ReservationModel
             let tmp: GuestModel = props.semiAutoParams as unknown as GuestModel;
             setSelectedFilialId(tmp.bed.room.flat.hotel.filial.id);
@@ -259,7 +265,7 @@ export const ReservationModal = (props: ModalProps) => {
                 getFioByTabnum(props.selectedReservation.tabnum);
             }
             if (props.selectedReservation.id) {
-                getGuestHistory(props.selectedReservation.id);
+                getEntityHistory({entityId: props.selectedReservation.id, entityType: "reservation"});
             }
             if (props.selectedReservation.familyMemberOfEmployee != null) {
                 setIsFamilyMemberOfEmployee(true);

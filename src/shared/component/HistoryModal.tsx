@@ -1,12 +1,28 @@
 import React from 'react';
-import {Modal, Table, TableProps} from 'antd';
+import {Flex, Modal, Table, TableProps} from 'antd';
 import {HistoryModel} from "entities/HistoryModel";
+import {GuestModel} from "entities/GuestModel";
 
 type ModalProps = {
     visible: boolean,
     setVisible: Function,
     history: HistoryModel[]
 }
+
+const Item = (props: { title: string, valueBefore: any, valueAfter: any }) => (
+    <Flex style={{border: "1px solid #f0f0f0"}}>
+        <Flex style={{width: 200}}>
+            {props.title}
+        </Flex>
+        <Flex style={{width: 200}}>
+            {props.valueBefore ? props.valueBefore : "Пусто"}
+        </Flex>
+        <Flex style={{width: 200}}>
+            {props.valueAfter ? props.valueAfter : "Пусто"}
+        </Flex>
+    </Flex>
+)
+
 export const HistoryModal = (props: ModalProps) => {
     const columns: TableProps<HistoryModel>['columns'] = [
         {
@@ -24,15 +40,15 @@ export const HistoryModal = (props: ModalProps) => {
         },
         {
             title: 'ИД запроса',
-            render: (record, i) => (<div>{record.request.id}</div>)
+            render: (record, i) => (<div>{record.request?.id}</div>)
         },
         {
             title: 'Дата',
-            render: (record, i) => (<div>{record.request.date}</div>)
+            render: (record, i) => (<div>{record.request?.date}</div>)
         },
         {
             title: 'Пользователь',
-            render: (record, i) => (<div>{record.request.user}</div>)
+            render: (record, i) => (<div>{record.request?.user}</div>)
         },
         {
             title: 'Состояние до изменения',
@@ -68,28 +84,46 @@ export const HistoryModal = (props: ModalProps) => {
                     };
                 }}
                 expandable={{
-                    expandedRowRender: (record) => <p style={{margin: 0}}>
-                        <div>Измененные свойства:</div>
-                        <div>{JSON.parse(record.stateBefore).tabnum != JSON.parse(record.stateAfter).tabnum && `Табельный номер: ${JSON.parse(record.stateBefore).tabnum} ---> ${JSON.parse(record.stateAfter).tabnum}`}</div>
-                        <div>{JSON.parse(record.stateBefore).firstname != JSON.parse(record.stateAfter).firstname && `Имя: ${JSON.parse(record.stateBefore).firstname} ---> ${JSON.parse(record.stateAfter).firstname}`}</div>
-                        <div>{JSON.parse(record.stateBefore).lastname != JSON.parse(record.stateAfter).lastname && `Фамилия: ${JSON.parse(record.stateBefore).lastname} ---> ${JSON.parse(record.stateAfter).lastname}`}</div>
-                        <div>{JSON.parse(record.stateBefore).secondName != JSON.parse(record.stateAfter).secondName && `Отчество: ${JSON.parse(record.stateBefore).secondName} ---> ${JSON.parse(record.stateAfter).secondName}`}</div>
-                        <div>{JSON.parse(record.stateBefore).dateStart != JSON.parse(record.stateAfter).dateStart && `Дата заселения: ${JSON.parse(record.stateBefore).dateStart} ---> ${JSON.parse(record.stateAfter).dateStart}`}</div>
-                        <div>{JSON.parse(record.stateBefore).dateFinish != JSON.parse(record.stateAfter).dateFinish && `Дата выселения: ${JSON.parse(record.stateBefore).dateFinish} ---> ${JSON.parse(record.stateAfter).dateFinish}`}</div>
-                        <div>{JSON.parse(record.stateBefore).male != JSON.parse(record.stateAfter).male && `Пол: ${JSON.parse(record.stateBefore).male} ---> ${JSON.parse(record.stateAfter).male}`}</div>
-                        <div>{JSON.parse(record.stateBefore).contractId != JSON.parse(record.stateAfter).contractId && `ИД договора: ${JSON.parse(record.stateBefore).contractId} ---> ${JSON.parse(record.stateAfter).contractId}`}</div>
-                        <div>{JSON.parse(record.stateBefore).memo != JSON.parse(record.stateAfter).memo && `Номер марш. листа / служебного задания: ${JSON.parse(record.stateBefore).memo} ---> ${JSON.parse(record.stateAfter).memo}`}</div>
-                        <div>{JSON.parse(record.stateBefore).billing != JSON.parse(record.stateAfter).billing && `Вид оплаты: ${JSON.parse(record.stateBefore).billing} ---> ${JSON.parse(record.stateAfter).billing}`}</div>
-                        <div>{JSON.parse(record.stateBefore).reason != JSON.parse(record.stateAfter).reason && `Основание: ${JSON.parse(record.stateBefore).reason} ---> ${JSON.parse(record.stateAfter).reason}`}</div>
-                        <div>{JSON.parse(record.stateBefore).regPoMestu != JSON.parse(record.stateAfter).regPoMestu && `Рег. по месту пребывания: ${JSON.parse(record.stateBefore).regPoMestu} ---> ${JSON.parse(record.stateAfter).regPoMestu}`}</div>
-                        <div>{JSON.parse(record.stateBefore).filialId != JSON.parse(record.stateAfter).filialId && `ИД филиала: ${JSON.parse(record.stateBefore).filialId} ---> ${JSON.parse(record.stateAfter).filialId}`}</div>
-                        <div>{JSON.parse(record.stateBefore).hotelId != JSON.parse(record.stateAfter).hotelId && `ИД общежития: ${JSON.parse(record.stateBefore).hotelId} ---> ${JSON.parse(record.stateAfter).hotelId}`}</div>
-                        <div>{JSON.parse(record.stateBefore).flatId != JSON.parse(record.stateAfter).flatId && `ИД секции: ${JSON.parse(record.stateBefore).flatId} ---> ${JSON.parse(record.stateAfter).flatId}`}</div>
-                        <div>{JSON.parse(record.stateBefore).roomId != JSON.parse(record.stateAfter).roomId && `ИД комнаты: ${JSON.parse(record.stateBefore).roomId} ---> ${JSON.parse(record.stateAfter).roomId}`}</div>
-                        <div>{JSON.parse(record.stateBefore).bedName != JSON.parse(record.stateAfter).bedName && `Имя места: ${JSON.parse(record.stateBefore).bedName} ---> ${JSON.parse(record.stateAfter).bedName}`}</div>
-
-
-                    </p>,
+                    expandedRowRender: (row) => {
+                        let stateBefore: GuestModel = JSON.parse(row.stateBefore);
+                        let stateAfter: GuestModel = JSON.parse(row.stateAfter);
+                        return (<p style={{margin: 0}}>
+                            <Flex vertical>
+                                <Flex>
+                                    <Flex style={{width: 200, fontSize: 16, fontWeight: 700}}>
+                                        Свойство
+                                    </Flex>
+                                    <Flex style={{width: 200, fontSize: 16, fontWeight: 700}}>
+                                        Значение ДО
+                                    </Flex>
+                                    <Flex style={{width: 200, fontSize: 16, fontWeight: 700}}>
+                                        Значение ПОСЛЕ
+                                    </Flex>
+                                </Flex>
+                                <Item title={'Табельный номер'} valueBefore={stateBefore.tabnum} valueAfter={stateAfter.tabnum}/>
+                                <Item title={'Фамилия'} valueBefore={stateBefore.lastname} valueAfter={stateAfter.lastname}/>
+                                <Item title={'Имя'} valueBefore={stateBefore.firstname} valueAfter={stateAfter.firstname}/>
+                                <Item title={'Отчество'} valueBefore={stateBefore.secondName} valueAfter={stateAfter.secondName}/>
+                                <Item title={'Дата заселения'} valueBefore={stateBefore.dateStart} valueAfter={stateAfter.dateStart}/>
+                                <Item title={'Дата выселения'} valueBefore={stateBefore.dateFinish} valueAfter={stateAfter.dateFinish}/>
+                                <Item title={'Пол'} valueBefore={stateBefore.male ? "Мужской" : "Женский"} valueAfter={stateAfter.male ? "Мужской" : "Женский"}/>
+                                <Item title={'Договор'} valueBefore={stateBefore.contract ? stateBefore.contract.docnum : "Пусто"}
+                                      valueAfter={stateAfter.contract ? stateAfter.contract.docnum : "Пусто"}/>
+                                <Item title={'Вид оплаты'} valueBefore={stateBefore.contract ? stateBefore.contract.billing : "Пусто"}
+                                      valueAfter={stateAfter.contract ? stateAfter.contract.billing : "Пусто"}/>
+                                <Item title={'Основание'} valueBefore={stateBefore.contract ? stateBefore.contract.reason.name : "Пусто"}
+                                      valueAfter={stateAfter.contract ? stateAfter.contract.reason.name : "Пусто"}/>
+                                <Item title={'Номер СЗ'} valueBefore={stateBefore.memo} valueAfter={stateAfter.memo}/>
+                                <Item title={'Рег. по месту пребывания'} valueBefore={stateBefore.regPoMestu ? "Да" : "Нет"} valueAfter={stateAfter.regPoMestu ? "Да" : "Нет"}/>
+                                <Item title={'Филиал'} valueBefore={stateBefore?.bed?.room?.flat.hotel.filial.name} valueAfter={stateAfter?.bed?.room?.flat.hotel.filial.name}/>
+                                <Item title={'Общежитие'} valueBefore={stateBefore?.bed?.room.flat.hotel.name} valueAfter={stateAfter?.bed?.room.flat.hotel.name}/>
+                                <Item title={'Секция'} valueBefore={stateBefore?.bed?.room.flat.name} valueAfter={stateAfter?.bed?.room.flat.name}/>
+                                <Item title={'Комната'} valueBefore={stateBefore?.bed?.room.name} valueAfter={stateAfter?.bed?.room.name}/>
+                                <Item title={'Место'} valueBefore={stateBefore?.bed?.name} valueAfter={stateAfter?.bed?.name}/>
+                                <Item title={'Примечание'} valueBefore={stateBefore?.note} valueAfter={stateAfter?.note}/>
+                            </Flex>
+                        </p>)
+                    },
                     rowExpandable: (record) => true,
                 }}
             />

@@ -147,7 +147,7 @@ export const NewChess = (props: PropsType) => {
     const [dates, setDates] = useState<Dayjs[]>([]);
     const [selectedRow, setSelectedRow] = useState<BedModel | null>(null);
     const [cellWidth] = useState<number>(window.innerWidth - 165);
-    const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(true);
+    const [visibleCellsViewSettings, setVisibleCellsViewSettings] = useState(false);
     const [visibleGuestModal, setVisibleGuestModal] = useState(false);
     const [visibleReservationModal, setVisibleReservationModal] = useState(false);
     const [filialId, setFilialId] = useState<number | null>(null);
@@ -458,7 +458,7 @@ export const NewChess = (props: PropsType) => {
                             <div style={{width: 162, fontSize: 14, textAlign: 'end', paddingRight: 3, marginBottom: 3}}>Мероприятия</div>
                             {eventsData?.map((eventCell: ChessEvent) => {
                                 return (
-                                    <Flex justify='center' align='center' style={{width: cellWidth / dates.length, fontSize: 12}}>
+                                    <Flex justify='end' align='center' vertical style={{width: cellWidth / dates.length, fontSize: 12}}>
                                         {eventCell.events.map((event: EventModel) => <EventCell
                                             event={event}
                                             currentDate={eventCell.date}
@@ -471,9 +471,9 @@ export const NewChess = (props: PropsType) => {
                                     </Flex>)
                             })}
                         </Flex>
-                        <Space direction='vertical' style={{height: window.innerHeight - 340, overflowY: 'scroll', overflowX: 'hidden'}}>
-                            {data?.map((flat: FlatModel) => (
-                                <Flat flat={flat} key={flat.id}/>
+                        <Space direction='vertical' style={{height: window.innerHeight - 365, overflowY: 'scroll', overflowX: 'hidden'}}>
+                            {data?.map((flat: FlatModel, flatIndex: number) => (
+                                <Flat flat={{...flat, flatIndex}} key={flat.id}/>
                             ))}
                         </Space>
                     </>

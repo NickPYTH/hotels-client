@@ -18,6 +18,7 @@ import {OrganizationPage} from "pages/Organizationpage";
 import {ReservationPage} from "pages/ReservationPage";
 import {ResponsibilityPage} from "pages/ResponsibilityPage";
 import {EventPage} from "pages/EventPage";
+import {BookLogPage} from "pages/BookLogPage";
 
 export enum AppRoutes {
     MAIN = 'MAIN',
@@ -28,6 +29,7 @@ export enum AppRoutes {
 
     // Администрирование
     LOG = 'LOG',
+    BOOK_LOG = 'BOOK_LOG',
     USER = 'USER',
     // -----
 
@@ -55,6 +57,7 @@ export const RoutePath: Record<AppRoutes, string> = {
 
     // Администрирование
     [AppRoutes.LOG]: 'hotels/logs',
+    [AppRoutes.BOOK_LOG]: 'hotels/bookLogs',
     [AppRoutes.USER]: 'hotels/users',
     // -----
 
@@ -99,6 +102,10 @@ export const routeConfig: Record<AppRoutes, RouteProps> = {
     [AppRoutes.LOG]: {
         path: RoutePath.LOG,
         element: <LogPage/>
+    },
+    [AppRoutes.BOOK_LOG]: {
+        path: RoutePath.BOOK_LOG,
+        element: <BookLogPage/>
     },
     [AppRoutes.USER]: {
         path: RoutePath.USER,

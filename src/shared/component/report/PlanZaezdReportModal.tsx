@@ -57,7 +57,7 @@ export const PlanZaezdReportModal = (props: ModalProps) => {
         showWarningMsg("Отчет начал формироваться")
         let tmpButton = document.createElement('a')
         if (startDate && endDate && selectedHotelId) {
-            tmpButton.href = `${host}/hotels/api/report/getPlanZaezdReport?hotelId=${selectedHotelId}&dateStart=${startDate.format("DD-MM-YYYY")}&dateFinish=${startDate.format("DD-MM-YYYY")}`;
+            tmpButton.href = `${host}/hotels/api/report/getPlanZaezdReport?hotelId=${selectedHotelId}&dateStart=${startDate.format("DD-MM-YYYY")}&dateFinish=${endDate.format("DD-MM-YYYY")}`;
             tmpButton.click();
         } else {
             showWarningMsg("Не все поля заполнены");
