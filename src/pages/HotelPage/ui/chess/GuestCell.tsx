@@ -16,7 +16,6 @@ export const GuestCell = (props: {
     flat: FlatModel,
     selectedRow: BedModel | null, setSelectedFlatId: Function, dateStart: Dayjs, guest: ChessGuest, data: ChessDate
 }) => {
-
     // States
     const [visible, setVisible] = React.useState(false);
     const [dateStart] = useState<Dayjs>(dayjs.unix(props.guest.dateStart));
@@ -71,8 +70,11 @@ export const GuestCell = (props: {
     const [fontSize] = useState(() => {
         return parseInt(localStorage.getItem('fontSize') ?? "10");
     });
+    const [columnWidth] = useState(() => {
+        return parseInt(localStorage.getItem('columnWidth') ?? "120");
+    });
     // -----
-
+    if (isStartCell)
     return (
         <div
             onClick={() => {
@@ -86,13 +88,13 @@ export const GuestCell = (props: {
             className={guestNotCheckouted ? "flaming-aura" : ""}
             style={{
                 top: 3,
-                left: position == Position.LEFT ? 0 : 'initial',
-                right: position == Position.RIGHT ? 0 : 'initial',
+                left: columnWidth * (percent/100),
+                //right: position == Position.RIGHT ? 0 : 'initial',
                 position: "absolute",
                 backgroundColor: guestNotCheckouted ? cellsNotCheckoutedColor : props.guest.male ?
                     dateStart.unix() >= dayjs().unix() ? cellsMaleAfterColor : cellsMaleBeforeColor : dateStart.unix() >= dayjs().unix() ? cellsFemaleAfterColor : cellsFemaleBeforeColor,
                 height: 24,
-                width: `${percent}%`,
+                width: columnWidth * dateFinish.diff(dateStart, "day"),
                 borderTopRightRadius: position == Position.LEFT ? 10 : 0,
                 borderBottomRightRadius: position == Position.LEFT ? 10 : 0,
                 borderTopLeftRadius: position == Position.RIGHT ? 10 : 0,
@@ -147,4 +149,5 @@ export const GuestCell = (props: {
             }
         </div>
     )
+    else return <></>;
 }
